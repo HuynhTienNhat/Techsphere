@@ -1,0 +1,199 @@
+/* General settings */
+
+@import url("https://fonts.googleapis.com/css2?family=Spartan:wght@100;200;300;400;500;600;700;800;900&display=swap");
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Spartan", sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Global Styles */
+
+h1 {
+  font-size: 50px;
+  line-height: 64px;
+  color: #222;
+}
+
+h2 {
+  font-size: 46px;
+  line-height: 54px;
+  color: #222;
+}
+
+h4 {
+  font-size: 20px;
+  color: #222;
+}
+
+h6 {
+  font-weight: 700;
+  font-size: 12px;
+}
+
+p {
+  font-size: 16px;
+  color: #465b52;
+  margin: 15px 0 20px 0;
+}
+
+button{
+  font-size: 14px;
+  font-weight: 600;
+  padding: 15px 30px;
+  color: black;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  transition: 0.2s;
+}
+
+.section-p1 {
+  padding: 40px 80px;
+}
+
+.section-m1 {
+  margin: 40px 0;
+}
+
+body {
+  width: 100%;
+}
+
+/* Overlay */
+
+.overlay{
+    position: fixed;
+    top: 44px;
+    background-color: lightgray;
+    height: calc(100% - 44px);
+    width: 100%;
+    left: 0;
+    display: none;
+    z-index: 2;
+}
+
+.overlay.show{
+    display: block;
+}
+
+
+/* Header */
+
+#header{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 80px;
+    background-color: #D70019;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+    z-index: 1000;
+    position: sticky;
+    top: 0;
+    left:0;
+}
+
+#header .logo{
+    text-decoration: none;
+    color: white;
+    font-size: 20px;
+}
+
+#header .logo sup{
+    color: khaki;
+}
+
+#header .search-bar{
+    display: flex;
+}
+
+#header .search-bar input{
+    height: 30px;
+    padding: 8px;
+    outline: none;
+    border: none;
+    border-radius: 4px;
+    width: 250px;
+}
+
+#header .search-bar button{
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    width: 8px;
+    background-color: white;
+    color: black;
+    border-radius: none;
+}
+
+#header ul{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    list-style: none;
+}
+
+#header ul li a{
+    margin-right: 20px;
+    padding: 16px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    color: white;
+}
+
+#header ul li a:last-child{
+    margin: 0;
+}
+
+#header li a:hover{
+    background-color: #E2484C;
+}
+
+/* Dropdown */
+
+.nav-menu .dropdown{
+    position: relative;
+}
+
+.nav-menu .dropdown .dropdown-content{
+    position: absolute;
+    z-index: 1000;
+    display: none;
+    top: 40px;
+    left: 0;
+    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+    width: 300px;
+    height: 120px;
+    padding: 10px;
+    background-color: white;
+}
+
+.nav-menu .dropdown .dropdown-content.show{
+    display: block;
+}
+
+.nav-menu .dropdown .dropdown-content .grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Tạo 3 cột bằng nhau */
+    gap: 10px; /* Khoảng cách giữa các ô */
+}
+
+.nav-menu .dropdown .dropdown-content .grid span{
+    font-size: 14px;
+}
+
+.nav-menu .dropdown .dropdown-content .grid span:hover{
+    color: #E2484C;
+    cursor: pointer;
+}
+
+
