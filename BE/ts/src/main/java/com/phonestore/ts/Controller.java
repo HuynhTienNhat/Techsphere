@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @RestController
-@RequestMapping("test")
+@RequestMapping("/test")
 public class Controller {
     @GetMapping("")
     public String getMethodName() {
