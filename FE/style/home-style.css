@@ -71,12 +71,12 @@ body {
 .overlay{
     position: fixed;
     top: 44px;
-    background-color: lightgray;
+    background-color: rgba(0, 0, 0, 0.1);
     height: calc(100% - 44px);
     width: 100%;
     left: 0;
     display: none;
-    z-index: 2;
+    z-index: 3;
 }
 
 .overlay.show{
@@ -90,7 +90,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 80px;
+    padding: 14px 140px;
     background-color: #D70019;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
     z-index: 1000;
@@ -146,7 +146,7 @@ body {
     padding: 16px;
     border-radius: 4px;
     text-decoration: none;
-    font-size: 14px;
+    font-size: 13px;
     color: white;
 }
 
@@ -158,42 +158,118 @@ body {
     background-color: #E2484C;
 }
 
-/* Dropdown */
-
-.nav-menu .dropdown{
-    position: relative;
+/* Hero section */
+#hero{
+  padding: 10px 140px;
+  display: flex;
+  justify-content: space-between;
+  max-height: 450px;
 }
 
-.nav-menu .dropdown .dropdown-content{
-    position: absolute;
-    z-index: 1000;
-    display: none;
-    top: 40px;
-    left: 0;
-    box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
-    width: 300px;
-    height: 120px;
-    padding: 10px;
-    background-color: white;
+#hero .brand-menu{
+  width: 100%; /* Chiều rộng của menu */
+  max-width: 220px;
+  height: 100%;
+  background-color: #f8f9fa; /* Màu nền */
+  padding: 15px;
+  border-radius: 10px; /* Bo góc */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng */
+  z-index: 5;
 }
 
-.nav-menu .dropdown .dropdown-content.show{
-    display: block;
+.brand-menu ul {
+  list-style: none; /* Bỏ dấu chấm mặc định */
+  padding: 0;
+  margin: 0;
 }
 
-.nav-menu .dropdown .dropdown-content .grid{
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Tạo 3 cột bằng nhau */
-    gap: 10px; /* Khoảng cách giữa các ô */
+.brand-menu ul li {
+  margin: 10px 0; /* Khoảng cách giữa các mục */
+  align-items: center;
 }
 
-.nav-menu .dropdown .dropdown-content .grid span{
-    font-size: 14px;
+.brand-menu ul li a {
+  text-decoration: none; /* Bỏ gạch chân */
+  color: #333; /* Màu chữ */
+  font-size: 14px;
+  font-weight: bold;
+  transition: color 0.3s ease; /* Hiệu ứng chuyển màu */
 }
 
-.nav-menu .dropdown .dropdown-content .grid span:hover{
-    color: #E2484C;
-    cursor: pointer;
+.brand-menu ul li a:hover {
+  color: #E2484C; /* Màu chữ khi hover */
+}
+
+.brand-menu ul li a i{
+  margin-right: 10px;
+  line-height: 1;
+}
+
+.brand-menu ul li a .fa-fire{
+  color: #E2484C;
+}
+
+.brand-menu ul li a .oppo{
+  margin-right: 3px;
+}
+
+.slider {
+  position: relative;
+  width: 80%;
+  max-width: 750px;
+  overflow: hidden;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slides {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.slide {
+  width: 100%;
+  flex-shrink: 0;
+}
+
+#hero button {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 50%;
+  font-size: 18px;
+}
+
+button:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+}
+
+.prev {
+  left: 10px;
+}
+
+.next {
+  right: 10px;
 }
 
 
+#hero .small-banner{
+  display: flex;
+  width: 220px;
+  overflow: hidden;
+  flex-direction: column;
+  border-radius: 10px;
+  gap: 10px;
+}
+
+#hero .small-banner .image{
+  width: 100%;
+  height: 180px;
+  border-radius: 10px;
+  border: 0.1px;
+}

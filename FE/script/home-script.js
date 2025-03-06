@@ -1,18 +1,47 @@
-const dropdownBtn = document.querySelector(".dropbtn");
-const dropdownContent = document.querySelector(".dropdown-content");
+const productBtn = document.querySelector('.productbtn')
 const overlay = document.querySelector(".overlay");
 
 // Hiển thị dropdown và overlay
-dropdownBtn.addEventListener("click", function(event) {
-    event.preventDefault();
-    dropdownContent.classList.toggle("show");
-    overlay.style.display = dropdownContent.classList.contains("show") ? "block" : "none";
+productBtn.addEventListener("click", function(event) {
+    overlay.classList.toggle('show')
+    event.stopPropagation();
 });
 
-// Đóng dropdown khi click ra ngoài
-window.addEventListener("click", function(event) {
-    if (!event.target.closest(".dropdown")) {
-        dropdownContent.classList.remove("show");
-        overlay.style.display = "none";
+document.addEventListener("click", function(event) {
+    if (event.target === overlay || (!overlay.contains(event.target) && !productBtn.contains(event.target))) {
+        overlay.classList.remove('show');
     }
 });
+
+
+// Hero section
+
+let currentSlide = 0;
+
+function showSlide(index) {
+    const slides = document.querySelector('.slides');
+    const totalSlides = document.querySelectorAll('.slide').length;
+
+    // Đảm bảo index nằm trong phạm vi hợp lệ
+    if (index >= totalSlides) {
+        currentSlide = 0;
+    } else if (index < 0) {
+        currentSlide = totalSlides - 1;
+    } else {
+        currentSlide = index;
+    }
+
+    // Di chuyển slides
+    slides.style.transform = `translateX(${-currentSlide * 100}%)`;
+}
+
+function nextSlide() {
+    showSlide(currentSlide + 1);
+}
+
+function prevSlide() {
+    showSlide(currentSlide - 1);
+}
+
+// Khởi tạo slider
+showSlide(currentSlide);

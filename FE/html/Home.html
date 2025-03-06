@@ -10,9 +10,11 @@
 
     <link rel="stylesheet" href="../style/home-style.css">
 
-    <script src="../script/home-script.js"></script>
+    <script src="../script/home-script.js" defer></script>
 </head>
 <body>
+    <div class="overlay"></div>
+
     <section id="header">
         <a href="#" class="logo"><i class="fas fa-mobile-alt"></i> <span>Tech</span> <sup>Sphere</sup></a>
     
@@ -26,20 +28,7 @@
                 <li><a href="#"><i class="fas fa-store"></i> Hệ Thống Cửa Hàng</a></li>
 
                 <!-- Dropdown cho Sản Phẩm -->
-                <li class="dropdown">
-                    <a href="#" class="dropbtn"><i class="fas fa-mobile-alt"></i> Sản Phẩm <i class="fas fa-caret-down"></i></a>
-                    <div class="dropdown-content">
-                        <p><strong>Hãng Sản Xuất</strong></p>
-                        <div class="grid">
-                            <span>Apple</span>
-                            <span>Samsung</span>
-                            <span>Sony</span>
-                            <span>OPPO</span>
-                            <span>Huawei</span>
-                            <span>Xiaomi</span>
-                        </div>
-                    </div>
-                </li>
+                <li><a href="#" class="productbtn"><i class="fas fa-mobile-alt"></i> Sản Phẩm</i></a></li>
         </ul>
 
         <ul class="nav-access">
@@ -47,6 +36,40 @@
             <li><a href="#"><i class="fas fa-key"></i> Đăng Ký</a></li>
         </ul>
     </section>    
+
     <div class="overlay"></div>
+
+    <section id="hero">
+        <div class="brand-menu js-menu">
+            <ul>
+                <li><a href="#"><i class="fa-solid fa-fire"></i>IPhone 16 Promax</a></li>
+                <li><a href="#"><i class="fa-solid fa-fire"></i>IPhone 15 Promax</a></li>
+                <li><a href="#"><i class="fab fa-apple"></i> Apple</a></li>
+                <li><a href="#"><i class="fas fa-mobile"></i> Samsung</a></li>
+                <li><a href="#"><i class="fas fa-mobile-alt"></i> Sony</a></li>
+                <li><a href="#"><i class="fab fa-android oppo"></i> OPPO</a></li>
+                <li><a href="#"><i class="fas fa-mobile-alt"></i> Huawei</a></li>
+                <li><a href="#"><i class="fas fa-mobile"></i> Xiaomi</a></li>
+            </ul>
+        </div>
+
+        <div class="slider">
+            <div class="slides">
+                <img src="../images/banner1.jpg" alt="banner" class="slide">
+                <img src="../images/banner2.jpg" alt="banner" class="slide">
+                <img src="../images/banner3.jpg" alt="banner" class="slide">
+                <img src="../images/banner4.jpg" alt="banner" class="slide">
+            </div>
+
+            <button class="prev" onclick="prevSlide()">&#10094;</button>
+            <button class="next" onclick="nextSlide()">&#10095;</button>
+        </div>
+
+        <div class="small-banner">
+            <img src="../images/smallbanner1.jpg" alt="Image 1" class="image image-1">
+            <img src="../images/smallbanner2.jpg" alt="Image 2" class="image image-2">
+            <img src="../images/smallbanner3.jpg" alt="Image 3" class="image image-3">
+        </div>
+    </section>
 </body>
 </html>
