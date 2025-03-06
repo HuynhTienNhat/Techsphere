@@ -23,22 +23,22 @@ public class UserController {
 	UserService userService;
 	
 	@GetMapping
-	ResponseEntity<ResponseObject> getUsers(){
+	ResponseObject getUsers(){
 		return userService.getUsers();
 	}
 	
 	@PostMapping
-	ResponseEntity<ResponseObject> createUser(@RequestBody UserCreationRequest request){
+	ResponseObject createUser(@RequestBody UserCreationRequest request){
 		return userService.createUser(request);
 	}
 	
 	@PutMapping("/{id}")
-	ResponseEntity<ResponseObject> updateUser(@RequestBody UserUpdateRequest request,@PathVariable int id){
+	ResponseObject updateUser(@RequestBody UserUpdateRequest request,@PathVariable int id){
 		return userService.updateUser(request,id);
 	}
 	
 	@DeleteMapping("/{id}")
-	ResponseEntity<ResponseObject> updateUser(@PathVariable int id){
+	ResponseObject updateUser(@PathVariable int id){
 		return userService.deleteUser(id);
 	}
 }

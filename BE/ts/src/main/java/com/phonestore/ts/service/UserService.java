@@ -30,29 +30,25 @@ public class UserService {
 	@Autowired
 	PasswordEncoder passwordEncoder;
 	
-	public ResponseEntity<ResponseObject> getUsers(){
-		return ResponseEntity.status(HttpStatus.OK).body(
-					ResponseObject.builder()
+	public ResponseObject getUsers(){
+		return ResponseObject.builder()
 					.status("ok")
 					.message("get all users")
 					.data(userRepository.findAll())
-					.build()
-				);
+					.build();
 	}
 	
-	public ResponseEntity<ResponseObject> createUser(UserCreationRequest request){
+	public ResponseObject createUser(UserCreationRequest request){
 		String errorMessage = "";
 		if(userRepository.existsByUsername(request.getUsername())) errorMessage = "Username existed";
 		if(userRepository.existsByEmail(request.getEmail())) errorMessage = "Email existed";
 		if(userRepository.existsByPhone(request.getPhone())) errorMessage = "Phone number existed";
 		if(!errorMessage.equals(""))
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
-					ResponseObject.builder()
+			return ResponseObject.builder()
 					.status("bad request")
 					.message(errorMessage)
 					.data("")
-					.build()
-				);
+					.build();
 		
 		User user = userMapper.toUser(request);
 		
@@ -65,38 +61,32 @@ public class UserService {
 		user.setPassword(passwordEncoder.encode(request.getPassword()));
 		
 		userRepository.save(user);
-		return ResponseEntity.status(HttpStatus.OK).body(
-					ResponseObject.builder()
+		return ResponseObject.builder()
 					.status("ok")
 					.message("Create user successfully")
 					.data(user)
-					.build()
-				);
+					.build();
 	}
 	
-	public ResponseEntity<ResponseObject> updateUser(UserUpdateRequest request, int id) {
+	public ResponseObject updateUser(UserUpdateRequest request, int id) {
 		User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("User not exists"));
 		
 		userMapper.updateUser(user, request);
 		
-		return ResponseEntity.status(HttpStatus.OK).body(
-				ResponseObject.builder()
+		return ResponseObject.builder()
 				.status("ok")
 				.message("Create user successfully")
 				.data(userMapper.toUserResponse(userRepository.save(user)))
-				.build()
-			);
+				.build();
 	}
 	
-	public ResponseEntity<ResponseObject> deleteUser(int id){
+	public ResponseObject deleteUser(int id){
 		userRepository.deleteById(id);
 		
-		return ResponseEntity.status(HttpStatus.OK).body(
-				ResponseObject.builder()
+		return ResponseObject.builder()
 				.status("ok")
-				.message("Dalete user successfully")
+				.message("Delete user successfully")
 				.data("")
-				.build()
-			);
+				.build();
 	}
 }
