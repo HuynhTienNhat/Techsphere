@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserResponse {
+	String name;
 	String username;
 	String email;
 	String phone;

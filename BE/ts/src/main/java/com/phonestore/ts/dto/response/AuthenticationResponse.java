@@ -1,5 +1,4 @@
-package com.phonestore.ts.dto.request;
-
+package com.phonestore.ts.dto.response;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -15,11 +14,7 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserUpdateRequest {
-	String name;
-	String password;
-	String email;
-	String phone;
-	String address;
+public class AuthenticationResponse {
+	String token;
+	Boolean isAuthenticated;
 }
-

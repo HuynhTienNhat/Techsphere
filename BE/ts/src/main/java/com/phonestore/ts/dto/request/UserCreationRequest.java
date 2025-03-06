@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserCreationRequest {
+	String name;
 	String username;
 	String password;
 	String email;
