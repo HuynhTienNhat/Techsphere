@@ -16,6 +16,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserUpdateRequest {
+	String name;
 	String password;
 	String email;
 	String phone;
