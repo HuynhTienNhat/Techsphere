@@ -14,12 +14,12 @@
 
     <div class="wrapper">
         <div class="form-box active" id="login-form">
-            <form action="#">
+            <form id="loginForm" action="http://localhost:8080/login" method="post">
                 <h2>Đăng nhập</h2>
                 <input type="text" name="username" placeholder="Tên đăng nhập" required>
                 <input type="password" name="password" placeholder="Mật khẩu" required>
                 <span><a href="#">Quên mật khẩu</a></span>
-                <button type="submit" name="login">Đăng nhập</button>
+                <button type="submit" name="login" >Đăng nhập</button>
                 <p>Chưa có tài khoản? <a href="#" onclick="showForm('register-form')">Đăng ký ngay</a></p>
             </form>
         </div>
