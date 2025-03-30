@@ -40,11 +40,6 @@ export default function HomeHero() {
         </li>
     ))
 
-    // document.querySelector(".home-slider").addEventListener("dblclick", (event) =>{
-    //     event.preventDefault();
-    //     event.stopPropagation();
-    // })
-    
     return (
         <div className="home-hero px-30 mt-10 flex justify-between items-stretch">
             <div className="home-category bg-white shadow-lg rounded-xl w-55 overflow-y-auto h-66">
