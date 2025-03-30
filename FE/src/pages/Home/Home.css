@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+input[type="search"]::-webkit-search-cancel-button {
+    cursor: pointer;  /* Makes it clickable */
+    width: 16px;      /* Adjust size */
+    height: 16px;
+    opacity: 1;       /* Ensure it's visible */
+}
+
+
+/* Make navigation buttons smaller and round */
+.swiper-button-next,
+.swiper-button-prev {
+    width: 35px; /* Adjust width */
+    height: 35px; /* Adjust height */
+    background-color: rgba(0, 0, 0, 0.2); /* Semi-transparent background */
+    border-radius: 50%; /* Make it circular */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+.swiper-button-next::after,
+.swiper-button-prev::after {
+    font-size: 20px !important; /* Smaller arrow */
+    color: white;
+}
+
+.home-slider {
+    user-select: none;
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none;    /* Firefox */
+    -ms-user-select: none;     /* Internet Explorer */
+}
+
+/* Hover effect */
+.swiper-button-next:hover,
+.swiper-button-prev:hover {
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+/* Adjust position (optional) */
+.swiper-button-next {
+    right: 10px; /* Move right button slightly */
+}
+
+.swiper-button-prev {
+    left: 10px; /* Move left button slightly */
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+    z-index: 10; /* Ensure it is above overlays */
+    font-weight: 700;
+}
+
+.image-container {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+    overflow: hidden;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.image-container:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
