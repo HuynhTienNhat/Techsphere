@@ -1,32 +1,36 @@
-export default function HomeHeader() {
+import { Link, useLocation } from "react-router-dom";
+
+export default function Header() {
+    const location = useLocation();
+
     return (
         <header className="px-30 py-4 dark:bg-gray-100 dark:text-gray-800">
-            <div className="container flex justify-between h-16 mx-auto items-center">
+            <div className="container flex justify-between h-16 items-center">
                 {/* Left Navigation Links */}
                 <ul className="items-stretch hidden space-x-3 lg:flex">
                     <li className="flex">
-                        <a rel="noopener noreferrer" href="#" className="flex items-center px-4 -mb-1 border-b-2 dark:border-violet-600 dark:text-violet-600">Home</a>
+                        <Link to="/" className={`flex items-center px-4 -mb-1 border-b-2 ${location.pathname === "/" ? "dark:border-violet-600 dark:text-violet-600" :"border-transparent hover:border-gray-300"}`}>Home</Link>
                     </li>
                     <li className="flex">
-                        <a rel="noopener noreferrer" href="#" className="flex items-center px-4 -mb-1 border-b-2 dark:border-transparent hover:dark:border-gray-300 transition-colors">Products</a>
+                        <Link to="/products" className={`flex items-center px-4 -mb-1 border-b-2 ${location.pathname === "/products" ? "dark:border-violet-600 dark:text-violet-600" :"border-transparent hover:border-gray-300"}`}>Products</Link>
                     </li>
                     <li className="flex">
-                        <a rel="noopener noreferrer" href="#" className="flex items-center px-4 -mb-1 border-b-2 dark:border-transparent hover:dark:border-gray-300 transition-colors">Link</a>
+                        {/* <a rel="noopener noreferrer" href="#" className="flex items-center px-4 -mb-1 border-b-2 dark:border-transparent hover:dark:border-gray-300 transition-colors">Link</a> */}
                     </li>
                     <li className="flex">
-                        <a rel="noopener noreferrer" href="#" className="flex items-center px-4 -mb-1 border-b-2 dark:border-transparent hover:dark:border-gray-300 transition-colors">Link</a>
+                        {/* <a rel="noopener noreferrer" href="#" className="flex items-center px-4 -mb-1 border-b-2 dark:border-transparent hover:dark:border-gray-300 transition-colors">Link</a> */}
                     </li>
                 </ul>
 
                 {/* Centered Logo */}
-                <a href="#" aria-label="Back to homepage" className="flex items-center p-2">
+                <Link to={"/"} href="" aria-label="Back to homepage" className="flex items-center p-2">
                     <span className="text-2xl font-bold text-purple-600 dark:text-violet-600">TechSphere</span>
-                </a>
+                </Link>
 
                 {/* Right Side Elements */}
                 <div className="flex items-center space-x-6">
                     {/* Wider Search Bar */}
-                    <div className="relative w-70"> {/* Changed width to w-64 */}
+                    <div className="relative w-[280px]"> {/* Changed width to w-64 */}
                         <span className="absolute inset-y-0 left-0 flex items-center pl-2">
                             <button type="submit" title="Search" className="p-1 focus:outline-none focus:ring">
                                 <svg fill="currentColor" viewBox="0 0 512 512" className="w-4 h-4 dark:text-gray-800">
