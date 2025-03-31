@@ -3,6 +3,10 @@ import './Home.css';
 import HomeHero from './Hero.jsx';
 import Introduction from './Introduction.jsx';
 import SalesBanner from './SaleBanner.jsx';
+import HomeProducts from './Products.jsx';
+import HomeJudgement from './Judgement.jsx';
+import HomeFooter from './Footer.jsx';
+
 export default function HomePage() {
     return (
         <>
@@ -10,6 +14,9 @@ export default function HomePage() {
             <HomeHero />
             <Introduction />
             <SalesBanner />
+            <HomeProducts />
+            <HomeJudgement />
+            <HomeFooter />
         </>
     )
 }
