@@ -16,7 +16,7 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResponseObject {
-	String status;
+	int status;
 	String message;
 	Object data;
 }
