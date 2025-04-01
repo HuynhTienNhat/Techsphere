@@ -1,6 +1,8 @@
 package com.phonestore.ts.entity;
 
+import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -12,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.lang.model.element.Name;
 
@@ -22,7 +25,7 @@ import javax.lang.model.element.Name;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class User{
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private int id;
@@ -58,10 +61,13 @@ public class User {
 	@Column(name = "address", nullable = false)
 	private String address;
 
-	@NotNull(message = "Vai trò không được để trống")
-	@ElementCollection
+	@NotNull(message = "Role không được để trống")
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), uniqueConstraints = @UniqueConstraint(
+			columnNames = {"user_id", "role"}))
 	@Column(name = "roles")
-	private Set<String> roles;
+	@Enumerated(EnumType.STRING)
+	private Set<String> roles = new HashSet<>();;
 
 	@PastOrPresent(message = "Ngày tạo không thể ở tương lai")
 	@Column(name = "create_date")

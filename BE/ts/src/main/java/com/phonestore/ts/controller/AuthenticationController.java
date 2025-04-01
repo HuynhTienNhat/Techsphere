@@ -16,7 +16,7 @@ import com.phonestore.ts.service.AuthenticationService;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+
 @RestController
 @RequestMapping("/login")
 public class AuthenticationController {

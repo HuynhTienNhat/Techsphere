@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.phonestore.ts.exception.ErrorCode;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,9 @@ import com.phonestore.ts.entity.User;
 import com.phonestore.ts.enums.Role;
 import com.phonestore.ts.mapper.UserMapper;
 import com.phonestore.ts.repository.UserRepository;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class UserService {
 	@Autowired
@@ -38,7 +41,7 @@ public class UserService {
 					.data(userRepository.findAll())
 					.build();
 	}
-	
+	@Transactional(rollbackFor = Exception.class)
 	public ResponseObject createUser(UserCreationRequest request){
 		String errorMessage = "";
 		if(userRepository.existsByUsername(request.getUsername())) errorMessage = "Username existed";

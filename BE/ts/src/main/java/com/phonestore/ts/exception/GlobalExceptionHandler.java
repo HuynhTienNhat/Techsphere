@@ -13,7 +13,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
                 ResponseObject.builder()
                         .status(ErrorCode.RUNTIME_ERROR.getStatus())
-                        .message(ErrorCode.RUNTIME_ERROR.getMessage())
+                        .message(ErrorCode.RUNTIME_ERROR.getMessage()+": "+runtimeException.getMessage())
                         .build()
         );
     }

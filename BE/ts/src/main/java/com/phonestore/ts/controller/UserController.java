@@ -20,7 +20,7 @@ import com.phonestore.ts.dto.request.UserUpdateRequest;
 import com.phonestore.ts.dto.response.ResponseObject;
 import com.phonestore.ts.service.UserService;
 
-@CrossOrigin(origins = "http://127.0.0.1:5500")
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
