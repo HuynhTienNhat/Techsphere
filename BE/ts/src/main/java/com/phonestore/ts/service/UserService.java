@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.phonestore.ts.exception.ErrorCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,8 +33,8 @@ public class UserService {
 	
 	public ResponseObject getUsers(){
 		return ResponseObject.builder()
-					.status("ok")
-					.message("get all users")
+					.status(ErrorCode.OK.getStatus())
+					.message("Get users successfully")
 					.data(userRepository.findAll())
 					.build();
 	}
@@ -45,7 +46,7 @@ public class UserService {
 		if(userRepository.existsByPhone(request.getPhone())) errorMessage = "Phone number existed";
 		if(!errorMessage.equals(""))
 			return ResponseObject.builder()
-					.status("bad request")
+					.status(ErrorCode.RUNTIME_ERROR.getStatus())
 					.message(errorMessage)
 					.data("")
 					.build();
@@ -62,7 +63,7 @@ public class UserService {
 		
 		userRepository.save(user);
 		return ResponseObject.builder()
-					.status("ok")
+					.status(ErrorCode.OK.getStatus())
 					.message("Create user successfully")
 					.data(user)
 					.build();
@@ -74,8 +75,8 @@ public class UserService {
 		userMapper.updateUser(user, request);
 		
 		return ResponseObject.builder()
-				.status("ok")
-				.message("Create user successfully")
+				.status(ErrorCode.OK.getStatus())
+				.message("Update user successfully")
 				.data(userMapper.toUserResponse(userRepository.save(user)))
 				.build();
 	}
@@ -84,7 +85,7 @@ public class UserService {
 		userRepository.deleteById(id);
 		
 		return ResponseObject.builder()
-				.status("ok")
+				.status(ErrorCode.OK.getStatus())
 				.message("Delete user successfully")
 				.data("")
 				.build();

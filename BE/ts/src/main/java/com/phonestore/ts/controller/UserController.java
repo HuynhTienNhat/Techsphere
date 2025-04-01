@@ -1,6 +1,9 @@
 package com.phonestore.ts.controller;
 
+import com.phonestore.ts.exception.ErrorCode;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,22 +28,22 @@ public class UserController {
 	UserService userService;
 	
 	@GetMapping
-	ResponseObject getUsers(){
-		return userService.getUsers();
+	ResponseEntity<ResponseObject> getUsers(){
+		return ResponseEntity.status(HttpStatus.OK).body(userService.getUsers());
 	}
 	
 	@PostMapping
-	ResponseObject createUser(@RequestBody UserCreationRequest request){
-		return userService.createUser(request);
+	ResponseEntity<ResponseObject> createUser(@Valid @RequestBody UserCreationRequest request){
+		return ResponseEntity.status(HttpStatus.OK).body(userService.createUser(request));
 	}
 	
 	@PutMapping("/{id}")
-	ResponseObject updateUser(@RequestBody UserUpdateRequest request,@PathVariable int id){
-		return userService.updateUser(request,id);
+	ResponseEntity<ResponseObject> updateUser(@Valid @RequestBody UserUpdateRequest request,@PathVariable int id){
+		return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(request,id));
 	}
 	
 	@DeleteMapping("/{id}")
-	ResponseObject updateUser(@PathVariable int id){
-		return userService.deleteUser(id);
+	ResponseEntity<ResponseObject> updateUser(@PathVariable int id){
+		return ResponseEntity.status(HttpStatus.OK).body(userService.deleteUser(id));
 	}
 }
