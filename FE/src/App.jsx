@@ -1,19 +1,22 @@
-import HomePage from './pages/Home/Home.jsx';
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Products from './pages/Products/Products.jsx';
-import Header from './components/Header.jsx';
-import Footer from './components/Footer.jsx';
-import BreadCrumb from './components/Breadcrumb.jsx';
+import Login from './pages/Auth/Login.jsx'
+import Register from './pages/Auth/Register.jsx'
+import { Routes, Route, Router } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
+import Header from './components/Header.jsx'
+import Footer from './components/Footer.jsx'
+import HomePage from './pages/Home/Home.jsx'
+import Products from './pages/Products/Products.jsx'
 export default function App(){
   return (
-    <Router>
-      <Header />
-      <BreadCrumb />
-      <Routes>
-        <Route path='/' element={<HomePage/>}/>
-        <Route path='/products' element={<Products/>}/>
-      </Routes>
-      <Footer />
-    </Router>
+    <BrowserRouter>
+    <Header />
+    <Routes>
+      <Route path='/' element={<HomePage />}></Route>
+      <Route path="/login" element={<Login />}></Route>
+      <Route path="/register" element={<Register />}></Route>
+      <Route path='/products' element={<Products/>}/>
+    </Routes>
+    <Footer />
+  </BrowserRouter>
   )
 }

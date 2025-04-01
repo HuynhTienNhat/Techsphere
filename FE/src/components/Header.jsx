@@ -1,4 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
+import Login from "../pages/Auth/Login";
 
 export default function Header() {
     const location = useLocation();
@@ -48,7 +49,9 @@ export default function Header() {
 
                     {/* Login Button */}
                     <button type="button" className="hidden cursor-pointer px-6 py-2 font-semibold rounded lg:block dark:bg-violet-600 dark:text-gray-50 hover:dark:bg-violet-700 transition-colors">
+                        <Link to="/login" className="text-gray-50">
                         Log in
+                        </Link>
                     </button>
                 </div>
 
