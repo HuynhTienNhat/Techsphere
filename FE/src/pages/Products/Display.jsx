@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from "react-router-dom";
 
 export default function ProductDisplay() {
     const [products, setProducts] = React.useState([])
@@ -8,6 +9,10 @@ export default function ProductDisplay() {
     React.useEffect(() => {
         fetchProducts();
     }, [sortOrder]); 
+
+    const handleClick = (slug) =>{
+        navigate(`/products/${slug}`);
+    }
 
     const fetchProducts = () => {
         let url = 'http://localhost:8080/api/products'
@@ -22,7 +27,8 @@ export default function ProductDisplay() {
     }
 
     const productElements = products.map(product => (
-        <div key={product.id} className="transition-transform transform hover:-translate-y-2 hover:shadow-lg p-2 flex flex-col justify-center rounded-md shadow-md dark:bg-white-50 dark:text-gray-900 border-[0.5px] border-gray-100">
+        <div key={product.id} onClick={() => handleClick(product.slug)}
+        className="transition-transform transform hover:-translate-y-2 hover:shadow-lg p-2 flex flex-col justify-center rounded-md shadow-md dark:bg-white-50 dark:text-gray-900 border-[0.5px] border-gray-100">
             <img src={product.image_url} alt={product.name} className="w-full h-40 object-cover" />
             <h2 className="text-lg font-semibold mt-2">{product.name}</h2>
             <p className="text-red-500 font-bold">{product.price.toLocaleString()} đ</p>
@@ -47,8 +53,8 @@ export default function ProductDisplay() {
                 </select>
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
-                {productElements}
+            <div className={`${products.length > 0 ? "grid grid-cols-4 gap-4" : "flex items-center"}`}>
+                {products.length > 0 ?productElements : <p className='text-center w-full'>Hiện chưa có sản phẩm nào</p>}
             </div>
         </div>
     )
