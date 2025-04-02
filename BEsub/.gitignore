@@ -26,8 +26,7 @@ pom.xml.next
 
 ### === Application Configs === ###
 # Ignore local properties (sensitive)
-application.properties          # Blocks default properties file
-application-*.properties       # Covers all variants (dev/local)
+src/main/resources/application.properties          # Blocks default properties file
 
 ### === Logs/Temporary Files === ###
 logs/
