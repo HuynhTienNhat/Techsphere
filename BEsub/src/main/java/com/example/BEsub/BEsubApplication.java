@@ -12,5 +12,4 @@ public class BEsubApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(BEsubApplication.class, args);
 	}
-
 }

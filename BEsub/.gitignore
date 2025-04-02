@@ -1,33 +1,44 @@
-HELP.md
+### === Build/Dependency Files === ###
+# Maven
 target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+!.mvn/wrapper/maven-wrapper.jar  # Keep the wrapper jar
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+### === IDE (IntelliJ) === ###
+.idea/
 *.iml
+*.iws
 *.ipr
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/dictionaries
+.idea/modules.xml
+.idea/.name
+.idea/compiler.xml
+.idea/encodings.xml
+.idea/jarRepositories.xml
+.idea/misc.xml
+.idea/vcs.xml
+.idea/checkstyle-idea.xml
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+### === Application Configs === ###
+# Ignore local properties (sensitive)
+application.properties          # Blocks default properties file
+application-*.properties       # Covers all variants (dev/local)
 
-### VS Code ###
-.vscode/
+### === Logs/Temporary Files === ###
+logs/
+*.log
+*.log.*
+
+### === Compiled/Generated Files === ###
+*.class
+*.jar
+*.war
+*.ear
+*.original
+*.swp
+*.swo
