@@ -13,27 +13,27 @@ import java.util.List;
 @Builder
 @Entity
 @Table(name = "products")
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+public class Product extends BaseEntity{
     private String brand;
     private String model;
     private String slug;
-
-
     private BigDecimal price;
 
-    private String mainImageUrl;
+    @Column(name = "old_price")
+    private BigDecimal oldPrice;
+
+    @Column(name = "main_img_url", columnDefinition = "TEXT")
+    private String mainImgUrl;
+
+    @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductVariant> variants;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductSpec> specs;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductSpec> specs;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> variants;
 }

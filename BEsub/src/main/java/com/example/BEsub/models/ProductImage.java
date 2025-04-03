@@ -10,15 +10,14 @@ import lombok.*;
 @Builder
 @Entity
 @Table(name = "product_images")
-public class ProductImage {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+public class ProductImage extends BaseEntity{
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id")
     private Product product;
 
-    private String imageUrl;
+    @Column(name = "img_url")
+    private String imgUrl;
+
+    @Column(name = "display_order")
     private Integer displayOrder;
 }
