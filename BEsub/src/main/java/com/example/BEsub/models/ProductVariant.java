@@ -6,24 +6,25 @@ import lombok.*;
 import java.math.*;
 
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "product_variants")
-public class ProductVariant extends BaseEntity{
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
+@Data
+public class ProductVariant extends BaseEntity {
     private String color;
+
     private String storage;
 
     @Column(name = "price_adjustment")
     private BigDecimal priceAdjustment;
 
-    @Column(name = "stock_quantity")
+    @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
+
+    // Quan hệ Many-to-One với PRODUCTS
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 }

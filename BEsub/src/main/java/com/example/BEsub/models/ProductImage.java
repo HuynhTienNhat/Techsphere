@@ -11,13 +11,14 @@ import lombok.*;
 @Entity
 @Table(name = "product_images")
 public class ProductImage extends BaseEntity{
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id")
-    private Product product;
-
-    @Column(name = "img_url")
+    @Column(name = "img_url", nullable = false)
     private String imgUrl;
 
     @Column(name = "display_order")
     private Integer displayOrder;
+
+    // Quan hệ Many-to-One với PRODUCTS
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 }

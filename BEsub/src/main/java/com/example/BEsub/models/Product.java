@@ -6,34 +6,46 @@ import java.math.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Entity
 @Table(name = "products")
-public class Product extends BaseEntity{
-    private String brand;
+@Data
+public class Product extends BaseEntity {
+    @Column(nullable = false)
+    private String name;
+
     private String model;
+
+    @Column(nullable = false, unique = true)
     private String slug;
-    private BigDecimal price;
+
+    @Column(name = "base_price", nullable = false)
+    private BigDecimal basePrice;
 
     @Column(name = "old_price")
     private BigDecimal oldPrice;
 
-    @Column(name = "main_img_url", columnDefinition = "TEXT")
-    private String mainImgUrl;
+    // Quan hệ Many-to-One với CATEGORIES
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
-    @Column(name = "release_date")
-    private LocalDate releaseDate;
+    // Quan hệ Many-to-One với BRANDS
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "brand_id", nullable = false)
+    private Brand brand;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductSpec> specs;
+    // Quan hệ One-to-Many với PRODUCT_VARIANTS
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductVariant> variants;
 
+    // Quan hệ One-to-Many với PRODUCT_IMAGES
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImage> images;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ProductVariant> variants;
+    // Quan hệ One-to-Many với PRODUCT_SPECS
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<ProductSpec> specs;
 }

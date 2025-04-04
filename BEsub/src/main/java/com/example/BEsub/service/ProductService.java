@@ -1,15 +1,17 @@
 package com.example.BEsub.service;
 
-import com.example.BEsub.models.Product;
-import com.example.BEsub.repositories.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.example.BEsub.dtos.ProductDetailDTO;
+import com.example.BEsub.dtos.ProductDTO;
 
-import java.math.BigDecimal;
 import java.util.List;
 
-@Service
-public class ProductService {
-    @Autowired
-    private ProductRepository productRepository;
+public interface ProductService {
+    ProductDetailDTO createProduct(ProductDetailDTO productDTO);
+    ProductDetailDTO updateProduct(Long productId, ProductDetailDTO productDTO);
+    void deleteProduct(Long productId);
+    ProductDetailDTO getProductBySlug(String slug);
+    List<ProductDTO> getAllProducts();
+    List<ProductDTO> getProductsByBrand(String brandName);
+    List<ProductDTO> getProductsSortedByPrice(String sortOrder); // "asc" hoặc "desc"
+    List<ProductDTO> searchProducts(String keyword);
 }
