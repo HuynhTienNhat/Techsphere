@@ -1,9 +1,11 @@
 package com.example.BEsub.models;
 
 
+import com.example.BEsub.enums.*;
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
+
+import java.time.*;
 import java.util.List;
 
 @Entity
@@ -23,6 +25,11 @@ public class User extends BaseEntity {
 
     private String phone;
 
+    private Gender gender;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
@@ -41,12 +48,4 @@ public class User extends BaseEntity {
     // Quan hệ One-to-One với CART
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Cart cart;
-
-    // Quan hệ One-to-Many với REVIEWS
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Review> reviews;
-
-    public enum Role {
-        ADMIN, CUSTOMER
-    }
 }
