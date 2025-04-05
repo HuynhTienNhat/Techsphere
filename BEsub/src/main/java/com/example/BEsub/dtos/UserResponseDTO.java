@@ -22,4 +22,5 @@ public class UserResponseDTO {
     private Role role;
     private LocalDateTime createdAt;
     private LocalDateTime lastLogin;
+    private String token;
 }

@@ -1,6 +1,7 @@
 package com.example.BEsub.service;
 
 import com.example.BEsub.dtos.*;
+import com.example.BEsub.exception.AppException;
 import com.example.BEsub.models.*;
 import com.example.BEsub.repositories.*;
 import jakarta.transaction.Transactional;
@@ -39,7 +40,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailDTO updateProduct(Long productId, ProductDetailDTO productDTO) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> new AppException("Product not found"));
         mapToEntity(productDTO, product);
         Product updatedProduct = productRepository.save(product);
         return mapToDetailDTO(updatedProduct);
@@ -53,7 +54,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailDTO getProductBySlug(String slug) {
         Product product = productRepository.findBySlug(slug);
-        if (product == null) throw new RuntimeException("Product not found");
+        if (product == null) throw new AppException("Product not found");
         return mapToDetailDTO(product);
     }
 
@@ -174,10 +175,10 @@ public class ProductServiceImpl implements ProductService {
 //                        review.setProduct(product);
 //                        // Lấy User và Order từ repository (giả sử ID hợp lệ)
 //                        User user = userRepository.findById(r.getUserId())
-//                                .orElseThrow(() -> new RuntimeException("User not found for review"));
+//                                .orElseThrow(() -> new AppException("User not found for review"));
 //                        review.setUser(user);
 //                        Order order = orderRepository.findById(1L) // Giả lập orderId, cần điều chỉnh thực tế
-//                                .orElseThrow(() -> new RuntimeException("Order not found for review"));
+//                                .orElseThrow(() -> new AppException("Order not found for review"));
 //                        review.setOrder(order);
 //                        return review;
 //                    })

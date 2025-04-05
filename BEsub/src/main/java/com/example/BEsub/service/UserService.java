@@ -14,4 +14,6 @@ public interface UserService {
     CustomerProfileDTO updateProfile(Long userId, UserUpdateDTO updateDTO); // Customer
     void changePassword(Long userId, String oldPassword, String newPassword);
     void deleteUser(Long userId); // Admin
+    Long getUserIdByUsername(String username);
+    void deleteAddress(Long userId, Long addressId);
 }

@@ -41,3 +41,7 @@ logs/
 *.original
 *.swp
 *.swo
+
+!src/test/       # Include the test directory
+!src/test/**/*.java    # Include all Java source files in test
+src/test/**/*.class    # Still ignore compiled class files in test
