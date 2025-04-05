@@ -3,6 +3,7 @@ package com.example.BEsub.controller;
 
 import com.example.BEsub.dtos.*;
 import com.example.BEsub.service.*;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +19,14 @@ public class ProductController {
 
     // Tạo sản phẩm
     @PostMapping
-    public ResponseEntity<ProductDetailDTO> createProduct(@RequestBody ProductDetailDTO productDTO) {
+    public ResponseEntity<ProductDetailDTO> createProduct(@RequestBody @Valid ProductDetailDTO productDTO) {
         return ResponseEntity.ok(productService.createProduct(productDTO));
     }
 
     // Cập nhật sản phẩm
     @PutMapping("/{productId}")
     public ResponseEntity<ProductDetailDTO> updateProduct(@PathVariable Long productId,
-                                                          @RequestBody ProductDetailDTO productDTO) {
+                                                          @RequestBody @Valid ProductDetailDTO productDTO) {
         return ResponseEntity.ok(productService.updateProduct(productId, productDTO));
     }
 
@@ -56,7 +57,7 @@ public class ProductController {
 
     // Sắp xếp theo giá
     @GetMapping("/sort")
-    public ResponseEntity<List<ProductDTO>> getProductsSortedByPrice(@RequestParam String order) {
+    public ResponseEntity<List<ProductDTO>> getProductsSortedByPrice(@RequestParam(defaultValue = "asc") String order) {
         return ResponseEntity.ok(productService.getProductsSortedByPrice(order));
     }
 

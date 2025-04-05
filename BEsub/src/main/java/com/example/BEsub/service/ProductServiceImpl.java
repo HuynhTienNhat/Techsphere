@@ -31,6 +31,11 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDetailDTO createProduct(ProductDetailDTO productDTO) {
         Product product = new Product();
+
+        if (productRepository.findBySlug(productDTO.getSlug()) != null) {
+            throw new AppException("Slug already exists");
+        }
+
         mapToEntity(productDTO, product);
         Product savedProduct = productRepository.save(product);
         return mapToDetailDTO(savedProduct);
@@ -41,13 +46,23 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailDTO updateProduct(Long productId, ProductDetailDTO productDTO) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException("Product not found"));
+
+        Product existingProduct = productRepository.findBySlug(productDTO.getSlug());
+        if (existingProduct != null && !existingProduct.getId().equals(productId)) {
+            throw new AppException("Slug already exists");
+        }
+
         mapToEntity(productDTO, product);
         Product updatedProduct = productRepository.save(product);
         return mapToDetailDTO(updatedProduct);
     }
 
+    @Transactional
     @Override
     public void deleteProduct(Long productId) {
+        if (!productRepository.existsById(productId)) {
+            throw new AppException("Product not found");
+        }
         productRepository.deleteById(productId);
     }
 
@@ -78,10 +93,12 @@ public class ProductServiceImpl implements ProductService {
             return productRepository.findAllByOrderByBasePriceDesc().stream()
                     .map(this::mapToDTO)
                     .collect(Collectors.toList());
-        } else {
+        } else if ("asc".equalsIgnoreCase(sortOrder)) {
             return productRepository.findAllByOrderByBasePriceAsc().stream()
                     .map(this::mapToDTO)
                     .collect(Collectors.toList());
+        } else {
+            throw new AppException("Invalid sort order. Use 'asc' or 'desc'");
         }
     }
 
@@ -94,6 +111,10 @@ public class ProductServiceImpl implements ProductService {
 
     // Ánh xạ từ DTO sang Entity
     private void mapToEntity(ProductDetailDTO dto, Product product) {
+        if (dto.getName() == null || dto.getName().isBlank()) {
+            throw new AppException("Product name cannot be null or blank");
+        }
+
         product.setName(dto.getName());
         product.setModel(dto.getModel());
         product.setSlug(dto.getSlug());
