@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -210,6 +211,19 @@ public class UserServiceImpl implements UserService {
 
         addressRepository.delete(address);
     }
+    @Override
+    public UserResponseDTO getUserById(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
+        return mapToUserResponseDTO(user);
+    }
+
+    @Override
+    public List<UserResponseDTO> getAllUsers() {
+        List<User> userDTOS = userRepository.findAll();
+        return userDTOS.stream()
+                .map(this::mapToUserResponseDTO)
+                .collect(Collectors.toList());
+    }
 
     // Helper methods to map Entity to DTO
     private UserResponseDTO mapToUserResponseDTO(User user) {
@@ -242,4 +256,6 @@ public class UserServiceImpl implements UserService {
                 .map(this::mapToUserAddressDTO)
                 .collect(Collectors.toList());
     }
+
+
 }

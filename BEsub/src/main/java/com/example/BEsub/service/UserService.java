@@ -16,4 +16,6 @@ public interface UserService {
     void deleteUser(Long userId); // Admin
     Long getUserIdByUsername(String username);
     void deleteAddress(Long userId, Long addressId);
+    UserResponseDTO getUserById(Long userId);
+    List<UserResponseDTO> getAllUsers();
 }
