@@ -10,6 +10,9 @@ import java.util.List;
 @Entity
 @Table(name = "orders")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class Order extends BaseEntity {
     @Column(name = "order_date", nullable = false)
     private LocalDateTime orderDate;
@@ -46,7 +49,7 @@ public class Order extends BaseEntity {
     private UserAddress address;
 
     // Quan hệ One-to-Many với ORDER_ITEMS
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems;
 
     public enum PaymentMethod {

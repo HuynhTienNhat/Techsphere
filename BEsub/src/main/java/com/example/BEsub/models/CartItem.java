@@ -1,12 +1,19 @@
 package com.example.BEsub.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.math.BigDecimal;
 
 @Entity
 @Table(name = "cart_items")
 @Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class CartItem extends BaseEntity {
     private Integer quantity;
 

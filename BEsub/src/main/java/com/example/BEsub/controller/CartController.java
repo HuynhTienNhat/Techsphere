@@ -24,13 +24,13 @@ public class CartController {
     UserService userService;
 
     @GetMapping
-    public ResponseEntity<List<CartItem>> getCartItems(){
-        return ResponseEntity.status(HttpStatus.OK).body(cartService.getCartByUserId());
+    public ResponseEntity<List<CartItemDTO>> getCartItems(){
+        return ResponseEntity.status(HttpStatus.OK).body(cartService.getCart());
     }
 
     @PostMapping
-    public ResponseEntity<String> addItemToCart(@RequestBody CartItem cartItem){
-        cartService.addItemToCart(cartItem);
+    public ResponseEntity<String> addItemToCart(@RequestBody CartItemDTO cartItemDTO){
+        cartService.addItemToCart(cartItemDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Add item to cart successfully");
     }
 
@@ -41,8 +41,9 @@ public class CartController {
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<String> updateItemInCart(@PathVariable Long itemId, @RequestBody CartItemDTO){
-
+    public ResponseEntity<String> updateItemInCart(@PathVariable Long itemId, @RequestBody CartItemDTO cartItemDTO){
+        cartService.updateItemInCart(itemId,cartItemDTO);
+        return ResponseEntity.status(HttpStatus.OK).body("Update item successfully");
     }
 
 
