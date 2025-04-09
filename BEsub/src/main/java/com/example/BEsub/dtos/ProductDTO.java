@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductDTO {
-    private Long productId; // Không cần validate
+    private Long productId;
 
     @NotBlank(message = "Product name cannot be blank")
     @Size(max = 100, message = "Product name cannot exceed 100 characters")

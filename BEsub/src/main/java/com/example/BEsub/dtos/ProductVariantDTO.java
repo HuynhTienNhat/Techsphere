@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductVariantDTO {
-    private Long variantId; // Không cần validate
+    private Long variantId;
 
     @NotBlank(message = "Color cannot be blank")
     @Size(max = 50, message = "Color cannot exceed 50 characters")

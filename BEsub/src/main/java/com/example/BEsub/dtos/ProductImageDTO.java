@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductImageDTO {
-    private Long imageId; // Không cần validate
+    private Long imageId;
 
     @NotBlank(message = "Image URL cannot be blank")
     @Size(max = 255, message = "Image URL cannot exceed 255 characters")

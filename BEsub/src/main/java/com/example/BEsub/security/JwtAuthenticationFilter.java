@@ -31,6 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         System.out.println("Request URI: " + request.getRequestURI());
         String header = request.getHeader("Authorization");
+        System.out.println("Authorization header: " + header);
         String token = null;
         String username = null;
 
@@ -41,10 +42,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtil.validateToken(token)) {
+
                 // Lấy role từ token
                 Claims claims = jwtUtil.getClaimsFromToken(token);
                 String role = claims.get("role", String.class);
-                // Gán role vào authorities với prefix "ROLE_" (chuẩn Spring Security)
+                System.out.println("Role from token: " + role);
+
+                // Gán role vào authorities với prefix "ROLE_"
                 List<SimpleGrantedAuthority> authorities = Collections.singletonList(
                         new SimpleGrantedAuthority("ROLE_" + role.toUpperCase())
                 );

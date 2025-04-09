@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ProductSpecDTO {
-    private Long specId; // Không cần validate
+    private Long specId;
 
     @NotBlank(message = "Spec name cannot be blank")
     @Size(max = 50, message = "Spec name cannot exceed 50 characters")
