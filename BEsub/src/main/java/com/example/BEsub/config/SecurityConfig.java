@@ -26,11 +26,19 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
         System.out.println("SecurityFilterChain configured");
         http
-                .cors(Customizer.withDefaults())  // Thêm cấu hình CORS
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        // Cho phép tất cả truy cập login/register
                         .requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/register").permitAll()
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()  // Cho phép OPTIONS request
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // Chỉ ADMIN được thêm sản phẩm
+                        .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
+                        // Chỉ ADMIN được cập nhật sản phẩm
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        // Chỉ ADMIN được xóa sản phẩm
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+                        // Các request khác (GET) chỉ cần authenticated
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

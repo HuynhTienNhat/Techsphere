@@ -72,7 +72,7 @@ public class UserServiceImpl implements UserService {
         user.setPhone(registerDTO.getPhone());
         user.setGender(registerDTO.getGender());
         user.setDateOfBirth(registerDTO.getDateOfBirth());
-        user.setRole(Role.CUSTOMER); // Mặc định là CUSTOMER
+        user.setRole(Role.CUSTOMER);
         user.setCreatedAt(LocalDateTime.now());
 
         user = userRepository.save(user);
