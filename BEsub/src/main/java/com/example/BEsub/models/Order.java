@@ -1,5 +1,6 @@
 package com.example.BEsub.models;
 
+import com.example.BEsub.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +34,7 @@ public class Order extends BaseEntity {
     private PaymentMethod paymentMethod;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private OrderStatus status;
 
     // Quan hệ Many-to-One với USERS
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,12 +49,4 @@ public class Order extends BaseEntity {
     // Quan hệ One-to-Many với ORDER_ITEMS
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
-
-    public enum PaymentMethod {
-        COD, BANKING,
-    }
-
-    public enum Status {
-        PROCESSING, DELIVERED, CANCELLED
-    }
 }

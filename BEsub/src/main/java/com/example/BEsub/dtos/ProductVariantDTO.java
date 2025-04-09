@@ -22,8 +22,8 @@ public class ProductVariantDTO {
     private String storage;
 
     @NotNull(message = "Price adjustment cannot be null")
-    @DecimalMin(value = "-10000000.000", message = "Price adjustment must be at least -10.000.000")
-    @DecimalMax(value = "10000000.000", message = "Price adjustment must be less than 10.000.000")
+    @DecimalMin(value = "-10000000", message = "Price adjustment must be at least -10.000.000")
+    @DecimalMax(value = "10000000", message = "Price adjustment must be less than 10.000.000")
     private BigDecimal priceAdjustment;
 
     @NotNull(message = "Stock quantity cannot be null")

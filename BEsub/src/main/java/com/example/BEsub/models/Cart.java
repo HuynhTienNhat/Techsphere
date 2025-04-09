@@ -9,7 +9,6 @@ import java.util.List;
 @Table(name = "cart")
 @Data
 public class Cart extends BaseEntity {
-
     // Quan hệ One-to-One với USERS
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
