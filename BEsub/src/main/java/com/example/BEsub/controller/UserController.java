@@ -2,6 +2,8 @@ package com.example.BEsub.controller;
 
 import com.example.BEsub.dtos.*;
 import com.example.BEsub.service.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,14 +20,14 @@ public class UserController {
 
     // Đăng nhập
     @PostMapping("/login")
-    public ResponseEntity<UserResponseDTO> login(@RequestBody UserLoginDTO loginDTO) {
+    public ResponseEntity<UserResponseDTO> login(@RequestBody @Valid UserLoginDTO loginDTO) {
         UserResponseDTO response = userService.login(loginDTO);
         return ResponseEntity.ok(response);
     }
 
     // Đăng ký
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> register(@RequestBody UserRegisterDTO registerDTO) {
+    public ResponseEntity<UserResponseDTO> register(@RequestBody @Valid UserRegisterDTO registerDTO) {
         System.out.println("Register endpoint reached with data: " + registerDTO);
         UserResponseDTO response = userService.register(registerDTO);
         System.out.println("Registration successful for user: " + response.getUsername());
@@ -45,7 +47,7 @@ public class UserController {
 
     // Cập nhật profile
     @PutMapping("/profile")
-    public ResponseEntity<CustomerProfileDTO> updateProfile(@RequestBody UserUpdateDTO updateDTO) {
+    public ResponseEntity<CustomerProfileDTO> updateProfile(@RequestBody @Valid UserUpdateDTO updateDTO) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Long userId = userService.getUserIdByUsername(userName);
         CustomerProfileDTO updatedProfile = userService.updateProfile(userId, updateDTO);
@@ -54,7 +56,7 @@ public class UserController {
 
     // Đổi mật khẩu
     @PutMapping("/password")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordRequest request) {
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Long userId = userService.getUserIdByUsername(userName);
         userService.changePassword(userId, request.oldPassword(), request.newPassword());
@@ -63,7 +65,7 @@ public class UserController {
 
     // Thêm địa chỉ
     @PostMapping("/addresses")
-    public ResponseEntity<UserAddressDTO> addAddress(@RequestBody UserAddressDTO addressDTO) {
+    public ResponseEntity<UserAddressDTO> addAddress(@RequestBody @Valid UserAddressDTO addressDTO) {
         String userName = SecurityContextHolder.getContext().getAuthentication().getName();
         Long userId = userService.getUserIdByUsername(userName);
         UserAddressDTO address = userService.addAddress(userId, addressDTO);
@@ -89,7 +91,24 @@ public class UserController {
         return ResponseEntity.ok("Default address set successfully");
     }
 
-    public record ChangePasswordRequest(String oldPassword, String newPassword) {
+    // Xóa địa chỉ
+    @DeleteMapping("/addresses/{addressId}")
+    public ResponseEntity<String> deleteAddress(@PathVariable Long addressId) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userService.getUserIdByUsername(userName);
+
+        userService.deleteAddress(userId, addressId);
+        return ResponseEntity.ok("Address deleted successfully");
+    }
+
+    // Helper đổi mật khẩu
+    public record ChangePasswordRequest(
+            @NotBlank(message = "Old password is required")
+            String oldPassword,
+            @NotBlank(message = "New password is required")
+            @Size(min = 6, message = "New password must be at least 6 characters")
+            String newPassword)
+    {
         public ChangePasswordRequest {
             if (oldPassword == null || oldPassword.isBlank()) {
                 throw new IllegalArgumentException("Old password cannot be null or blank");

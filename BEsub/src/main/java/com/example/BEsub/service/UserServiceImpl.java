@@ -217,6 +217,12 @@ public class UserServiceImpl implements UserService {
         addressRepository.delete(address);
     }
 
+    @Override
+    public List<AdminProfileDTO> getAllUsers(){
+        List<User> users = userRepository.findAll();
+        return users.stream().map(this::mapToAdminProfileDTO).collect(Collectors.toList());
+    }
+
     // Helper methods to map Entity to DTO
     private UserResponseDTO mapToUserResponseDTO(User user) {
         UserResponseDTO dto = new UserResponseDTO();
@@ -247,5 +253,21 @@ public class UserServiceImpl implements UserService {
         return addresses.stream()
                 .map(this::mapToUserAddressDTO)
                 .collect(Collectors.toList());
+    }
+
+    private AdminProfileDTO mapToAdminProfileDTO(User user) {
+        AdminProfileDTO dto = new AdminProfileDTO();
+        dto.setId(user.getId());
+        dto.setEmail(user.getEmail());
+        dto.setName(user.getName());
+        dto.setUsername(user.getUsername());
+        dto.setPhone(user.getPhone());
+        dto.setGender(user.getGender());
+        dto.setDateOfBirth(user.getDateOfBirth());
+        dto.setRole(user.getRole());
+        dto.setCreatedAt(user.getCreatedAt());
+        dto.setLastLogin(user.getLastLogin());
+        dto.setAddresses(getUserAddresses(user.getId())); // Lấy danh sách địa chỉ
+        return dto;
     }
 }

@@ -38,6 +38,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
                         // Chỉ ADMIN được xóa sản phẩm
                         .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+                        // Chỉ ADMIN được xem danh sách tất cả người dùng
+                        .requestMatchers(HttpMethod.GET, "/api/admin/users").hasRole("ADMIN")
                         // Các request khác (GET) chỉ cần authenticated
                         .anyRequest().authenticated()
                 )

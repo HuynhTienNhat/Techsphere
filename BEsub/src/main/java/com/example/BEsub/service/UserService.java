@@ -3,6 +3,7 @@ package com.example.BEsub.service;
 import com.example.BEsub.dtos.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     UserResponseDTO login(UserLoginDTO loginDTO);
@@ -16,4 +17,5 @@ public interface UserService {
     void deleteUser(Long userId); // Admin
     Long getUserIdByUsername(String username);
     void deleteAddress(Long userId, Long addressId);
+    List<AdminProfileDTO> getAllUsers(); // Admin
 }

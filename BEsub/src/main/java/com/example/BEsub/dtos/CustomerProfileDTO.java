@@ -1,6 +1,8 @@
 package com.example.BEsub.dtos;
 
 import com.example.BEsub.enums.Gender;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
