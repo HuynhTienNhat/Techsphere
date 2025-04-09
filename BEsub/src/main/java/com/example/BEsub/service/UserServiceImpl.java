@@ -6,6 +6,7 @@ import com.example.BEsub.exception.AppException;
 import com.example.BEsub.models.*;
 import com.example.BEsub.repositories.*;
 import com.example.BEsub.security.JwtUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -110,7 +111,8 @@ public class UserServiceImpl implements UserService {
         address.setUser(user);
 
         // Nếu đây là địa chỉ đầu tiên, đặt làm mặc định
-        if (user.getAddresses().isEmpty()) {
+        long addressCount = addressRepository.countByUserId(userId);
+        if (addressCount==0) {
             address.setIsDefault(true);
         } else {
             address.setIsDefault(addressDTO.getIsDefault() != null && addressDTO.getIsDefault());
@@ -173,6 +175,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void setDefaultAddress(Long userId, Long addressId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found"));
@@ -192,6 +195,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void deleteAddress(Long userId, Long addressId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found"));
@@ -204,7 +208,9 @@ public class UserServiceImpl implements UserService {
         if (address.getIsDefault()) {
             throw new AppException("Cannot delete default address!");
         }
-        if (user.getAddresses().size() <= 1) {
+
+        long addressCount = addressRepository.countByUserId(userId);
+        if (addressCount <= 1) {
             throw new AppException("Cannot delete last address!");
         }
 

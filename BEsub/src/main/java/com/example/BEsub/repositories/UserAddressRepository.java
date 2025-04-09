@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface UserAddressRepository extends JpaRepository<UserAddress, Long> {
     List<UserAddress> findByUserId(Long userId);
     Optional<UserAddress> findByUserIdAndIsDefaultTrue(Long userId);
+    long countByUserId(Long userId);
 }

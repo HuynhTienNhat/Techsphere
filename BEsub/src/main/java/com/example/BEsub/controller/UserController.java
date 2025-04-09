@@ -82,10 +82,11 @@ public class UserController {
     // Đặt địa chỉ mặc định
     @PutMapping("/addresses/{addressId}/default")
     public ResponseEntity<String> setDefaultAddress(
-            @RequestParam Long userId, // Giả sử userId từ token
             @PathVariable Long addressId) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userService.getUserIdByUsername(userName);
         userService.setDefaultAddress(userId, addressId);
-        return ResponseEntity.ok("Default address updated successfully");
+        return ResponseEntity.ok("Default address set successfully");
     }
 
     public record ChangePasswordRequest(String oldPassword, String newPassword) {
