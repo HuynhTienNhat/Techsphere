@@ -1,6 +1,5 @@
 package com.example.BEsub.dtos;
 
-import com.example.BEsub.models.CartItem;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -12,6 +11,8 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartDTO {
-    private List<CartItem> cartItems;
+    private Long cartId;
+    private Long userId;
+    private List<CartItemDTO> cartItems;
     private BigDecimal totalPrice;
 }

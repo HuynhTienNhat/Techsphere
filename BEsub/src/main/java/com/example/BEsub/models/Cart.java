@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.*;
 
 @Entity
-@Table(name = "carts")
+@Table(name = "cart")
 @Data
 public class Cart extends BaseEntity {
     // Quan hệ One-to-One với USERS

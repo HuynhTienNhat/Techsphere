@@ -5,7 +5,7 @@ import lombok.Data;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "cart_items")
+@Table(name = "cart_item")
 @Data
 public class CartItem extends BaseEntity {
     private Integer quantity=1;
