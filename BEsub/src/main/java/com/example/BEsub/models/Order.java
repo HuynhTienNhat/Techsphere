@@ -49,4 +49,8 @@ public class Order extends BaseEntity {
     // Quan hệ One-to-Many với ORDER_ITEMS
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
     private List<OrderItem> orderItems;
+
+    public BigDecimal caculateTotalAmount(){
+        return subtotal.add(shippingFee).subtract(discountAmount);
+    }
 }
