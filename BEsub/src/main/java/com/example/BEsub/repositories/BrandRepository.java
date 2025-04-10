@@ -3,6 +3,8 @@ package com.example.BEsub.repositories;
 import com.example.BEsub.models.Brand;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface BrandRepository extends JpaRepository<Brand, Integer> {
-    Brand findByName(String name);
+import java.util.Optional;
+
+public interface BrandRepository extends JpaRepository<Brand, Long> {
+    Optional<Brand> findByName(String name);
 }

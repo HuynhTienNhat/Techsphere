@@ -35,10 +35,6 @@ public class ProductDetailDTO {
     @DecimalMax(value = "50000000", message = "Old price must be less than 50,000,000")
     private BigDecimal oldPrice;
 
-    @NotBlank(message = "Category name is required")
-    @Size(max = 50, message = "Category name cannot exceed 50 characters")
-    private String categoryName;
-
     @NotBlank(message = "Brand name is required")
     @Size(max = 50, message = "Brand name cannot exceed 50 characters")
     private String brandName;
@@ -55,5 +51,4 @@ public class ProductDetailDTO {
     @NotNull(message = "Reviews cannot be null")
     private List<ReviewDTO> reviews;
 }
-
 

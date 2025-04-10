@@ -1,5 +1,6 @@
 package com.example.BEsub.models;
 
+import com.example.BEsub.enums.*;
 import jakarta.persistence.*;
 import lombok.*;
 import java.math.*;
@@ -27,12 +28,6 @@ public class Product extends BaseEntity {
     @Column(name = "old_price")
     private BigDecimal oldPrice;
 
-    // Quan hệ Many-to-One với CATEGORIES
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private Category category;
-
-    // Quan hệ Many-to-One với BRANDS
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;

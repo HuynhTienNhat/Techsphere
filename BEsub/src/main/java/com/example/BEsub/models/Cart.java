@@ -2,11 +2,10 @@ package com.example.BEsub.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import java.time.LocalDateTime;
-import java.util.List;
+import java.util.*;
 
 @Entity
-@Table(name = "cart")
+@Table(name = "carts")
 @Data
 public class Cart extends BaseEntity {
     // Quan hệ One-to-One với USERS
@@ -15,6 +14,6 @@ public class Cart extends BaseEntity {
     private User user;
 
     // Quan hệ One-to-Many với CART_ITEMS
-    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL)
-    private List<CartItem> cartItems;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItem> cartItems = new ArrayList<>();
 }

@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 @Table(name = "cart_items")
 @Data
 public class CartItem extends BaseEntity {
-    private Integer quantity;
+    private Integer quantity=1;
 
     @Column(name = "unit_price", nullable = false)
     private BigDecimal unitPrice;

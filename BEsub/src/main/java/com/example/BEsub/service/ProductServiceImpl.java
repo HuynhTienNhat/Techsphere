@@ -9,8 +9,7 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,13 +18,10 @@ public class ProductServiceImpl implements ProductService {
     private ProductRepository productRepository;
 
     @Autowired
-    private CategoryRepository categoryRepository;
+    private ReviewRepository reviewRepository;
 
     @Autowired
     private BrandRepository brandRepository;
-
-    @Autowired
-    private ReviewRepository reviewRepository;
 
     @Transactional
     @Override
@@ -82,7 +78,9 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDTO> getProductsByBrand(String brandName) {
-        return productRepository.findByBrandName(brandName).stream()
+        Brand brand = brandRepository.findByName(brandName)
+                .orElseThrow(() -> new AppException("Brand not found"));
+        return productRepository.findByBrand(brand).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
@@ -121,22 +119,18 @@ public class ProductServiceImpl implements ProductService {
         product.setBasePrice(dto.getBasePrice());
         product.setOldPrice(dto.getOldPrice());
 
-        // Ánh xạ Category
-        Category category = categoryRepository.findByName(dto.getCategoryName());
-        if (category == null) {
-            category = new Category();
-            category.setName(dto.getCategoryName());
-            category = categoryRepository.save(category);
-        }
-        product.setCategory(category);
-
         // Ánh xạ Brand
-        Brand brand = brandRepository.findByName(dto.getBrandName());
-        if (brand == null) {
-            brand = new Brand();
-            brand.setName(dto.getBrandName());
-            brand = brandRepository.save(brand);
+        String brandName = dto.getBrandName();
+        if (brandName == null || brandName.isBlank()) {
+            throw new AppException("Brand name cannot be null or blank");
         }
+        Brand brand = brandRepository.findByName(brandName)
+                .orElseGet(() -> {
+                    Brand newBrand = new Brand();
+                    newBrand.setName(brandName);
+                    return brandRepository.save(newBrand);
+                });
+
         product.setBrand(brand);
 
         // Ánh xạ Variants
@@ -171,8 +165,8 @@ public class ProductServiceImpl implements ProductService {
 
         // Ánh xạ Images
         if (dto.getImages() != null) {
-            List<ProductImage> images = dto.getImages().stream().
-                    filter(i -> i.getImgUrl() != null && !i.getImgUrl().isEmpty())
+            List<ProductImage> images = dto.getImages().stream()
+                    .filter(i -> i.getImgUrl() != null && !i.getImgUrl().isEmpty())
                     .map(i -> {
                         ProductImage image = new ProductImage();
                         image.setImgUrl(i.getImgUrl());
@@ -182,45 +176,37 @@ public class ProductServiceImpl implements ProductService {
                     })
                     .collect(Collectors.toList());
             product.setImages(images);
-        }else {
+        } else {
             product.setImages(new ArrayList<>());
         }
-
-        // Thêm: ánh xạ và lưu reviews từ DTO
-//        if (dto.getReviews() != null && !dto.getReviews().isEmpty()) {
-//            List<Review> reviews = dto.getReviews().stream()
-//                    .map(r -> {
-//                        Review review = new Review();
-//                        review.setRating(r.getRating());
-//                        review.setComment(r.getComment());
-//                        review.setProduct(product);
-//                        // Lấy User và Order từ repository (giả sử ID hợp lệ)
-//                        User user = userRepository.findById(r.getUserId())
-//                                .orElseThrow(() -> new AppException("User not found for review"));
-//                        review.setUser(user);
-//                        Order order = orderRepository.findById(1L) // Giả lập orderId, cần điều chỉnh thực tế
-//                                .orElseThrow(() -> new AppException("Order not found for review"));
-//                        review.setOrder(order);
-//                        return review;
-//                    })
-//                    .collect(Collectors.toList());
-//            product.setReviews(reviews);
-//        } else {
-//            product.setReviews(new ArrayList<>());
-//        }
     }
 
     // Ánh xạ từ Entity sang ProductDTO
     private ProductDTO mapToDTO(Product product) {
-        return new ProductDTO(
-                product.getId(), product.getName(), product.getModel(), product.getSlug(),
-                product.getBasePrice(),product.getOldPrice() ,product.getCategory().getName(), product.getBrand().getName()
-        );
+        ProductDTO dto = new ProductDTO();
+        dto.setProductId(product.getId());
+        dto.setName(product.getName());
+        dto.setModel(product.getModel());
+        dto.setSlug(product.getSlug());
+        dto.setBasePrice(product.getBasePrice());
+        dto.setOldPrice(product.getOldPrice());
+        dto.setBrandName(product.getBrand().getName());
+
+        if (product.getImages() != null && !product.getImages().isEmpty()) {
+            String mainImageUrl = product.getImages().stream()
+                    .min(Comparator.comparing(ProductImage::getDisplayOrder))
+                    .map(ProductImage::getImgUrl)
+                    .orElse(null);
+            dto.setMainImageUrl(mainImageUrl);
+        } else {
+            dto.setMainImageUrl(null);
+        }
+
+        return dto;
     }
 
     // Ánh xạ từ Entity sang ProductDetailDTO
     private ProductDetailDTO mapToDetailDTO(Product product) {
-        // Tải các danh sách liên quan nếu chưa được tải
         Hibernate.initialize(product.getVariants());
         Hibernate.initialize(product.getSpecs());
         Hibernate.initialize(product.getImages());
@@ -236,15 +222,23 @@ public class ProductServiceImpl implements ProductService {
                 .map(i -> new ProductImageDTO(i.getId(), i.getImgUrl(), i.getDisplayOrder()))
                 .collect(Collectors.toList());
 
-        // Tải các đánh giá liên quan nếu cần
         List<ReviewDTO> reviews = reviewRepository.findByProductId(product.getId()).stream()
-                .map(r -> new ReviewDTO(r.getId(), r.getRating(), r.getComment(), r.getUser().getId(), r.getUser().getName(), r.getCreatedAt()))
+                .map(r -> new ReviewDTO(r.getId(), r.getRating(), r.getComment(),
+                        r.getUser().getId(), r.getUser().getName(), r.getCreatedAt()))
                 .collect(Collectors.toList());
 
-        return new ProductDetailDTO(
-                product.getId(), product.getName(), product.getModel(), product.getSlug(),
-                product.getBasePrice(), product.getOldPrice() ,product.getCategory().getName(), product.getBrand().getName(),
-                variants, specs, images, reviews
-        );
+        ProductDetailDTO dto = new ProductDetailDTO();
+        dto.setProductId(product.getId());
+        dto.setName(product.getName());
+        dto.setModel(product.getModel());
+        dto.setSlug(product.getSlug());
+        dto.setBasePrice(product.getBasePrice());
+        dto.setOldPrice(product.getOldPrice());
+        dto.setBrandName(product.getBrand().getName());
+        dto.setVariants(variants);
+        dto.setSpecs(specs);
+        dto.setImages(images);
+        dto.setReviews(reviews);
+        return dto;
     }
 }
