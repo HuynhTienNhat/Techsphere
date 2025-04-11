@@ -9,6 +9,8 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -98,6 +100,30 @@ public class ProductServiceImpl implements ProductService {
         } else {
             throw new AppException("Invalid sort order. Use 'asc' or 'desc'");
         }
+    }
+
+    @Override
+    public List<ReviewDTO> getProductReview(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(()-> new AppException("Product not found"));
+        ProductDetailDTO productDetailDTO = mapToDetailDTO(product);
+        return productDetailDTO.getReviews();
+    }
+
+    @Override
+    public AverageRatingDTO getAverageRating(Long productId) {
+        Product product = productRepository.findById(productId).orElseThrow(()-> new AppException("Product not found"));
+        ProductDetailDTO productDetailDTO = mapToDetailDTO(product);
+        List<ReviewDTO> reviewDTOS = productDetailDTO.getReviews();
+
+        BigDecimal sum = new BigDecimal(0);
+        int ratingCount = Math.toIntExact(reviewDTOS.size());
+        for(ReviewDTO reviewDTO : reviewDTOS){
+            sum = sum.add(new BigDecimal(reviewDTO.getRating()));
+        }
+        return AverageRatingDTO.builder()
+                .rating(sum.divide(new BigDecimal(ratingCount), 2, RoundingMode.HALF_UP))
+                .reviewCount(ratingCount)
+                .build();
     }
 
     @Override
@@ -241,4 +267,6 @@ public class ProductServiceImpl implements ProductService {
         dto.setReviews(reviews);
         return dto;
     }
+
+
 }

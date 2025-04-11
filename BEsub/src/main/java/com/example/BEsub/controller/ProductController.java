@@ -5,6 +5,7 @@ import com.example.BEsub.dtos.*;
 import com.example.BEsub.service.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -65,5 +66,15 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String keyword) {
         return ResponseEntity.ok(productService.searchProducts(keyword));
+    }
+
+    @GetMapping("/reviews/{productId}")
+    public ResponseEntity<List<ReviewDTO>> getProductReview(@PathVariable Long productId){
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReview(productId));
+    }
+
+    @GetMapping("/reviews/{productId}/averageRating")
+    public ResponseEntity<AverageRatingDTO> getAverageRating(@PathVariable Long productId){
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getAverageRating(productId));
     }
 }
