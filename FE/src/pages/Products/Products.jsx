@@ -1,17 +1,26 @@
-import ProductFilter from './BrandShow.jsx';
-import ProductDisplay from './Display.jsx';
-import GeneralInformation from './Information.jsx';
+import React, { useState } from "react";
+import ProductFilter from "./BrandShow";
+import ProductDisplay from "./Display";
+import GeneralInformation from "./Information";
+import { useLocation } from "react-router-dom";
 
 export default function Products() {
-    function handleSelectedBtn(brand){
-        console.log(brand);
-    }
+    const [selectedBrand, setSelectedBrand] = useState("All");
+    const location = useLocation();
 
-    return(
-        <>
-            <ProductFilter onSelectBrand={handleSelectedBtn}/>
-            <ProductDisplay/>
-            <GeneralInformation/>
-        </>
-    )
+    // Lấy keyword từ query parameter
+    const searchParams = new URLSearchParams(location.search);
+    const keyword = searchParams.get("keyword") || "";
+
+    const handleSelectedBtn = (brand) => {
+        setSelectedBrand(brand);
+    };
+
+    return (
+        <div className="products-page">
+        <ProductFilter onSelectBrand={handleSelectedBtn} />
+        <ProductDisplay selectedBrand={selectedBrand} keyword={keyword} />
+        <GeneralInformation />
+        </div>
+    );
 }
