@@ -1,8 +1,47 @@
 import { Link, useLocation } from "react-router-dom";
-import Login from "../pages/Auth/Login";
+import { useState, useEffect } from "react";
+import { FaShoppingCart } from "react-icons/fa";
 
 export default function Header() {
     const location = useLocation();
+
+    const [user, setUser] = useState(null)
+    const [isLoading, setIsLoading] = useState(true)
+
+    useEffect(() => {
+        const token = localStorage.getItem("token")
+        if (token) {
+            fetch("http://localhost:8080/api/users/profile", {
+                method: "GET",
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                },
+            }).then((response) => {
+                if (response.ok) {
+                    return response.json()
+                }
+                throw new Error("Failed to fetch user profile!")
+            }).then((data) => {
+                setUser(data)
+                setIsLoading(false)
+            }).catch((error) => {
+                console.error(error)
+                localStorage.removeItem("token")
+                setIsLoading(false)
+            })
+        } else{
+            setIsLoading(false)
+        }
+    },[])
+
+    const handleCartClick = () => {
+        if (!user) {
+            alert("Bạn cần đăng nhập trước!")
+        }else{
+            window.location.href = "/cart"
+        }
+    }
 
     return (
         <header className="px-30 py-4 dark:bg-gray-100 dark:text-gray-800">
@@ -47,20 +86,33 @@ export default function Header() {
                         />
                     </div>
 
-                    {/* Login Button */}
-                    <button type="button" className="hidden cursor-pointer px-6 py-2 font-semibold rounded lg:block dark:bg-violet-600 dark:text-gray-50 hover:dark:bg-violet-700 transition-colors">
-                        <Link to="/login" className="text-gray-50">
-                        Log in
-                        </Link>
+                    <button
+                        type="button"
+                        className="p-2 cursor-pointer rounded-full dark:bg-violet-600 dark:text-gray-50 hover:dark:bg-violet-700 transition-colors"
+                        onClick={handleCartClick}
+                        title="Giỏ hàng"
+                    >
+                        <FaShoppingCart className="w-5 h-5" />
                     </button>
-                </div>
 
-                {/* Mobile Menu Button */}
-                <button title="Open menu" type="button" className="p-4 lg:hidden">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" className="w-6 h-6 dark:text-gray-800">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
+                    {/* Login Button */}
+                    {isLoading ? (
+                        <span className="px-6 py-2 font-semibold">Đang tải...</span>
+                    ) : user ? (
+                        <span className="px-6 py-2 font-semibold text-violet-600">
+                        Xin chào {user.name}
+                        </span>
+                    ) : (
+                        <button
+                        type="button"
+                        className="hidden cursor-pointer px-6 py-2 font-semibold rounded lg:block dark:bg-violet-600 dark:text-gray-50 hover:dark:bg-violet-700 transition-colors"
+                        >
+                        <Link to="/login" className="text-gray-50">
+                            Log in
+                        </Link>
+                        </button>
+                    )}
+                </div>
             </div>
         </header>
     )

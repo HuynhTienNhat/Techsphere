@@ -14,9 +14,9 @@ export default function App(){
       <BreadCrumb />
       <Routes>
         <Route path='/' element={<HomePage/>}/>
-        <Route path='/products' element={<Products/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/register' element={<Register/>}/>
+        <Route path='/products' element={<Products/>}/>
       </Routes>
       <Footer />
     </Router>
