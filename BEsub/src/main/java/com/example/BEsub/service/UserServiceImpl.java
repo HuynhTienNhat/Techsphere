@@ -63,6 +63,10 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(registerDTO.getEmail()).isPresent()) {
             throw new AppException("Email already exists");
         }
+        if (userRepository.findByPhone(registerDTO.getPhone()).isPresent()) {
+            throw new AppException("Phone number already exists");
+        }
+
 
         User user = new User();
         user.setEmail(registerDTO.getEmail());

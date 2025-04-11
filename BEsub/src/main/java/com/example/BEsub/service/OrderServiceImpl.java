@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
-public class OrderServiceImpl implements OrderService{
+public class OrderServiceImpl implements OrderService {
     @Autowired
     OrderRepository orderRepository;
 
@@ -33,7 +33,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public List<OrderDTO> getAllOrdersOfUser() {
-        User user = userRepository.findById(getCurrentUserId()).orElseThrow(()->new AppException("User not found"));
+        User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
         List<Order> orders = user.getOrders();
 
         return orders.stream().map(this::mapToOrderDTO).toList();
@@ -41,7 +41,7 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public List<OrderDTO> getAllOrdersByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(()->new AppException("User not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
         List<Order> orders = user.getOrders();
 
         return orders.stream().map(this::mapToOrderDTO).toList();
@@ -49,13 +49,13 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public void changeStatusOfOrder(OrderStatusChangeDTO orderStatusChangeDTO) {
-        User user = userRepository.findById(orderStatusChangeDTO.getUserId()).orElseThrow(()->new AppException("User not found"));
+        User user = userRepository.findById(orderStatusChangeDTO.getUserId()).orElseThrow(() -> new AppException("User not found"));
         List<Order> orders = user.getOrders();
 
         Order orderChange = orders.stream()
                 .filter(o -> o.getId().equals(orderStatusChangeDTO.getOrderId()))
                 .findFirst()
-                .orElseThrow(()-> new AppException("Order not found"));
+                .orElseThrow(() -> new AppException("Order not found"));
 
         orderChange.setStatus(OrderStatus.fromString(orderStatusChangeDTO.getStatus()));
         orderRepository.save(orderChange);
@@ -63,13 +63,13 @@ public class OrderServiceImpl implements OrderService{
 
     @Override
     public OrderDTO getOrder(Long orderId) {
-        User user = userRepository.findById(getCurrentUserId()).orElseThrow(()->new AppException("User not found"));
+        User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
         List<Order> orders = user.getOrders();
 
         Order order = orders.stream()
                 .filter(o -> o.getId().equals(orderId))
                 .findFirst()
-                .orElseThrow(()-> new AppException("Order not found"));
+                .orElseThrow(() -> new AppException("Order not found"));
 
         return mapToOrderDTO(order);
     }
@@ -85,20 +85,20 @@ public class OrderServiceImpl implements OrderService{
         order.setSubtotal(orderCreateDTO.getSubtotal());
         order.setShippingFee(orderCreateDTO.getShippingFee());
         order.setTotalAmount(order.caculateTotalAmount());
-        order.setUser(userRepository.findById(getCurrentUserId()).orElseThrow(()->new AppException("User not found")));
+        order.setUser(userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found")));
         order.setAddress(orderCreateDTO.getUserAddress());
 
         Cart cart = cartRepository.findByUserId(getCurrentUserId())
-                .orElseThrow(()->new AppException("User not found"));
+                .orElseThrow(() -> new AppException("User not found"));
         List<CartItem> cartItems = cart.getCartItems();
-        for(CartItem item : cartItems){
+        for (CartItem item : cartItems) {
             if (item.getQuantity() > item.getVariant().getStockQuantity()) {
                 throw new AppException("Product " + item.getVariant().getProduct().getName() + " is not have enough stock");
             }
         }
 
         order.setOrderItems(cartItems.stream()
-                .map((item)->mapCartItemToOrderItem(item,order))
+                .map((item) -> mapCartItemToOrderItem(item, order))
                 .toList());
 
         cartItems.clear();
@@ -106,8 +106,8 @@ public class OrderServiceImpl implements OrderService{
 
         orderRepository.save(order);
 
-        for(CartItem item : cartItems){
-            item.getVariant().setStockQuantity(item.getVariant().getStockQuantity()-item.getQuantity());
+        for (CartItem item : cartItems) {
+            item.getVariant().setStockQuantity(item.getVariant().getStockQuantity() - item.getQuantity());
             productVariantRepository.save(item.getVariant());
         }
 
@@ -118,17 +118,17 @@ public class OrderServiceImpl implements OrderService{
     @Override
     public void deleteOrder(Long orderId) {
         User user = userRepository.findById(getCurrentUserId())
-                .orElseThrow(()->new AppException("User not found"));
+                .orElseThrow(() -> new AppException("User not found"));
         Order order = user.getOrders()
-                .stream().filter((od)->od.getId().equals(orderId))
+                .stream().filter((od) -> od.getId().equals(orderId))
                 .findFirst()
-                .orElseThrow(()-> new AppException("Order not found"));
-        if(order.getStatus().equals(OrderStatus.DELIVERED)) throw new AppException("Order was delivered");
+                .orElseThrow(() -> new AppException("Order not found"));
+        if (order.getStatus().equals(OrderStatus.DELIVERED)) throw new AppException("Order was delivered");
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
     }
 
-    private OrderItem mapCartItemToOrderItem(CartItem cartItem, Order order){
+    private OrderItem mapCartItemToOrderItem(CartItem cartItem, Order order) {
         OrderItem orderItem = new OrderItem();
         orderItem.setQuantity(cartItem.getQuantity());
         orderItem.setUnitPrice(cartItem.getUnitPrice());
@@ -137,7 +137,7 @@ public class OrderServiceImpl implements OrderService{
         return orderItem;
     }
 
-    private OrderDTO mapToOrderDTO(Order order){
+    private OrderDTO mapToOrderDTO(Order order) {
         if (order == null) return null;
 
         OrderDTO dto = new OrderDTO();
@@ -172,10 +172,10 @@ public class OrderServiceImpl implements OrderService{
         order.setStatus(dto.getStatus());
 
         order.setUser(userRepository.findById(dto.getUserId())
-                .orElseThrow(()->new AppException("User not found")));
+                .orElseThrow(() -> new AppException("User not found")));
 
         Order orderToGetAddress = orderRepository.findById(dto.getOrderId())
-                        .orElseThrow(()->new AppException("Order not found"));
+                .orElseThrow(() -> new AppException("Order not found"));
         order.setAddress(orderToGetAddress.getAddress());
 
         // Thiết lập quan hệ ngược giữa OrderItem và Order
