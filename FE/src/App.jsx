@@ -19,11 +19,11 @@ export default function App(){
         <Route path='/login' element={<Login/>}/>
         <Route path='/register' element={<Register/>}/>
         <Route path='/products' element={<Products/>}/>
-        {/* <Route path='/admin' element={
+        <Route path='/admin' element={
           <ProtectedAdminRoute>
             <AdminDashBoard />
           </ProtectedAdminRoute>
-        }/> */}
+        }/> 
       </Routes>
       <Footer />
     </Router>
