@@ -1,17 +1,15 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-// Sửa: Thêm import FaEye, FaEyeSlash
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 export default function Login() {
-  // Sửa: Dùng object cho state và thêm showPassword
   const [loginData, setLoginData] = useState({
     usernameOrEmail: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate()
 
-  // Sửa: Thêm handleChange và validateForm
   const handleChange = (e) => {
     const { name, value } = e.target;
     setLoginData((prevData) => ({
@@ -27,11 +25,9 @@ export default function Login() {
     return null;
   };
 
-  // Sửa: Cập nhật handleInputChange
   const handleInputChange = async (event) => {
     event.preventDefault();
 
-    // Validate form trước khi gửi
     const errorMessage = validateForm();
     if (errorMessage) {
       alert(errorMessage);
@@ -56,8 +52,32 @@ export default function Login() {
 
       if (response.status === 200) {
         alert("Đăng nhập thành công!");
+        
         localStorage.setItem("token", result.token);
-        window.location.href = "../";
+
+        // Kích hoạt custom event sau khi lưu token
+        window.dispatchEvent(new Event("token-changed"));
+
+        const profileResponse = await fetch("http://localhost:8080/api/users/profile", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${result.token}`,
+          }
+        })
+
+        if (!profileResponse.ok) {
+          throw new Error("Không thể tải thông tin người dùng!"); 
+        }
+
+        const profileData = await profileResponse.json()
+        const role = profileData.role
+
+        if (role === "ADMIN") {
+          navigate("/admin");
+        } else {
+          navigate("/");
+        }
       } else {
         alert("Đăng nhập thất bại: " + (result.error || "Lỗi không xác định"));
       }
@@ -67,7 +87,6 @@ export default function Login() {
     }
   };
 
-  // Sửa: Cập nhật JSX để thêm icon mắt và dùng state mới
   return (
     <div id="loginForm" className="flex min-h-full flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
       <div className="border border-slate-400 rounded-md p-8 shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50 relative">

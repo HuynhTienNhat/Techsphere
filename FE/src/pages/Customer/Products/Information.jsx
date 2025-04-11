@@ -1,5 +1,5 @@
 import React from "react";
-import {sections} from './../../assets/data/Products/Information';
+import {sections} from '../../../assets/data/Products/Information';
 
 export default function GeneralInformation() {
     const [expanded, setExpanded] = React.useState(false);

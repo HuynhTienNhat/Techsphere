@@ -1,6 +1,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFire } from '@fortawesome/free-solid-svg-icons';
-import {products} from './../../assets/data/Products';
+import {products} from './../../../assets/data/Products';
 export default function HomeProducts() {
     
     const productDisplay = products.map(product =>
