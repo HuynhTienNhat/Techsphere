@@ -1,4 +1,4 @@
-import ProductFiler from './BrandShow.jsx';
+import ProductFilter from './BrandShow.jsx';
 import ProductDisplay from './Display.jsx';
 import GeneralInformation from './Information.jsx';
 
@@ -9,7 +9,7 @@ export default function Products() {
 
     return(
         <>
-            <ProductFiler onSelectBrand={handleSelectedBtn}/>
+            <ProductFilter onSelectBrand={handleSelectedBtn}/>
             <ProductDisplay/>
             <GeneralInformation/>
         </>
