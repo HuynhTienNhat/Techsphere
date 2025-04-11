@@ -124,7 +124,7 @@ export default function Register() {
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
       <div className="border border-slate-400 rounded-md p-8 shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50 relative w-[450px]">
-        <h2 className="text-3xl text-center mb-6">Đăng ký tài khoản</h2>
+        <h2 className="mt-6 text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">Đăng ký tài khoản</h2>
         <form onSubmit={handleInputChange} autoComplete="off">
           <div className="relative my-4">
             <input

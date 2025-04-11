@@ -71,7 +71,7 @@ export default function Login() {
   return (
     <div id="loginForm" className="flex min-h-full flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
       <div className="border border-slate-400 rounded-md p-8 shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50 relative">
-        <h1 className="text-3xl text-center mb-6">Đăng nhập</h1>
+        <h1 className="mt-6 text-center text-3xl font-bold leading-9 tracking-tight text-gray-900">Đăng nhập</h1>
         <form onSubmit={handleInputChange} autoComplete="off">
           <div className="relative my-4">
             <input
@@ -114,7 +114,7 @@ export default function Login() {
             </div>
           </div>
           <span className="block text-right text-violet-600 hover:underline">
-            <a href="#">Quên mật khẩu?</a>
+            <Link to={'/forget-password'}>Quên mật khẩu?</Link>
           </span>
           <button
             className="w-full mb-4 cursor-pointer text-[18px] mt-6 rounded-full bg-violet-600 text-emerald-50 hover:bg-violet-800 py-2"
