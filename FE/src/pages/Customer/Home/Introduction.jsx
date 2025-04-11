@@ -1,4 +1,4 @@
-import {smallProducts} from './../../assets/data/SmallProducts';
+import {smallProducts} from './../../../assets/data/SmallProducts';
 
 export default function Introduction() {
     const liElements = smallProducts.map( (product) =>
