@@ -39,4 +39,6 @@ public class ProductDTO {
     private String brandName;
 
     private String mainImageUrl;
+
+    private boolean isOutOfStock;
 }

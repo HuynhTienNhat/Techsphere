@@ -15,7 +15,11 @@ public class ProductCreateRequest {
     private BigDecimal oldPrice;
     private String brandName;
     private List<ProductVariantDTO> variants;
-    private List<ProductSpecDTO> specs;
-    private List<MultipartFile> imageFiles; // Nhận file hình ảnh
-    private List<Integer> displayOrders; // Thứ tự hiển thị của hình ảnh
- }
+    private String screen; // Màn hình
+    private String ram; // RAM
+    private String frontCamera; // Camera trước
+    private String rearCamera; // Camera sau
+    private String pin; // CPU
+    private List<MultipartFile> imageFiles;
+    private List<Integer> displayOrders;
+}

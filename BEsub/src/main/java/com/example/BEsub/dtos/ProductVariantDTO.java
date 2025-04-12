@@ -5,11 +5,10 @@ import lombok.*;
 
 import java.math.BigDecimal;
 
-@Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Data
 public class ProductVariantDTO {
     private Long variantId;
 
@@ -29,4 +28,6 @@ public class ProductVariantDTO {
     @NotNull(message = "Stock quantity cannot be null")
     @Min(value = 0, message = "Stock quantity must be at least 0")
     private Integer stockQuantity;
+
+    private boolean isDefault;
 }

@@ -32,17 +32,120 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private BrandRepository brandRepository;
 
+    // Các specName cố định
+    private static final Map<String, String> SPEC_FIELDS = new LinkedHashMap<>() {{
+        put("Màn hình", "screen");
+        put("RAM", "ram");
+        put("Camera trước", "frontCamera");
+        put("Camera sau", "rearCamera");
+        put("Pin", "pin");
+    }};
+
+    // Hàm validate specs
+    private void validateSpecs(ProductCreateRequest request) {
+        // Màn hình: Số thập phân
+        if (request.getScreen() == null || request.getScreen().isBlank()) {
+            throw new AppException("Màn hình cannot be null or blank");
+        }
+        try {
+            double screenSize = Double.parseDouble(request.getScreen());
+            if (screenSize <= 0 || screenSize > 10) {
+                throw new AppException("Màn hình must be a number between 0 and 10");
+            }
+        } catch (NumberFormatException e) {
+            throw new AppException("Màn hình must be a valid number (e.g., 6.7)");
+        }
+
+        // RAM: Số nguyên
+        if (request.getRam() == null || request.getRam().isBlank()) {
+            throw new AppException("RAM cannot be null or blank");
+        }
+        try {
+            int ramSize = Integer.parseInt(request.getRam());
+            if (ramSize <= 0 || ramSize > 128) {
+                throw new AppException("RAM must be a number between 1 and 128");
+            }
+        } catch (NumberFormatException e) {
+            throw new AppException("RAM must be a valid number (e.g., 8)");
+        }
+
+        // Camera trước: Số nguyên
+        if (request.getFrontCamera() == null || request.getFrontCamera().isBlank()) {
+            throw new AppException("Camera trước cannot be null or blank");
+        }
+        try {
+            int frontCamera = Integer.parseInt(request.getFrontCamera());
+            if (frontCamera <= 0 || frontCamera > 100) {
+                throw new AppException("Camera trước must be a number between 1 and 100");
+            }
+        } catch (NumberFormatException e) {
+            throw new AppException("Camera trước must be a valid number (e.g., 12)");
+        }
+
+        // Camera sau: 1-3 số
+        if (request.getRearCamera() == null || request.getRearCamera().isBlank()) {
+            throw new AppException("Camera sau cannot be null or blank");
+        }
+        String[] rearCameraParts = request.getRearCamera().trim().split("\\s+");
+        if (rearCameraParts.length < 1 || rearCameraParts.length > 3) {
+            throw new AppException("Camera sau must have 1 to 3 values (e.g., '48 12')");
+        }
+        for (String part : rearCameraParts) {
+            try {
+                int camera = Integer.parseInt(part);
+                if (camera <= 0 || camera > 100) {
+                    throw new AppException("Each Camera sau value must be between 1 and 100");
+                }
+            } catch (NumberFormatException e) {
+                throw new AppException("Camera sau must contain valid numbers (e.g., '48 12')");
+            }
+        }
+
+        // Pin: Số nguyên
+        if (request.getPin() == null || request.getPin().isBlank()) {
+            throw new AppException("Pin cannot be null or blank");
+        }
+        try {
+            int pinSize = Integer.parseInt(request.getPin());
+            if (pinSize < 1000 || pinSize > 10000) {
+                throw new AppException("Pin must be a number between 1000 and 10000");
+            }
+        } catch (NumberFormatException e) {
+            throw new AppException("Pin must be a valid number (e.g., 4000)");
+        }
+    }
+
     @Transactional
     public ProductDetailDTO createProduct(ProductCreateRequest request) {
-        // Kiểm tra slug đã tồn tại chưa
+        // Kiểm tra slug
         if (productRepository.findBySlug(request.getSlug()) != null) {
             throw new AppException("Slug already exists");
         }
 
-        // Kiểm tra imageFiles và displayOrders có cùng kích thước không
-        if (request.getImageFiles() != null && request.getDisplayOrders() != null &&
-                request.getImageFiles().size() != request.getDisplayOrders().size()) {
+        // Kiểm tra imageFiles và displayOrders
+        if (request.getImageFiles() == null || request.getImageFiles().isEmpty()) {
+            throw new AppException("At least one image is required");
+        }
+        if (request.getImageFiles().size() != request.getDisplayOrders().size()) {
             throw new AppException("Number of images and display orders must match");
+        }
+
+        // Kiểm tra variants
+        if (request.getVariants() == null || request.getVariants().isEmpty()) {
+            throw new AppException("At least one variant is required");
+        }
+
+        // Validate specs
+        validateSpecs(request);
+
+        // Validate variants: Chỉ 1 isDefault
+        long defaultCount = request.getVariants().stream().filter(ProductVariantDTO::isDefault).count();
+        if (defaultCount > 1) {
+            throw new AppException("Only one variant can be set as default");
+        }
+        if (defaultCount == 0) {
+            // Tự động chọn variant đầu tiên làm mặc định
+            request.getVariants().get(0).setDefault(true);
         }
 
         // Tạo sản phẩm mới
@@ -50,33 +153,27 @@ public class ProductServiceImpl implements ProductService {
         mapToEntity(request, product);
         Product savedProduct = productRepository.save(product);
 
-        // Upload hình ảnh lên Cloudinary và lưu URL
-        if (request.getImageFiles() != null && !request.getImageFiles().isEmpty()) {
-            List<ProductImage> images = new ArrayList<>();
-            for (int i = 0; i < request.getImageFiles().size(); i++) {
-                MultipartFile imageFile = request.getImageFiles().get(i);
-                Integer displayOrder = request.getDisplayOrders().get(i);
-
-                // Upload lên Cloudinary
-                String folder = "products/" + savedProduct.getId();
-                String publicId = displayOrder == 0 ? "main" : "image-" + displayOrder;
-                String imageUrl;
-                try {
-                    imageUrl = cloudinaryService.uploadImage(imageFile, folder, publicId);
-                } catch (Exception e) {
-                    throw new AppException("Failed to upload image to Cloudinary: " + e.getMessage());
-                }
-
-                // Lưu vào ProductImage
-                ProductImage image = new ProductImage();
-                image.setImgUrl(imageUrl);
-                image.setDisplayOrder(displayOrder);
-                image.setProduct(savedProduct);
-                images.add(image);
+        // Upload hình ảnh
+        List<ProductImage> images = new ArrayList<>();
+        for (int i = 0; i < request.getImageFiles().size(); i++) {
+            MultipartFile imageFile = request.getImageFiles().get(i);
+            Integer displayOrder = request.getDisplayOrders().get(i);
+            String folder = "products/" + savedProduct.getId();
+            String publicId = displayOrder == 0 ? "main" : "image-" + displayOrder;
+            String imageUrl;
+            try {
+                imageUrl = cloudinaryService.uploadImage(imageFile, folder, publicId);
+            } catch (Exception e) {
+                throw new AppException("Failed to upload image: " + e.getMessage());
             }
-            productImageRepository.saveAll(images);
-            savedProduct.setImages(images);
+            ProductImage image = new ProductImage();
+            image.setImgUrl(imageUrl);
+            image.setDisplayOrder(displayOrder);
+            image.setProduct(savedProduct);
+            images.add(image);
         }
+        productImageRepository.saveAll(images);
+        savedProduct.setImages(images);
 
         return mapToDetailDTO(savedProduct);
     }
@@ -92,9 +189,38 @@ public class ProductServiceImpl implements ProductService {
             throw new AppException("Slug already exists");
         }
 
+        // Không cho phép cập nhật specs
+        if (productDTO.getSpecs() != null && !productDTO.getSpecs().isEmpty()) {
+            throw new AppException("Specs cannot be updated after product creation");
+        }
+
+        // Không cho phép cập nhật images
+        if (productDTO.getImages() != null && !productDTO.getImages().isEmpty()) {
+            throw new AppException("Images cannot be updated after product creation");
+        }
+
+        // Validate variants: Chỉ 1 isDefault
+        if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
+            long defaultCount = productDTO.getVariants().stream().filter(ProductVariantDTO::isDefault).count();
+            if (defaultCount > 1) {
+                throw new AppException("Only one variant can be set as default");
+            }
+            if (defaultCount == 0) {
+                // Tự động chọn variant đầu tiên làm mặc định
+                productDTO.getVariants().get(0).setDefault(true);
+            }
+        }
+
         mapToEntity(productDTO, product);
         Product updatedProduct = productRepository.save(product);
         return mapToDetailDTO(updatedProduct);
+    }
+
+    @Override
+    public ProductDetailDTO getProductById(Long id) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new AppException("Product not found"));
+        return mapToDetailDTO(product);
     }
 
     @Transactional
@@ -114,7 +240,6 @@ public class ProductServiceImpl implements ProductService {
                 }
             }
         }
-
         productRepository.delete(product);
     }
 
@@ -187,7 +312,6 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    // Ánh xạ từ DTO sang Entity
     private void mapToEntity(ProductDetailDTO dto, Product product) {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new AppException("Product name cannot be null or blank");
@@ -210,55 +334,36 @@ public class ProductServiceImpl implements ProductService {
                     newBrand.setName(brandName);
                     return brandRepository.save(newBrand);
                 });
-
         product.setBrand(brand);
 
         // Ánh xạ Variants
+        List<ProductVariant> currentVariants = product.getVariants() != null ? product.getVariants() : new ArrayList<>();
+        List<ProductVariant> updatedVariants = new ArrayList<>();
+        Map<Long, ProductVariant> variantMap = currentVariants.stream()
+                .filter(v -> v.getId() != null)
+                .collect(Collectors.toMap(ProductVariant::getId, v -> v));
+
         if (dto.getVariants() != null) {
-            List<ProductVariant> variants = dto.getVariants().stream()
-                    .map(v -> {
-                        ProductVariant variant = new ProductVariant();
-                        variant.setColor(v.getColor());
-                        variant.setStorage(v.getStorage());
-                        variant.setPriceAdjustment(v.getPriceAdjustment());
-                        variant.setStockQuantity(v.getStockQuantity());
-                        variant.setProduct(product);
-                        return variant;
-                    })
-                    .collect(Collectors.toList());
-            product.setVariants(variants);
+            for (ProductVariantDTO vDto : dto.getVariants()) {
+                ProductVariant variant;
+                if (vDto.getVariantId() != null && variantMap.containsKey(vDto.getVariantId())) {
+                    // Cập nhật variant hiện có
+                    variant = variantMap.get(vDto.getVariantId());
+                    variantMap.remove(vDto.getVariantId());
+                } else {
+                    // Thêm variant mới
+                    variant = new ProductVariant();
+                    variant.setProduct(product);
+                }
+                variant.setColor(vDto.getColor());
+                variant.setStorage(vDto.getStorage());
+                variant.setPriceAdjustment(vDto.getPriceAdjustment());
+                variant.setStockQuantity(vDto.getStockQuantity());
+                variant.setDefault(vDto.isDefault());
+                updatedVariants.add(variant);
+            }
         }
-
-        // Ánh xạ Specs
-        if (dto.getSpecs() != null) {
-            List<ProductSpec> specs = dto.getSpecs().stream()
-                    .map(s -> {
-                        ProductSpec spec = new ProductSpec();
-                        spec.setSpecName(s.getSpecName());
-                        spec.setSpecValue(s.getSpecValue());
-                        spec.setProduct(product);
-                        return spec;
-                    })
-                    .collect(Collectors.toList());
-            product.setSpecs(specs);
-        }
-
-        // Ánh xạ Images
-        if (dto.getImages() != null) {
-            List<ProductImage> images = dto.getImages().stream()
-                    .filter(i -> i.getImgUrl() != null && !i.getImgUrl().isEmpty())
-                    .map(i -> {
-                        ProductImage image = new ProductImage();
-                        image.setImgUrl(i.getImgUrl());
-                        image.setDisplayOrder(i.getDisplayOrder());
-                        image.setProduct(product);
-                        return image;
-                    })
-                    .collect(Collectors.toList());
-            product.setImages(images);
-        } else {
-            product.setImages(new ArrayList<>());
-        }
+        product.setVariants(updatedVariants);
     }
 
     // Ánh xạ từ Entity sang ProductDTO
@@ -282,6 +387,7 @@ public class ProductServiceImpl implements ProductService {
             dto.setMainImageUrl(null);
         }
 
+        dto.setOutOfStock(product.getVariants().stream().allMatch(v -> v.getStockQuantity() == 0));
         return dto;
     }
 
@@ -293,7 +399,7 @@ public class ProductServiceImpl implements ProductService {
 
         List<ProductVariantDTO> variants = product.getVariants().stream()
                 .map(v -> new ProductVariantDTO(v.getId(), v.getColor(), v.getStorage(),
-                        v.getPriceAdjustment(), v.getStockQuantity()))
+                        v.getPriceAdjustment(), v.getStockQuantity(), v.isDefault()))
                 .collect(Collectors.toList());
         List<ProductSpecDTO> specs = product.getSpecs().stream()
                 .map(s -> new ProductSpecDTO(s.getId(), s.getSpecName(), s.getSpecValue()))
@@ -346,33 +452,46 @@ public class ProductServiceImpl implements ProductService {
         product.setBrand(brand);
 
         // Ánh xạ Variants
-        if (request.getVariants() != null) {
-            List<ProductVariant> variants = request.getVariants().stream()
-                    .map(v -> {
-                        ProductVariant variant = new ProductVariant();
-                        variant.setColor(v.getColor());
-                        variant.setStorage(v.getStorage());
-                        variant.setPriceAdjustment(v.getPriceAdjustment());
-                        variant.setStockQuantity(v.getStockQuantity());
-                        variant.setProduct(product);
-                        return variant;
-                    })
-                    .collect(Collectors.toList());
-            product.setVariants(variants);
-        }
+        List<ProductVariant> variants = request.getVariants().stream()
+                .map(v -> {
+                    ProductVariant variant = new ProductVariant();
+                    variant.setColor(v.getColor());
+                    variant.setStorage(v.getStorage());
+                    variant.setPriceAdjustment(v.getPriceAdjustment());
+                    variant.setStockQuantity(v.getStockQuantity());
+                    variant.setDefault(v.isDefault());
+                    variant.setProduct(product);
+                    return variant;
+                })
+                .collect(Collectors.toList());
+        product.setVariants(variants);
 
         // Ánh xạ Specs
-        if (request.getSpecs() != null) {
-            List<ProductSpec> specs = request.getSpecs().stream()
-                    .map(s -> {
-                        ProductSpec spec = new ProductSpec();
-                        spec.setSpecName(s.getSpecName());
-                        spec.setSpecValue(s.getSpecValue());
-                        spec.setProduct(product);
-                        return spec;
-                    })
-                    .collect(Collectors.toList());
-            product.setSpecs(specs);
-        }
+        List<ProductSpec> specs = new ArrayList<>();
+        SPEC_FIELDS.forEach((specName, fieldName) -> {
+            ProductSpec spec = new ProductSpec();
+            spec.setSpecName(specName);
+            spec.setProduct(product);
+            switch (fieldName) {
+                case "screen":
+                    spec.setSpecValue(request.getScreen() + " inches");
+                    break;
+                case "ram":
+                    spec.setSpecValue(request.getRam() + "GB");
+                    break;
+                case "frontCamera":
+                    spec.setSpecValue(request.getFrontCamera() + "MP");
+                    break;
+                case "rearCamera":
+                    String[] parts = request.getRearCamera().trim().split("\\s+");
+                    spec.setSpecValue(String.join("MP + ", parts) + "MP");
+                    break;
+                case "pin":
+                    spec.setSpecValue(request.getPin() + "mAh");
+                    break;
+            }
+            specs.add(spec);
+        });
+        product.setSpecs(specs);
     }
 }
