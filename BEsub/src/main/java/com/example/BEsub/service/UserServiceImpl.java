@@ -100,6 +100,7 @@ public class UserServiceImpl implements UserService {
         profileDTO.setGender(user.getGender());
         profileDTO.setDateOfBirth(user.getDateOfBirth());
         profileDTO.setAddresses(getUserAddresses(userId));
+        profileDTO.setRole(user.getRole().name());
         return profileDTO;
     }
 

@@ -9,11 +9,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Service
+
 public interface ReviewService {
     ReviewDTO createReview(ReviewCreateDTO reviewCreateDTO);
     List<ReviewDTO> getReviewsOfUser();
     ReviewDTO updateReview(Long reviewId, ReviewUpdateDTO reviewUpdateDTO);
     void deleteReview(Long reviewId);
-
 }
