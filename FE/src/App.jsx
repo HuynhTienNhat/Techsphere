@@ -9,6 +9,8 @@ import Login from "./pages/Auth/Login";
 import Register from "./pages/Auth/Register";
 import AdminDashBoard from "./pages/Admin/Dashboard/Dashboard";
 import ProtectedAdminRoute from "./routes/ProtectedAdminRoute";
+import AdminProducts from './pages/Admin/Products/Products.jsx';
+import Users from './pages/Admin/Users/Users.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -80,6 +82,8 @@ function AppContent() {
             <AdminLayout>
               <Routes>
                 <Route path="/" element={<AdminDashBoard />} />
+                <Route path="products" element={<AdminProducts />} />
+                <Route path="users" element={<Users/>}/>
               </Routes>
             </AdminLayout>
           </ProtectedAdminRoute>

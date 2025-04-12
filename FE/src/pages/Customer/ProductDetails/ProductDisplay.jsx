@@ -1,8 +1,8 @@
 import React from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
-import "swiper/css"; // Styles cơ bản của Swiper
-import "swiper/css/navigation"; // Styles cho nút navigation
-import "swiper/css/pagination"; // Styles cho pagination
+import "swiper/css"; 
+import "swiper/css/navigation"; 
+import "swiper/css/pagination"; 
 
 export default function ProductDisplay({ product }) {
     return (
