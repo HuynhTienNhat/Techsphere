@@ -110,7 +110,8 @@ export default function Register() {
 
       if (response.status === 201) {
         alert("Đăng ký thành công!");
-        navigate('/login')
+        localStorage.setItem("token", result.token);
+        window.location.href = "../email-verify";
       } else {
         alert("Đăng ký thất bại: " + (result.error || "Lỗi không xác định"));
       }
