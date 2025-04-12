@@ -3,7 +3,6 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css"; // Styles cơ bản của Swiper
 import "swiper/css/navigation"; // Styles cho nút navigation
 import "swiper/css/pagination"; // Styles cho pagination
-import { Navigation, Pagination } from "swiper";
 
 export default function ProductDisplay({ product }) {
     return (

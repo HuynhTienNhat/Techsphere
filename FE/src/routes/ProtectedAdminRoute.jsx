@@ -9,23 +9,32 @@ export default function ProtectedAdminRoute({ children }) {
     const fetchUserRole = async () => {
         try {
             const token = localStorage.getItem("token");
+            const storedRole = localStorage.getItem('role')
+
             if (!token) {
                 throw new Error("No token found");
             }
-            const response = await fetch("http://localhost:8080/api/users/profile", {
-                method: "GET",
-                headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-                },
-            });
+            if (storedRole) {
+              setRole(storedRole)
+            }else{
+              console.log("Else runs");
+              
+              const response = await fetch("http://localhost:8080/api/users/profile", {
+                  method: "GET",
+                  headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${token}`,
+                  },
+              });
 
-            if (!response.ok) {
-                throw new Error("Failed to fetch user profile");
+              if (!response.ok) {
+                  throw new Error("Failed to fetch user profile");
+              }
+
+              const data = await response.json();
+              setRole(data.role); // Lấy role từ API
+              localStorage.setItem('role', data.role)
             }
-
-            const data = await response.json();
-            setRole(data.role); // Lấy role từ API
         } catch (err) {
             console.error(err);
             setRole(null);
@@ -45,7 +54,7 @@ export default function ProtectedAdminRoute({ children }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (role.toUpperCase() !== "ADMIN") {
+  if (role !== "ADMIN") {
     return <Navigate to="/" replace />;
   }
 

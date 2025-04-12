@@ -52,11 +52,9 @@ export default function Login() {
 
       if (response.status === 200) {
         alert("Đăng nhập thành công!");
+        console.log(result.token);
         
         localStorage.setItem("token", result.token);
-
-        // Kích hoạt custom event sau khi lưu token
-        window.dispatchEvent(new Event("token-changed"));
 
         const profileResponse = await fetch("http://localhost:8080/api/users/profile", {
           method: "GET",
@@ -69,9 +67,14 @@ export default function Login() {
         if (!profileResponse.ok) {
           throw new Error("Không thể tải thông tin người dùng!"); 
         }
-
+        
         const profileData = await profileResponse.json()
         const role = profileData.role
+        
+        localStorage.setItem('role', role)
+
+        // Kích hoạt custom event sau khi lưu token
+        window.dispatchEvent(new Event("token-changed"));
 
         if (role === "ADMIN") {
           navigate("/admin");

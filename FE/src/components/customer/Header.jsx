@@ -1,4 +1,3 @@
-// src/components/common/Header.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaShoppingCart } from "react-icons/fa";
@@ -11,17 +10,13 @@ export default function Header() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token"));
 
-  // Lắng nghe custom event và sự kiện storage
   useEffect(() => {
     const handleTokenChange = () => {
       setToken(localStorage.getItem("token"));
     };
 
-    // Lắng nghe custom event "token-changed"
     window.addEventListener("token-changed", handleTokenChange);
-    // Lắng nghe sự kiện storage (cho các tab khác)
     window.addEventListener("storage", handleTokenChange);
-    // Cập nhật token ngay lập tức khi component mount
     setToken(localStorage.getItem("token"));
 
     return () => {
@@ -30,7 +25,6 @@ export default function Header() {
     };
   }, []);
 
-  // Gọi API để lấy thông tin người dùng khi token thay đổi
   useEffect(() => {
     if (token) {
       setIsLoading(true);
@@ -54,6 +48,7 @@ export default function Header() {
         .catch((error) => {
           console.error(error);
           localStorage.removeItem("token");
+          localStorage.removeItem("role"); // Xóa role nếu token không hợp lệ
           setToken(null);
           setUser(null);
           setIsLoading(false);
@@ -85,17 +80,16 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("role"); // Xóa role khi đăng xuất
     setToken(null);
     setUser(null);
     navigate("/login");
-    // Kích hoạt custom event khi đăng xuất
     window.dispatchEvent(new Event("token-changed"));
   };
 
   return (
     <header className="px-30 py-4 dark:bg-gray-100 dark:text-gray-800">
       <div className="container flex justify-between h-16 items-center">
-        {/* Left Navigation Links */}
         <ul className="items-stretch hidden space-x-3 lg:flex">
           <li className="flex">
             <Link
@@ -119,14 +113,11 @@ export default function Header() {
           </li>
         </ul>
 
-        {/* Centered Logo */}
         <Link to={"/"} href="" aria-label="Back to homepage" className="flex items-center p-2">
           <span className="text-2xl font-bold text-purple-600 dark:text-violet-600">TechSphere</span>
         </Link>
 
-        {/* Right Side Elements */}
         <div className="flex items-center space-x-6">
-          {/* Wider Search Bar */}
           <div className="relative w-[280px]">
             <span className="absolute inset-y-0 left-0 flex items-center pl-2">
               <button type="submit" title="Search" className="p-1 focus:outline-none focus:ring" onClick={handleSearch}>
@@ -170,7 +161,6 @@ export default function Header() {
             <FaShoppingCart className="w-5 h-5" />
           </button>
 
-          {/* Login Button */}
           {isLoading ? (
             <span className="px-6 py-2 font-semibold">Đang tải...</span>
           ) : user ? (
