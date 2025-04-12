@@ -25,7 +25,7 @@ function ForgetPassword() {
               Địa chỉ Email
             </label>
           </div>
-          <Link to={'/reset-password'}>
+          <Link to={'/email-verify'}>
             <button
               className="w-full mb-4 cursor-pointer text-[18px] mt-6 rounded-full bg-violet-600 text-white hover:bg-violet-800 py-2"
               type="submit"
@@ -35,7 +35,7 @@ function ForgetPassword() {
           </Link>
           <p className="block text-center">
             Đã có tài khoản?{" "}
-            <Link to={"/login"} className="text-violet-600 hover:underline">
+            <Link to={"/email-verify"} className="text-violet-600 hover:underline">
               Đăng nhập ngay
             </Link>
           </p>

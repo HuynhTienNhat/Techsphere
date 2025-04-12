@@ -110,7 +110,7 @@ export default function Register() {
       if (response.status === 201) {
         alert("Đăng ký thành công!");
         localStorage.setItem("token", result.token);
-        window.location.href = "../";
+        window.location.href = "../email-verify";
       } else {
         // Hiển thị thông báo lỗi cụ thể từ backend (ví dụ: "Username already exists")
         alert("Đăng ký thất bại: " + (result.error || "Lỗi không xác định"));
