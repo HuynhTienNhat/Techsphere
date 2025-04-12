@@ -1,14 +1,11 @@
 package com.example.BEsub.service;
 
-import com.example.BEsub.dtos.AverageRatingDTO;
-import com.example.BEsub.dtos.ProductDetailDTO;
-import com.example.BEsub.dtos.ProductDTO;
-import com.example.BEsub.dtos.ReviewDTO;
+import com.example.BEsub.dtos.*;
 
 import java.util.List;
 
 public interface ProductService {
-    ProductDetailDTO createProduct(ProductDetailDTO productDTO);
+    ProductDetailDTO createProduct(ProductCreateRequest request);
     ProductDetailDTO updateProduct(Long productId, ProductDetailDTO productDTO);
     void deleteProduct(Long productId);
     ProductDetailDTO getProductBySlug(String slug);

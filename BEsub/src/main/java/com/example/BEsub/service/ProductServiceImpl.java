@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -23,19 +24,60 @@ public class ProductServiceImpl implements ProductService {
     private ReviewRepository reviewRepository;
 
     @Autowired
+    private ProductImageRepository productImageRepository;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
+
+    @Autowired
     private BrandRepository brandRepository;
 
     @Transactional
-    @Override
-    public ProductDetailDTO createProduct(ProductDetailDTO productDTO) {
-        Product product = new Product();
-
-        if (productRepository.findBySlug(productDTO.getSlug()) != null) {
+    public ProductDetailDTO createProduct(ProductCreateRequest request) {
+        // Kiểm tra slug đã tồn tại chưa
+        if (productRepository.findBySlug(request.getSlug()) != null) {
             throw new AppException("Slug already exists");
         }
 
-        mapToEntity(productDTO, product);
+        // Kiểm tra imageFiles và displayOrders có cùng kích thước không
+        if (request.getImageFiles() != null && request.getDisplayOrders() != null &&
+                request.getImageFiles().size() != request.getDisplayOrders().size()) {
+            throw new AppException("Number of images and display orders must match");
+        }
+
+        // Tạo sản phẩm mới
+        Product product = new Product();
+        mapToEntity(request, product);
         Product savedProduct = productRepository.save(product);
+
+        // Upload hình ảnh lên Cloudinary và lưu URL
+        if (request.getImageFiles() != null && !request.getImageFiles().isEmpty()) {
+            List<ProductImage> images = new ArrayList<>();
+            for (int i = 0; i < request.getImageFiles().size(); i++) {
+                MultipartFile imageFile = request.getImageFiles().get(i);
+                Integer displayOrder = request.getDisplayOrders().get(i);
+
+                // Upload lên Cloudinary
+                String folder = "products/" + savedProduct.getId();
+                String publicId = displayOrder == 0 ? "main" : "image-" + displayOrder;
+                String imageUrl;
+                try {
+                    imageUrl = cloudinaryService.uploadImage(imageFile, folder, publicId);
+                } catch (Exception e) {
+                    throw new AppException("Failed to upload image to Cloudinary: " + e.getMessage());
+                }
+
+                // Lưu vào ProductImage
+                ProductImage image = new ProductImage();
+                image.setImgUrl(imageUrl);
+                image.setDisplayOrder(displayOrder);
+                image.setProduct(savedProduct);
+                images.add(image);
+            }
+            productImageRepository.saveAll(images);
+            savedProduct.setImages(images);
+        }
+
         return mapToDetailDTO(savedProduct);
     }
 
@@ -56,12 +98,24 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
-    @Override
     public void deleteProduct(Long productId) {
-        if (!productRepository.existsById(productId)) {
-            throw new AppException("Product not found");
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException("Product not found"));
+
+        // Xóa hình ảnh trên Cloudinary
+        if (product.getImages() != null) {
+            for (ProductImage image : product.getImages()) {
+                String publicId = "products/" + productId + "/" + (image.getDisplayOrder() == 0 ? "main" : "image-" + image.getDisplayOrder());
+                try {
+                    cloudinaryService.deleteImage(publicId);
+                } catch (Exception e) {
+                    // Log lỗi, không ném ngoại lệ để tiếp tục xóa sản phẩm
+                    System.err.println("Failed to delete image from Cloudinary: " + e.getMessage());
+                }
+            }
         }
-        productRepository.deleteById(productId);
+
+        productRepository.delete(product);
     }
 
     @Override
@@ -268,5 +322,58 @@ public class ProductServiceImpl implements ProductService {
         return dto;
     }
 
+    private void mapToEntity(ProductCreateRequest request, Product product) {
+        if (request.getName() == null || request.getName().isBlank()) {
+            throw new AppException("Product name cannot be null or blank");
+        }
 
+        product.setName(request.getName());
+        product.setModel(request.getModel());
+        product.setSlug(request.getSlug());
+        product.setBasePrice(request.getBasePrice());
+        product.setOldPrice(request.getOldPrice());
+
+        // Ánh xạ Brand
+        String brandName = request.getBrandName();
+        if (brandName == null || brandName.isBlank()) {
+            throw new AppException("Brand name cannot be null or blank");
+        }
+        Brand brand = brandRepository.findByName(brandName)
+                .orElseGet(() -> {
+                    Brand newBrand = new Brand();
+                    newBrand.setName(brandName);
+                    return brandRepository.save(newBrand);
+                });
+        product.setBrand(brand);
+
+        // Ánh xạ Variants
+        if (request.getVariants() != null) {
+            List<ProductVariant> variants = request.getVariants().stream()
+                    .map(v -> {
+                        ProductVariant variant = new ProductVariant();
+                        variant.setColor(v.getColor());
+                        variant.setStorage(v.getStorage());
+                        variant.setPriceAdjustment(v.getPriceAdjustment());
+                        variant.setStockQuantity(v.getStockQuantity());
+                        variant.setProduct(product);
+                        return variant;
+                    })
+                    .collect(Collectors.toList());
+            product.setVariants(variants);
+        }
+
+        // Ánh xạ Specs
+        if (request.getSpecs() != null) {
+            List<ProductSpec> specs = request.getSpecs().stream()
+                    .map(s -> {
+                        ProductSpec spec = new ProductSpec();
+                        spec.setSpecName(s.getSpecName());
+                        spec.setSpecValue(s.getSpecValue());
+                        spec.setProduct(product);
+                        return spec;
+                    })
+                    .collect(Collectors.toList());
+            product.setSpecs(specs);
+        }
+    }
 }
