@@ -4,6 +4,7 @@ package com.example.BEsub.controller;
 import com.example.BEsub.dtos.*;
 import com.example.BEsub.exception.AppException;
 import com.example.BEsub.service.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.Valid;
@@ -33,8 +34,12 @@ public class ProductController {
             @RequestParam("basePrice") BigDecimal basePrice,
             @RequestParam(value = "oldPrice", required = false) BigDecimal oldPrice,
             @RequestParam("brandName") String brandName,
-            @RequestParam(value = "variants", required = false) String variantsJson,
-            @RequestParam(value = "specs", required = false) String specsJson,
+            @RequestParam("variants") String variantsJson, // Bắt buộc
+            @RequestParam("screen") String screen,
+            @RequestParam("ram") String ram,
+            @RequestParam("frontCamera") String frontCamera,
+            @RequestParam("rearCamera") String rearCamera,
+            @RequestParam("pin") String pin,
             @RequestParam("imageFiles") List<MultipartFile> imageFiles,
             @RequestParam("displayOrders") List<Integer> displayOrders) throws Exception {
 
@@ -45,8 +50,11 @@ public class ProductController {
         if (imageFiles.size() != displayOrders.size()) {
             throw new AppException("Number of images and display orders must match");
         }
+        if (variantsJson == null || variantsJson.trim().isEmpty()) {
+            throw new AppException("At least one variant is required");
+        }
 
-        // Tạo ProductCreateRequest từ các tham số
+        // Tạo ProductCreateRequest
         ProductCreateRequest request = new ProductCreateRequest();
         request.setName(name);
         request.setModel(model);
@@ -57,16 +65,25 @@ public class ProductController {
         request.setImageFiles(imageFiles);
         request.setDisplayOrders(displayOrders);
 
-        // Chuyển JSON variants và specs thành List
+        // Gán specs
+        request.setScreen(screen);
+        request.setRam(ram);
+        request.setFrontCamera(frontCamera);
+        request.setRearCamera(rearCamera);
+        request.setPin(pin);
+
+        // Chuyển JSON variants
         ObjectMapper objectMapper = new ObjectMapper();
-        if (variantsJson != null && !variantsJson.isEmpty()) {
-            List<ProductVariantDTO> variants = objectMapper.readValue(variantsJson, new TypeReference<List<ProductVariantDTO>>() {});
-            request.setVariants(variants);
+        List<ProductVariantDTO> variants;
+        try {
+            variants = objectMapper.readValue(variantsJson, new TypeReference<List<ProductVariantDTO>>() {});
+        } catch (JsonProcessingException e) {
+            throw new AppException("Invalid variants JSON format: " + e.getMessage());
         }
-        if (specsJson != null && !specsJson.isEmpty()) {
-            List<ProductSpecDTO> specs = objectMapper.readValue(specsJson, new TypeReference<List<ProductSpecDTO>>() {});
-            request.setSpecs(specs);
+        if (variants.isEmpty()) {
+            throw new AppException("At least one variant is required");
         }
+        request.setVariants(variants);
 
         ProductDetailDTO productDTO = productService.createProduct(request);
         return ResponseEntity.ok(productDTO);
@@ -77,6 +94,11 @@ public class ProductController {
     public ResponseEntity<ProductDetailDTO> updateProduct(@PathVariable Long productId,
                                                           @RequestBody @Valid ProductDetailDTO productDTO) {
         return ResponseEntity.ok(productService.updateProduct(productId, productDTO));
+    }
+
+    @GetMapping("/id/{id}")
+    public ResponseEntity<ProductDetailDTO> getProductById(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.getProductById(id));
     }
 
     // Xóa sản phẩm
