@@ -3,7 +3,6 @@ package com.example.BEsub.controller;
 import com.example.BEsub.dtos.OrderCreateDTO;
 import com.example.BEsub.dtos.OrderDTO;
 import com.example.BEsub.service.*;
-import com.example.BEsub.service.OrderServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +33,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{orderId}")
-    ResponseEntity<String> createOrder(@PathVariable Long orderId){
+    ResponseEntity<String> deleteOrder(@PathVariable Long orderId){
         orderService.deleteOrder(orderId);
         return ResponseEntity.status(HttpStatus.OK).body("Delete order successfully");
     }

@@ -23,4 +23,5 @@ public class CustomerProfileDTO {
     private Gender gender;
     private LocalDate dateOfBirth;
     private List<UserAddressDTO> addresses;
+    private String role;
 }
