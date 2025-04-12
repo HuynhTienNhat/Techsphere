@@ -14,4 +14,5 @@ public interface OrderService {
     void deleteOrder(Long orderId);
     List<OrderDTO> getAllOrdersByUserId(Long userId);
     void changeStatusOfOrder(OrderStatusChangeDTO orderStatusChangeDTO);
+
 }

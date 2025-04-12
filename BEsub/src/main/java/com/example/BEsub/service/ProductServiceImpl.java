@@ -308,7 +308,6 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
 
         ProductDetailDTO dto = new ProductDetailDTO();
-        dto.setProductId(product.getId());
         dto.setName(product.getName());
         dto.setModel(product.getModel());
         dto.setSlug(product.getSlug());

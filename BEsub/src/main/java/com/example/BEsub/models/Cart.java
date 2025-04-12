@@ -1,12 +1,19 @@
 package com.example.BEsub.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.*;
 
 @Entity
 @Table(name = "cart")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class Cart extends BaseEntity {
     // Quan hệ One-to-One với USERS
     @OneToOne(fetch = FetchType.LAZY)

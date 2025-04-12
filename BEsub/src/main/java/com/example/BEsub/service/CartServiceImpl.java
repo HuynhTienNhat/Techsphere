@@ -47,6 +47,13 @@ public class CartServiceImpl implements CartService {
         ProductVariant variant = productVariantRepository.findById(variantId)
                 .orElseThrow(() -> new AppException("Product variant not found"));
 
+        boolean exists = cart.getCartItems().stream()
+                .anyMatch(item -> item.getVariant().getId().equals(variantId));
+
+        if (exists) {
+            throw new AppException("Sản phẩm đã tồn tại trong giỏ");
+        }
+
         // Tính unitPrice = basePrice + priceAdjustment
         BigDecimal unitPrice = variant.getProduct().getBasePrice().add(variant.getPriceAdjustment());
 
@@ -102,9 +109,10 @@ public class CartServiceImpl implements CartService {
 
     // Helper methods
     private Long getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Giả định username trong token là userId (hoặc lấy từ claims tùy cấu hình)
-        return Long.valueOf(authentication.getName());
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(()->new AppException("User not found"))
+                .getId();
     }
 
     private Cart createNewCart(Long userId) {

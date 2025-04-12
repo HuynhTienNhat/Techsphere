@@ -42,7 +42,7 @@ public class Order extends BaseEntity {
     private User user;
 
     // Quan hệ Many-to-One với USER_ADDRESS
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "address_id", nullable = false)
     private UserAddress address;
 

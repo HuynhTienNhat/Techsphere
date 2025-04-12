@@ -75,6 +75,7 @@ public class ReviewServiceImpl implements ReviewService{
         reviewDTO.setUserId(getCurrentUserId());
         reviewDTO.setUsername(review.getUser().getUsername());
         reviewDTO.setId(review.getId());
+        reviewDTO.setRating(review.getRating());
         return reviewDTO;
     }
 
@@ -94,8 +95,9 @@ public class ReviewServiceImpl implements ReviewService{
 
     // Helper methods
     private Long getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Giả định username trong token là userId (hoặc lấy từ claims tùy cấu hình)
-        return Long.valueOf(authentication.getName());
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(()->new AppException("User not found"))
+                .getId();
     }
 }

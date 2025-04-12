@@ -17,5 +17,5 @@ public class OrderCreateDTO {
     private String discountCode;
     private BigDecimal discountAmount;
     private PaymentMethod paymentMethod;
-    private UserAddress userAddress;
+    private Long userAddressId;
 }

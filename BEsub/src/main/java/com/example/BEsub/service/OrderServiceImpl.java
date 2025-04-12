@@ -2,6 +2,7 @@ package com.example.BEsub.service;
 
 import com.example.BEsub.dtos.OrderCreateDTO;
 import com.example.BEsub.dtos.OrderDTO;
+import com.example.BEsub.dtos.OrderItemDTO;
 import com.example.BEsub.dtos.OrderStatusChangeDTO;
 import com.example.BEsub.enums.OrderStatus;
 import com.example.BEsub.exception.AppException;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class OrderServiceImpl implements OrderService {
@@ -30,6 +32,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     CartRepository cartRepository;
+
+    @Autowired
+    UserAddressRepository addressRepository;
 
     @Override
     public List<OrderDTO> getAllOrdersOfUser() {
@@ -61,6 +66,8 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(orderChange);
     }
 
+
+
     @Override
     public OrderDTO getOrder(Long orderId) {
         User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
@@ -85,35 +92,50 @@ public class OrderServiceImpl implements OrderService {
         order.setSubtotal(orderCreateDTO.getSubtotal());
         order.setShippingFee(orderCreateDTO.getShippingFee());
         order.setTotalAmount(order.caculateTotalAmount());
-        order.setUser(userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found")));
-        order.setAddress(orderCreateDTO.getUserAddress());
 
+        // Lấy thông tin người dùng
+        order.setUser(userRepository.findById(getCurrentUserId())
+                .orElseThrow(() -> new AppException("User not found")));
+
+        // Lấy địa chỉ người dùng
+        UserAddress address = addressRepository.findById(orderCreateDTO.getUserAddressId())
+                .orElseThrow(() -> new AppException("Address not found"));
+        order.setAddress(address);
+
+        // Lưu đơn hàng vào cơ sở dữ liệu
+        orderRepository.save(order);
+
+        // Lấy giỏ hàng của người dùng
         Cart cart = cartRepository.findByUserId(getCurrentUserId())
-                .orElseThrow(() -> new AppException("User not found"));
-        List<CartItem> cartItems = cart.getCartItems();
-        for (CartItem item : cartItems) {
+                .orElseThrow(() -> new AppException("Cart not found"));
+
+        // Kiểm tra tồn kho các sản phẩm trong giỏ hàng
+        for (CartItem item : cart.getCartItems()) {
             if (item.getQuantity() > item.getVariant().getStockQuantity()) {
-                throw new AppException("Product " + item.getVariant().getProduct().getName() + " is not have enough stock");
+                throw new AppException("Product " + item.getVariant().getProduct().getName() + " is out of stock");
             }
         }
 
-        order.setOrderItems(cartItems.stream()
-                .map((item) -> mapCartItemToOrderItem(item, order))
-                .toList());
+        // Chuyển đổi từ CartItem sang OrderItem và lưu vào đơn hàng
+        List<OrderItem> orderItems = cart.getCartItems().stream()
+                .map(item -> mapCartItemToOrderItem(item, order))
+                .collect(Collectors.toList());
+        order.setOrderItems(orderItems);
 
-        cartItems.clear();
+        // Xóa giỏ hàng sau khi đã tạo đơn hàng
+        cart.getCartItems().clear();
         cartRepository.save(cart);
 
-        orderRepository.save(order);
-
-        for (CartItem item : cartItems) {
+        // Cập nhật số lượng tồn kho của các sản phẩm
+        for (CartItem item : cart.getCartItems()) {
             item.getVariant().setStockQuantity(item.getVariant().getStockQuantity() - item.getQuantity());
             productVariantRepository.save(item.getVariant());
         }
 
-
+        // Trả về DTO của đơn hàng
         return mapToOrderDTO(order);
     }
+
 
     @Override
     public void deleteOrder(Long orderId) {
@@ -152,9 +174,31 @@ public class OrderServiceImpl implements OrderService {
         dto.setStatus(order.getStatus());
         dto.setUserId(order.getUser() != null ? order.getUser().getId() : null);
         dto.setUserAddressId(order.getAddress() != null ? order.getAddress().getId() : null);
-        dto.setOrderItems(order.getOrderItems());
+        dto.setOrderItems(order.getOrderItems().stream().map(this::mapToOrderItemDTO).toList());
 
         return dto;
+    }
+
+    private OrderItem mapToOrderItem(OrderItemDTO orderItemDTO, Order order){
+        return OrderItem.builder()
+                .quantity(orderItemDTO.getQuantity())
+                .unitPrice(orderItemDTO.getUnitPrice())
+                .order(order)
+                .variant(productVariantRepository.findById(orderItemDTO.getVariantId()).orElseThrow(()->new AppException("Variant not found")))
+                .build();
+    }
+
+    public OrderItemDTO mapToOrderItemDTO(OrderItem orderItem){
+        OrderItemDTO orderItemDTO = new OrderItemDTO();
+
+        orderItemDTO.setQuantity(orderItem.getQuantity());
+        orderItemDTO.setColor(orderItem.getVariant().getColor());
+        orderItemDTO.setStorage(orderItem.getVariant().getStorage());
+        orderItemDTO.setProductName(orderItem.getVariant().getProduct().getName());
+        orderItemDTO.setVariantId(orderItem.getVariant().getId());
+        orderItemDTO.setUnitPrice(orderItem.getUnitPrice());
+
+        return orderItemDTO;
     }
 
     public Order mapToOrder(OrderDTO dto) {
@@ -178,12 +222,10 @@ public class OrderServiceImpl implements OrderService {
                 .orElseThrow(() -> new AppException("Order not found"));
         order.setAddress(orderToGetAddress.getAddress());
 
-        // Thiết lập quan hệ ngược giữa OrderItem và Order
         if (dto.getOrderItems() != null) {
-            for (OrderItem item : dto.getOrderItems()) {
-                item.setOrder(order); // đảm bảo mối quan hệ 2 chiều
-            }
-            order.setOrderItems(dto.getOrderItems());
+            List<OrderItemDTO> orderItemDTOS = dto.getOrderItems();
+            List<OrderItem> orderItems = orderItemDTOS.stream().map((item)->mapToOrderItem(item,order)).toList();
+            order.setOrderItems(orderItems);
         }
 
         return order;
@@ -191,8 +233,9 @@ public class OrderServiceImpl implements OrderService {
 
 
     private Long getCurrentUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        // Giả định username trong token là userId (hoặc lấy từ claims tùy cấu hình)
-        return Long.valueOf(authentication.getName());
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(()->new AppException("User not found"))
+                .getId();
     }
 }

@@ -78,6 +78,11 @@ public class UserServiceImpl implements UserService {
         user.setDateOfBirth(registerDTO.getDateOfBirth());
         user.setRole(Role.CUSTOMER);
         user.setCreatedAt(LocalDateTime.now());
+        Cart cart = Cart.builder()
+                        .cartItems(List.of())
+                        .user(user)
+                        .build();
+        user.setCart(cart);
 
         user = userRepository.save(user);
 
