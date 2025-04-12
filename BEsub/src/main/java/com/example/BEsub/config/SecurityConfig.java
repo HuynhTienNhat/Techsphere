@@ -35,6 +35,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll() // Nếu có API tất cả sản phẩm
                         .requestMatchers(HttpMethod.GET, "/api/brand/**").permitAll() // Cho phép lọc theo brand
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/otp").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/otp").permitAll()
                         // Chỉ ADMIN được thêm sản phẩm
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")
                         // Chỉ ADMIN được cập nhật sản phẩm

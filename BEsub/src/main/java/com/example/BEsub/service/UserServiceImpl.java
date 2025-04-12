@@ -29,6 +29,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
+
     @Override
     public UserResponseDTO login(UserLoginDTO loginDTO) {
         User user = userRepository.findByUsernameOrEmail(loginDTO.getUsernameOrEmail(), loginDTO.getUsernameOrEmail())
@@ -55,6 +56,7 @@ public class UserServiceImpl implements UserService {
         return user.getId();
     }
 
+
     @Override
     public UserResponseDTO register(UserRegisterDTO registerDTO) {
         if (userRepository.findByUsername(registerDTO.getUsername()).isPresent()) {
@@ -66,7 +68,6 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByPhone(registerDTO.getPhone()).isPresent()) {
             throw new AppException("Phone number already exists");
         }
-
 
         User user = new User();
         user.setEmail(registerDTO.getEmail());
