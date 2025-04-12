@@ -1,12 +1,11 @@
 package com.example.BEsub.service;
 
-import com.example.BEsub.dtos.ProductDetailDTO;
-import com.example.BEsub.dtos.ProductDTO;
+import com.example.BEsub.dtos.*;
 
 import java.util.List;
 
 public interface ProductService {
-    ProductDetailDTO createProduct(ProductDetailDTO productDTO);
+    ProductDetailDTO createProduct(ProductCreateRequest request);
     ProductDetailDTO updateProduct(Long productId, ProductDetailDTO productDTO);
     void deleteProduct(Long productId);
     ProductDetailDTO getProductBySlug(String slug);
@@ -14,4 +13,6 @@ public interface ProductService {
     List<ProductDTO> getProductsByBrand(String brandName);
     List<ProductDTO> getProductsSortedByPrice(String sortOrder); // "asc" hoặc "desc"
     List<ProductDTO> searchProducts(String keyword);
+    List<ReviewDTO> getProductReview(Long productId);
+    AverageRatingDTO getAverageRating(Long productId);
 }

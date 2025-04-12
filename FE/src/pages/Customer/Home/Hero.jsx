@@ -1,23 +1,47 @@
-import { models } from './../../assets/data/Models';
-import { banners } from './../../assets/data/Banners';
-import {smallBanners} from './../../assets/data/SmallBanners';
+import { banners } from '../../../assets/data/Banners';
+import {smallBanners} from '../../../assets/data/SmallBanners';
 
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
+import React from 'react';
 
 export default function HomeHero() {
-    const liElements = models.map(model => (
-        <li key={model.id} className="w-full group">
+    const [brands, setBrands] = React.useState([])
+    React.useEffect(() => {
+          const fetchBrands = async () => {
+            try {
+                const res = await fetch("http://localhost:8080/api/brands", {
+                    method: "GET",
+                    headers: {
+                    "Content-Type": "application/json",
+                    },
+                });
+        
+                if (!res.ok) {
+                    throw new Error("Failed to fetch brands!");
+                }
+
+                const data = await res.json();
+                setBrands(data);
+            } catch (error) {
+                console.error("Error fetching brands:", error);
+            }
+        };
+        fetchBrands();
+    }, []);
+
+    const liElements = brands.map(brand => (
+        <li key={brand.id} className="w-full group">
             <a 
                 href="#" 
                 className="flex justify-between items-center w-full h-13 p-3 rounded-md transition duration-200 hover:bg-gray-200"
             >
                 <div className="flex items-center gap-3">
-                    <img src={model.logo} alt={model.name} className="w-6 h-6 mx-2" />
-                    <span className="text-gray-700 font-medium group-hover:text-violet-600">{model.name}</span>
+                    <img src={brand.logoUrl} alt={brand.name} className="w-6 h-6 mx-2" />
+                    <span className="text-gray-700 font-medium group-hover:text-violet-600">{brand.name}</span>
                 </div>
             </a>
         </li>

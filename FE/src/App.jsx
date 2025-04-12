@@ -6,10 +6,8 @@ import Footer from './components/Footer.jsx';
 import BreadCrumb from './components/Breadcrumb.jsx';
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx';
-import ForgetPassword from './pages/Auth/ForgetPassword.jsx';
-import ResetPassword from './pages/Auth/ResetPassword.jsx';
 
-export default function App(){
+export default function App() {
   return (
     <Router>
       <Header />
@@ -19,10 +17,8 @@ export default function App(){
         <Route path='/login' element={<Login/>}/>
         <Route path='/register' element={<Register/>}/>
         <Route path='/products' element={<Products/>}/>
-        <Route path='/forget-password' element={<ForgetPassword/>}/>
-        <Route path='/reset-password' element={<ResetPassword/>}/>
       </Routes>
       <Footer />
     </Router>
-  )
+  );
 }

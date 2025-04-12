@@ -31,6 +31,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép tất cả truy cập login/register
                         .requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/register").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/brands").permitAll() // Thêm dòng này
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll() // Nếu có API tất cả sản phẩm
+                        .requestMatchers(HttpMethod.GET, "/api/brand/**").permitAll() // Cho phép lọc theo brand
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         // Chỉ ADMIN được thêm sản phẩm
                         .requestMatchers(HttpMethod.POST, "/api/products").hasRole("ADMIN")

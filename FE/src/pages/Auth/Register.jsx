@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react"
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 
@@ -13,9 +13,10 @@ export default function Register() {
     dateOfBirth: "",
   });
   const [confirmPassword, setConfirmPassword] = useState("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const navigate = useNavigate()
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -109,10 +110,8 @@ export default function Register() {
 
       if (response.status === 201) {
         alert("Đăng ký thành công!");
-        localStorage.setItem("token", result.token);
-        window.location.href = "../";
+        navigate('/login')
       } else {
-        // Hiển thị thông báo lỗi cụ thể từ backend (ví dụ: "Username already exists")
         alert("Đăng ký thất bại: " + (result.error || "Lỗi không xác định"));
       }
     } catch (error) {
