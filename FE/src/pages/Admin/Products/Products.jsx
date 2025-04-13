@@ -9,7 +9,7 @@ export default function Products() {
   const [brands, setBrands] = useState([]);
   const [search, setSearch] = useState("");
   const [filterBrand, setFilterBrand] = useState("");
-  const [sortBy, setSortBy] = useState(""); // Thêm sortBy
+  const [sortBy, setSortBy] = useState(""); 
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -105,8 +105,8 @@ export default function Products() {
 
   return (
     <div className="px-40 z-1">
-        <h1 className="text-2xl font-bold mb-4">Quản lý sản phẩm</h1>
-        <div className="flex justify-between mb-3">
+        <h1 className="text-2xl font-bold mb-4 px-5">Quản lý sản phẩm</h1>
+        <div className="flex justify-between mb-3 px-5">
           <div className="mb-4 flex flex-col sm:flex-row gap-4">
             <div className="relative max-w-md">
               <input
@@ -161,7 +161,7 @@ export default function Products() {
           </div>
         </div>
         {isLoading ? (
-          <p>Đang tải...</p>
+          <p className="text-center py-5">Đang tải...</p>
         ) : (
           <ProductList
             products={products}

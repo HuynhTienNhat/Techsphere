@@ -7,26 +7,32 @@ export default function ProductList({ products, onEdit, onDelete }) {
     return mainImage?.imgUrl || "https://via.placeholder.com/80";
   };
 
+  const getTotalStock = (product) => {
+    return product.variants?.reduce((total, variant) => total + (variant.stockQuantity || 0), 0);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow">
+    <div className={`${products.length === 0 ? "shadow-lg rounded py-8 mx-5 text-center" : ""}`}>
       {products.length === 0 ? (
-        <p className="p-4 text-gray-500">Không có sản phẩm nào.</p>
+        <p className="py-2 px-5 text-gray-500 font-semibold">Không có sản phẩm nào.</p>
       ) : (
-        <div className="space-y-2">
-          {products.map((product) => (
+            products.map((product) => (
             <div
               key={product.productId}
-              className="flex items-center p-4 border-b border-gray-200 hover:bg-gray-50"
+              className="flex items-center p-4 min-h-30 items-center border shadow-sm border-gray-200 rounded hover:bg-gray-50 m-4"
             >
               <img
                 src={getMainImageUrl(product)}
                 alt={product.name}
                 className="w-20 h-20 object-contain rounded"
               />
-              <div className="flex-1 ml-4">
+              <div className="flex-1 ml-4 mt-2 flex-col justify-center items-center">
                 <h3 className="text-lg font-semibold">{product.name}</h3>
                 <p className="text-gray-600">
                   {product.basePrice.toLocaleString("vi-VN")} VND
+                </p>
+                <p className="text-sm text-gray-500">
+                  Tổng số lượng: {getTotalStock(product)}
                 </p>
               </div>
               <div className="flex gap-2">
@@ -44,8 +50,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
                 </button>
               </div>
             </div>
-          ))}
-        </div>
+          ))
       )}
     </div>
   );
