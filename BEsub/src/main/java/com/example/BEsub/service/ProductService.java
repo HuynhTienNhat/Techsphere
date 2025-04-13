@@ -5,11 +5,11 @@ import com.example.BEsub.dtos.*;
 import java.util.List;
 
 public interface ProductService {
-    ProductDetailDTO createProduct(ProductCreateRequest request);
-    ProductDetailDTO updateProduct(Long productId, ProductDetailDTO productDTO);
-    ProductDetailDTO getProductById(Long productId);
+    ProductDTO createProduct(ProductCreateRequest request);
+    ProductDTO updateProduct(Long productId, ProductDTO productDTO);
+    ProductDTO getProductById(Long productId);
     void deleteProduct(Long productId);
-    ProductDetailDTO getProductBySlug(String slug);
+    ProductDTO getProductBySlug(String slug);
     List<ProductDTO> getAllProducts();
     List<ProductDTO> getProductsByBrand(String brandName);
     List<ProductDTO> getProductsSortedByPrice(String sortOrder); // "asc" hoặc "desc"

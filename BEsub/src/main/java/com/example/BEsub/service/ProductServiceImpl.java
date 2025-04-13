@@ -5,7 +5,6 @@ import com.example.BEsub.exception.AppException;
 import com.example.BEsub.models.*;
 import com.example.BEsub.repositories.*;
 import jakarta.transaction.Transactional;
-import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -116,7 +115,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Transactional
-    public ProductDetailDTO createProduct(ProductCreateRequest request) {
+    @Override
+    public ProductDTO createProduct(ProductCreateRequest request) {
         // Kiểm tra slug
         if (productRepository.findBySlug(request.getSlug()) != null) {
             throw new AppException("Slug already exists");
@@ -175,12 +175,12 @@ public class ProductServiceImpl implements ProductService {
         productImageRepository.saveAll(images);
         savedProduct.setImages(images);
 
-        return mapToDetailDTO(savedProduct);
+        return mapToDTO(savedProduct);
     }
 
     @Transactional
     @Override
-    public ProductDetailDTO updateProduct(Long productId, ProductDetailDTO productDTO) {
+    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException("Product not found"));
 
@@ -213,17 +213,18 @@ public class ProductServiceImpl implements ProductService {
 
         mapToEntity(productDTO, product);
         Product updatedProduct = productRepository.save(product);
-        return mapToDetailDTO(updatedProduct);
+        return mapToDTO(updatedProduct);
     }
 
     @Override
-    public ProductDetailDTO getProductById(Long id) {
+    public ProductDTO getProductById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new AppException("Product not found"));
-        return mapToDetailDTO(product);
+        return mapToDTO(product);
     }
 
     @Transactional
+    @Override
     public void deleteProduct(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException("Product not found"));
@@ -235,7 +236,6 @@ public class ProductServiceImpl implements ProductService {
                 try {
                     cloudinaryService.deleteImage(publicId);
                 } catch (Exception e) {
-                    // Log lỗi, không ném ngoại lệ để tiếp tục xóa sản phẩm
                     System.err.println("Failed to delete image from Cloudinary: " + e.getMessage());
                 }
             }
@@ -244,10 +244,10 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDetailDTO getProductBySlug(String slug) {
+    public ProductDTO getProductBySlug(String slug) {
         Product product = productRepository.findBySlug(slug);
         if (product == null) throw new AppException("Product not found");
-        return mapToDetailDTO(product);
+        return mapToDTO(product);
     }
 
     @Override
@@ -283,24 +283,26 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ReviewDTO> getProductReview(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(()-> new AppException("Product not found"));
-        ProductDetailDTO productDetailDTO = mapToDetailDTO(product);
-        return productDetailDTO.getReviews();
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException("Product not found"));
+        ProductDTO productDTO = mapToDTO(product);
+        return productDTO.getReviews();
     }
 
     @Override
     public AverageRatingDTO getAverageRating(Long productId) {
-        Product product = productRepository.findById(productId).orElseThrow(()-> new AppException("Product not found"));
-        ProductDetailDTO productDetailDTO = mapToDetailDTO(product);
-        List<ReviewDTO> reviewDTOS = productDetailDTO.getReviews();
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new AppException("Product not found"));
+        ProductDTO productDTO = mapToDTO(product);
+        List<ReviewDTO> reviewDTOs = productDTO.getReviews();
 
         BigDecimal sum = new BigDecimal(0);
-        int ratingCount = Math.toIntExact(reviewDTOS.size());
-        for(ReviewDTO reviewDTO : reviewDTOS){
+        int ratingCount = reviewDTOs.size();
+        for (ReviewDTO reviewDTO : reviewDTOs) {
             sum = sum.add(new BigDecimal(reviewDTO.getRating()));
         }
         return AverageRatingDTO.builder()
-                .rating(sum.divide(new BigDecimal(ratingCount), 2, RoundingMode.HALF_UP))
+                .rating(ratingCount > 0 ? sum.divide(new BigDecimal(ratingCount), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO)
                 .reviewCount(ratingCount)
                 .build();
     }
@@ -312,7 +314,7 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    private void mapToEntity(ProductDetailDTO dto, Product product) {
+    private void mapToEntity(ProductDTO dto, Product product) {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new AppException("Product name cannot be null or blank");
         }
@@ -364,67 +366,6 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         product.setVariants(updatedVariants);
-    }
-
-    // Ánh xạ từ Entity sang ProductDTO
-    private ProductDTO mapToDTO(Product product) {
-        ProductDTO dto = new ProductDTO();
-        dto.setProductId(product.getId());
-        dto.setName(product.getName());
-        dto.setModel(product.getModel());
-        dto.setSlug(product.getSlug());
-        dto.setBasePrice(product.getBasePrice());
-        dto.setOldPrice(product.getOldPrice());
-        dto.setBrandName(product.getBrand().getName());
-
-        if (product.getImages() != null && !product.getImages().isEmpty()) {
-            String mainImageUrl = product.getImages().stream()
-                    .min(Comparator.comparing(ProductImage::getDisplayOrder))
-                    .map(ProductImage::getImgUrl)
-                    .orElse(null);
-            dto.setMainImageUrl(mainImageUrl);
-        } else {
-            dto.setMainImageUrl(null);
-        }
-
-        dto.setOutOfStock(product.getVariants().stream().allMatch(v -> v.getStockQuantity() == 0));
-        return dto;
-    }
-
-    // Ánh xạ từ Entity sang ProductDetailDTO
-    private ProductDetailDTO mapToDetailDTO(Product product) {
-        Hibernate.initialize(product.getVariants());
-        Hibernate.initialize(product.getSpecs());
-        Hibernate.initialize(product.getImages());
-
-        List<ProductVariantDTO> variants = product.getVariants().stream()
-                .map(v -> new ProductVariantDTO(v.getId(), v.getColor(), v.getStorage(),
-                        v.getPriceAdjustment(), v.getStockQuantity(), v.isDefault()))
-                .collect(Collectors.toList());
-        List<ProductSpecDTO> specs = product.getSpecs().stream()
-                .map(s -> new ProductSpecDTO(s.getId(), s.getSpecName(), s.getSpecValue()))
-                .collect(Collectors.toList());
-        List<ProductImageDTO> images = product.getImages().stream()
-                .map(i -> new ProductImageDTO(i.getId(), i.getImgUrl(), i.getDisplayOrder()))
-                .collect(Collectors.toList());
-
-        List<ReviewDTO> reviews = reviewRepository.findByProductId(product.getId()).stream()
-                .map(r -> new ReviewDTO(r.getId(), r.getRating(), r.getComment(),
-                        r.getUser().getId(), r.getUser().getName(), r.getCreatedAt()))
-                .collect(Collectors.toList());
-
-        ProductDetailDTO dto = new ProductDetailDTO();
-        dto.setName(product.getName());
-        dto.setModel(product.getModel());
-        dto.setSlug(product.getSlug());
-        dto.setBasePrice(product.getBasePrice());
-        dto.setOldPrice(product.getOldPrice());
-        dto.setBrandName(product.getBrand().getName());
-        dto.setVariants(variants);
-        dto.setSpecs(specs);
-        dto.setImages(images);
-        dto.setReviews(reviews);
-        return dto;
     }
 
     private void mapToEntity(ProductCreateRequest request, Product product) {
@@ -493,5 +434,59 @@ public class ProductServiceImpl implements ProductService {
             specs.add(spec);
         });
         product.setSpecs(specs);
+    }
+
+    // Ánh xạ từ Entity sang ProductDTO
+    private ProductDTO mapToDTO(Product product) {
+        ProductDTO dto = new ProductDTO();
+        dto.setProductId(product.getId());
+        dto.setName(product.getName());
+        dto.setModel(product.getModel());
+        dto.setSlug(product.getSlug());
+        dto.setBasePrice(product.getBasePrice());
+        dto.setOldPrice(product.getOldPrice());
+        dto.setBrandName(product.getBrand() != null ? product.getBrand().getName() : null);
+
+        // Ánh xạ Variants
+        List<ProductVariantDTO> variants = product.getVariants().stream()
+                .map(v -> new ProductVariantDTO(v.getId(), v.getColor(), v.getStorage(),
+                        v.getPriceAdjustment(), v.getStockQuantity(), v.isDefault()))
+                .collect(Collectors.toList());
+        dto.setVariants(variants);
+
+        // Ánh xạ Specs
+        List<ProductSpecDTO> specs = product.getSpecs().stream()
+                .map(s -> new ProductSpecDTO(s.getId(), s.getSpecName(), s.getSpecValue()))
+                .collect(Collectors.toList());
+        dto.setSpecs(specs);
+
+        // Ánh xạ Images
+        List<ProductImageDTO> images = product.getImages().stream()
+                .map(i -> new ProductImageDTO(i.getId(), i.getImgUrl(), i.getDisplayOrder()))
+                .collect(Collectors.toList());
+        dto.setImages(images);
+
+        // Ánh xạ Reviews
+        List<ReviewDTO> reviews = reviewRepository.findByProductId(product.getId()).stream()
+                .map(r -> new ReviewDTO(r.getId(), r.getRating(), r.getComment(),
+                        r.getUser().getId(), r.getUser().getName(), r.getCreatedAt()))
+                .collect(Collectors.toList());
+        dto.setReviews(reviews);
+
+        // Main Image URL
+        if (product.getImages() != null && !product.getImages().isEmpty()) {
+            String mainImageUrl = product.getImages().stream()
+                    .min(Comparator.comparing(ProductImage::getDisplayOrder))
+                    .map(ProductImage::getImgUrl)
+                    .orElse(null);
+            dto.setMainImageUrl(mainImageUrl);
+        } else {
+            dto.setMainImageUrl(null);
+        }
+
+        // Out of Stock
+        dto.setOutOfStock(product.getVariants().stream().allMatch(v -> v.getStockQuantity() == 0));
+
+        return dto;
     }
 }

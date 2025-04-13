@@ -4,6 +4,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Builder
 @Getter
@@ -37,6 +38,18 @@ public class ProductDTO {
     @NotBlank(message = "Brand name is required")
     @Size(max = 50, message = "Brand name cannot exceed 50 characters")
     private String brandName;
+
+    @NotNull(message = "Variants cannot be null")
+    private List<ProductVariantDTO> variants;
+
+    @NotNull(message = "Specs cannot be null")
+    private List<ProductSpecDTO> specs;
+
+    @NotNull(message = "Images cannot be null")
+    private List<ProductImageDTO> images;
+
+    @NotNull(message = "Reviews cannot be null")
+    private List<ReviewDTO> reviews;
 
     private String mainImageUrl;
 

@@ -27,14 +27,14 @@ public class ProductController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public ResponseEntity<ProductDetailDTO> createProduct(
+    public ResponseEntity<ProductDTO> createProduct(
             @RequestParam("name") String name,
             @RequestParam("model") String model,
             @RequestParam("slug") String slug,
             @RequestParam("basePrice") BigDecimal basePrice,
             @RequestParam(value = "oldPrice", required = false) BigDecimal oldPrice,
             @RequestParam("brandName") String brandName,
-            @RequestParam("variants") String variantsJson, // Bắt buộc
+            @RequestParam("variants") String variantsJson,
             @RequestParam("screen") String screen,
             @RequestParam("ram") String ram,
             @RequestParam("frontCamera") String frontCamera,
@@ -85,23 +85,26 @@ public class ProductController {
         }
         request.setVariants(variants);
 
-        ProductDetailDTO productDTO = productService.createProduct(request);
+        ProductDTO productDTO = productService.createProduct(request);
         return ResponseEntity.ok(productDTO);
     }
 
     // Cập nhật sản phẩm
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{productId}")
-    public ResponseEntity<ProductDetailDTO> updateProduct(@PathVariable Long productId,
-                                                          @RequestBody @Valid ProductDetailDTO productDTO) {
+    public ResponseEntity<ProductDTO> updateProduct(
+            @PathVariable Long productId,
+            @RequestBody @Valid ProductDTO productDTO) {
         return ResponseEntity.ok(productService.updateProduct(productId, productDTO));
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<ProductDetailDTO> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getProductById(id));
     }
 
     // Xóa sản phẩm
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{productId}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
@@ -110,7 +113,7 @@ public class ProductController {
 
     // Lấy chi tiết sản phẩm theo slug
     @GetMapping("/{slug}")
-    public ResponseEntity<ProductDetailDTO> getProductBySlug(@PathVariable String slug) {
+    public ResponseEntity<ProductDTO> getProductBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(productService.getProductBySlug(slug));
     }
 
@@ -128,7 +131,8 @@ public class ProductController {
 
     // Sắp xếp theo giá
     @GetMapping("/sort")
-    public ResponseEntity<List<ProductDTO>> getProductsSortedByPrice(@RequestParam(defaultValue = "asc") String order) {
+    public ResponseEntity<List<ProductDTO>> getProductsSortedByPrice(
+            @RequestParam(defaultValue = "asc") String order) {
         return ResponseEntity.ok(productService.getProductsSortedByPrice(order));
     }
 
@@ -139,12 +143,12 @@ public class ProductController {
     }
 
     @GetMapping("/reviews/{productId}")
-    public ResponseEntity<List<ReviewDTO>> getProductReview(@PathVariable Long productId){
+    public ResponseEntity<List<ReviewDTO>> getProductReview(@PathVariable Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReview(productId));
     }
 
     @GetMapping("/reviews/{productId}/averageRating")
-    public ResponseEntity<AverageRatingDTO> getAverageRating(@PathVariable Long productId){
+    public ResponseEntity<AverageRatingDTO> getAverageRating(@PathVariable Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getAverageRating(productId));
     }
 }
