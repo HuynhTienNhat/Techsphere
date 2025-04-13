@@ -34,11 +34,12 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
             const response = await fetch(url, {
                 method: "GET",
                 headers: {
-                "Content-Type": "application/json",
+                    "Content-Type": "application/json",
                 },
             });
 
             if (!response.ok) {
+                console.log("Error response:", await response.text()); // Log chi tiết lỗi
                 throw new Error("Không thể tải danh sách sản phẩm!");
             }
 
@@ -57,28 +58,30 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
 
     const productElements = products.map((product) => (
         <div
-        key={product.productId}
-        onClick={() => handleClick(product.slug)}
-        className="transition-transform transform hover:-translate-y-2 hover:shadow-lg p-4 flex flex-col justify-between rounded-md shadow-md bg-white border-[0.5px] border-gray-100 cursor-pointer"
+            key={product.productId}
+            onClick={() => handleClick(product.slug)}
+            className="transition-transform transform hover:-translate-y-2 max-w-55 max-h-78 hover:shadow-lg p-4 flex flex-col justify-between rounded-md shadow-md bg-white border-[0.5px] border-gray-100 cursor-pointer"
         >
-        <img
-            src={product.mainImageUrl || "https://via.placeholder.com/150"}
-            alt={product.name}
-            className="w-full h-48 object-contain rounded-md"
-            loading="lazy"
-        />
-        <div className="mt-2 flex flex-col flex-grow">
-            <h2 className="text-lg font-semibold truncate">{product.name}</h2>
-            <p className="text-sm text-gray-600">{product.model}</p>
-            <p className="text-red-500 font-bold mt-1">
-            {product.basePrice.toLocaleString("vi-VN")} đ
-            </p>
-            {product.oldPrice && (
-            <p className="text-gray-500 line-through text-sm">
-                {product.oldPrice.toLocaleString("vi-VN")} đ
-            </p>
-            )}
-        </div>
+            <img
+                src={product.mainImageUrl || "https://via.placeholder.com/150"}
+                alt={product.name}
+                className="w-full h-48 object-contain rounded-md"
+                loading="lazy"
+            />
+
+            <hr className="my-2 border-gray-200" />
+            
+            <div className="mt-2 flex flex-col flex-grow">
+                <h2 className="text-lg font-semibold truncate">{product.name}</h2>
+                <p className="text-violet-500 font-bold mt-1">
+                    {product.basePrice.toLocaleString("vi-VN")} đ
+                </p>
+                {product.oldPrice && (
+                <p className="text-gray-500 line-through text-sm">
+                    {product.oldPrice.toLocaleString("vi-VN")} đ
+                </p>
+                )}
+            </div>
         </div>
     ));
 
