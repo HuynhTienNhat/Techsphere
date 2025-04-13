@@ -1,26 +1,15 @@
 import React from 'react';
-
+import {fetchBrands} from './../../../services/api';
 export default function ProductFilter({ onSelectBrand }) {
     const [selectedBtn, setSelectedBtn] = React.useState("All");
     const [brands, setBrands] = React.useState([]);
     const [isLoading, setIsLoading] = React.useState(false);
   
     React.useEffect(() => {
-      const fetchBrands = async () => {
+      const loadBrands = async () => {
         setIsLoading(true);
         try {
-            const res = await fetch("http://localhost:8080/api/brands", {
-                method: "GET",
-                headers: {
-                "Content-Type": "application/json",
-                },
-            });
-    
-            if (!res.ok) {
-                throw new Error("Failed to fetch brands!");
-            }
-    
-            const data = await res.json();
+            const data = await fetchBrands();
             setBrands(data);
         } catch (error) {
           console.error("Error fetching brands:", error);
@@ -30,7 +19,7 @@ export default function ProductFilter({ onSelectBrand }) {
         }
       };
   
-      fetchBrands();
+      loadBrands();
     }, []);
   
     const handleSelectedBtn = (brand) => {

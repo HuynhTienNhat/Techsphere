@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {fetchProducts} from './../../../services/api.js';
 
 export default function ProductDisplay({ selectedBrand, keyword }) {
     const [products, setProducts] = useState([]);
@@ -9,48 +10,31 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchProducts();
+        loadProducts();
     }, [sortOrder, selectedBrand, keyword]);
 
-    const fetchProducts = async () => {
+    const loadProducts = async () => {
         setIsLoading(true);
         setError(null);
         try {
-            let url;
+            const params = {};
             if (keyword) {
-                // Tìm kiếm theo từ khóa
-                url = `http://localhost:8080/api/products/search?keyword=${encodeURIComponent(keyword)}`;
-            } else {
-                // Lọc theo hãng hoặc lấy tất cả
-                url = selectedBrand === "All" || !selectedBrand
-                ? "http://localhost:8080/api/products"
-                : `http://localhost:8080/api/products/brand/${selectedBrand}`;
+              params.keyword = keyword;
+            } else if (selectedBrand && selectedBrand !== "All") {
+              params.brand = selectedBrand;
             }
-
             if (sortOrder && !keyword) {
-                url += `${url.includes("?") ? "&" : "?"}sortBy=${sortOrder}`;
+              params.sortBy = sortOrder;
             }
-
-            const response = await fetch(url, {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
-
-            if (!response.ok) {
-                console.log("Error response:", await response.text()); // Log chi tiết lỗi
-                throw new Error("Không thể tải danh sách sản phẩm!");
-            }
-
-            const data = await response.json();
+      
+            const data = await fetchProducts(params);
             setProducts(data);
         } catch (err) {
             setError(err.message);
         } finally {
             setIsLoading(false);
-        }
-    };
+          }
+        };
 
     const handleClick = (slug) => {
         navigate(`/products/${slug}`);
@@ -92,7 +76,7 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
             >
             <div className="mb-4 px-6 md:px-10 border-b border-gray-200 pb-4 flex justify-between items-center">
                 <h3 className="text-lg font-semibold">
-                {keyword ? `Kết quả tìm kiếm cho "${keyword}"` : "Danh sách sản phẩm"}
+                    {keyword ? `Kết quả tìm kiếm cho "${keyword}"` : "Danh sách sản phẩm"}
                 </h3>
                 <div>
                 <label className="mr-2 text-sm font-medium">Sắp xếp theo: </label>
