@@ -7,7 +7,7 @@ export default function AdminBreadcrumb() {
   if (paths.length === 0 || paths.length === 1) return null;
 
   return (
-    <div className="px-34 py-3 text-gray-600 text-sm shadow-md mb-10">
+    <div className="px-44 py-3 text-gray-600 text-sm shadow-md mb-10">
       <ul className="flex space-x-2">
         {paths.map((path, index) => {
           const fullPath = `/${paths.slice(0, index + 1).join("/")}`; // Đường dẫn tuyệt đối
