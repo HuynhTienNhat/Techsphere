@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     @Autowired
     private UserRepository userRepository;
 
@@ -55,7 +54,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new AppException("User not found"));
         return user.getId();
     }
-
 
     @Override
     public UserResponseDTO register(UserRegisterDTO registerDTO) {

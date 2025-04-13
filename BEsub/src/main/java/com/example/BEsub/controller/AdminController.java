@@ -3,6 +3,7 @@ package com.example.BEsub.controller;
 import com.example.BEsub.dtos.AdminProfileDTO;
 import com.example.BEsub.dtos.OrderDTO;
 import com.example.BEsub.dtos.OrderStatusChangeDTO;
+import com.example.BEsub.dtos.UserAddressDTO;
 import com.example.BEsub.exception.AppException;
 import com.example.BEsub.service.OrderService;
 import com.example.BEsub.service.UserService;
@@ -47,6 +48,13 @@ public class AdminController {
     public ResponseEntity<List<AdminProfileDTO>> getAllUsers() {
         List<AdminProfileDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/users/{userId}/addresses")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<UserAddressDTO>> getUserAddresses(@PathVariable Long userId) {
+        List<UserAddressDTO> addresses = userService.getUserAddresses(userId);
+        return ResponseEntity.ok(addresses);
     }
 
     @GetMapping("/orders/{userId}")
