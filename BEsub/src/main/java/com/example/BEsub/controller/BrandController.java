@@ -10,7 +10,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/brands")
 public class BrandController {
-
     @Autowired
     private BrandService brandService;
 
