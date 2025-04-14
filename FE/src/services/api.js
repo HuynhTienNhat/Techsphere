@@ -108,3 +108,19 @@ export const fetchBrands = async () => {
   }
   return response.json();
 };
+
+export const fetchCart = async () => {
+  const token = localStorage.getItem('token');
+  const response = await fetch("http://localhost:8080/api/cart", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+  });
+  if (!response.ok) {
+    console.log("Error response:", await response.text());
+    throw new Error("Không thể tải giỏ hàng!");
+  }
+  return response.json();
+};

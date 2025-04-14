@@ -13,6 +13,7 @@ import AdminDashBoard from './pages/Admin/Dashboard/Dashboard';
 import ProtectedAdminRoute from './routes/ProtectedAdminRoute';
 import AdminProducts from './pages/Admin/Products/Products.jsx';
 import Users from './pages/Admin/Users/Users.jsx';
+import Cart from './pages/Customer/Cart/Cart.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -65,6 +66,14 @@ function AppContent() {
           element={
             <CustomerLayout>
               <Login />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <CustomerLayout>
+              <Cart />
             </CustomerLayout>
           }
         />

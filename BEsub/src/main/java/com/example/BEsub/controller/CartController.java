@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/cart")
 @PreAuthorize("hasRole('CUSTOMER')")
@@ -37,6 +39,7 @@ public class CartController {
         CartItemDTO cartItemDTO = cartService.updateCartItemQuantity(cartItemId, request.getQuantity());
         return ResponseEntity.ok(cartItemDTO);
     }
+
 
     // Xóa sản phẩm khỏi giỏ hàng
     @DeleteMapping("/items/{cartItemId}")

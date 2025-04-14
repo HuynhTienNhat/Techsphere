@@ -158,6 +158,8 @@ export default function Header() {
             onClick={handleCartClick}
             title="Giỏ hàng"
           >
+            <Link to="/home">
+            </Link>
             <FaShoppingCart className="w-5 h-5" />
           </button>
 
