@@ -28,6 +28,8 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
       }
 
       const data = await fetchProducts(params);
+      console.log(data);
+      
       setProducts(data);
     } catch (err) {
       setError(err.message);

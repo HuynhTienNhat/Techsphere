@@ -6,7 +6,7 @@ import CustomerLayout from './layouts/CustomerLayout';
 import AdminLayout from './layouts/AdminLayout';
 import Home from './pages/Customer/Home/Home';
 import Products from './pages/Customer/Products/Products';
-import ProductDetail from './pages/Customer/ProductDetails/Product_Details';
+import ProductDetail from './pages/Customer/ProductDetails/ProductDetails.jsx';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
 import AdminDashBoard from './pages/Admin/Dashboard/Dashboard';
@@ -53,7 +53,7 @@ function AppContent() {
           }
         />
         <Route
-          path="/products/:id"
+          path="/products/:slug"
           element={
             <CustomerLayout>
               <ProductDetail />
