@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    // Hiện tại chưa cần query đặc biệt, chỉ dùng các phương thức mặc định của JpaRepository
 }

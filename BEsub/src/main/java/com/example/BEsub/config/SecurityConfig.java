@@ -31,11 +31,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Cho phép tất cả truy cập login/register
                         .requestMatchers(HttpMethod.POST, "/api/users/login", "/api/users/register").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/brands").permitAll() // Thêm dòng này
-                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll() // Nếu có API tất cả sản phẩm
+                        .requestMatchers(HttpMethod.GET, "/api/brands").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/search").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/brand/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/brand/**").permitAll() // Cho phép lọc theo brand
+                        .requestMatchers(HttpMethod.GET, "/api/products/sort").permitAll() // Add this line
+                        .requestMatchers(HttpMethod.GET, "/api/products/by-brand").permitAll() // Add this line
+                        .requestMatchers(HttpMethod.GET, "/api/brand/**").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/otp").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/otp").permitAll()
