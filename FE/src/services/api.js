@@ -45,19 +45,22 @@ export const fetchProducts = async (
     // Tìm kiếm theo từ khóa
     url = new URL(`http://localhost:8080/api/products/search`);
     url.searchParams.append("keyword", encodeURIComponent(keyword));
-  } else if (brand && brand !== "All") {
-    // Lọc theo hãng, có hoặc không có sắp xếp
+  } else if (brand && brand !== "All" && sortBy) {
+    // Lọc theo hãng và sắp xếp
     url = new URL(`http://localhost:8080/api/products/by-brand`);
     url.searchParams.append("brandName", encodeURIComponent(brand));
-    if (sortBy) {
-      url.searchParams.append("sortOrder", sortBy);
-    }
+    url.searchParams.append("sortOrder", sortBy);
+  } else if (brand && brand !== "All") {
+    // Chỉ lọc theo hãng, không sắp xếp
+    url = new URL(`http://localhost:8080/api/products/brand/${encodeURIComponent(brand)}`);
+  } else if (sortBy) {
+    // Chỉ sắp xếp, không lọc
+    url = new URL(`http://localhost:8080/api/products/sort`);
+    url.searchParams.append("order", sortBy);
+    console.log("Sorting URL:", url.toString());
   } else {
-    // Lấy tất cả sản phẩm, có thể sắp xếp
+    // Lấy tất cả sản phẩm, không lọc, không sắp xếp
     url = new URL(`http://localhost:8080/api/products`);
-    if (sortBy) {
-      url.searchParams.append("sortOrder", sortBy);
-    }
   }
 
   const headers = {
@@ -70,20 +73,26 @@ export const fetchProducts = async (
     }
   }
 
-  const response = await fetch(url, {
-    method: "GET",
-    headers,
-  });
+  try {
+    const response = await fetch(url, {
+      method: "GET",
+      headers,
+    });
 
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.log("Error response:", errorText);
-    throw new Error(
-      response.status === 404 ? "Hãng không tồn tại!" : "Không thể tải sản phẩm!"
-    );
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.log("Error status:", response.status);
+      console.log("Error response:", errorText);
+      throw new Error(
+        response.status === 404 ? "Hãng không tồn tại!" : "Không thể tải sản phẩm!"
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error("Fetch error:", error);
+    throw error;
   }
-
-  return response.json();
 };
 
 export const fetchBrands = async () => {
