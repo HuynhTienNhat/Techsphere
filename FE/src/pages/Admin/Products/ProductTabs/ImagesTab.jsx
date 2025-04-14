@@ -1,24 +1,28 @@
 import React from "react";
+import { Card, CardMedia, Typography, Box } from "@mui/material";
 
 export default function ImagesTab({ images }) {
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <Box className="grid grid-cols-2 gap-4">
       {images && images.length > 0 ? (
         images.map((image, index) => (
-          <div key={index} className="p-2 border rounded">
-            <img
-              src={image.imgUrl}
+          <Card key={index} className="p-2" elevation={1}>
+            <CardMedia
+              component="img"
+              image={image.imgUrl}
               alt={`Image ${image.displayOrder}`}
-              className="w-full h-32 object-contain"
+              sx={{ height: 128, objectFit: "contain" }}
             />
-            <p className="text-sm text-gray-600">
+            <Typography variant="caption" className="text-center block">
               Display Order: {image.displayOrder}
-            </p>
-          </div>
+            </Typography>
+          </Card>
         ))
       ) : (
-        <p className="text-gray-500">Chưa có hình ảnh nào.</p>
+        <Typography variant="body2" color="text.secondary" className="col-span-2 text-center">
+          Chưa có hình ảnh nào.
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }

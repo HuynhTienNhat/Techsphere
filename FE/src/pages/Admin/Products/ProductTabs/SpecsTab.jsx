@@ -1,19 +1,28 @@
 import React from "react";
+import { Card, CardContent, Typography, Box } from "@mui/material";
 
 export default function SpecsTab({ specs }) {
   return (
-    <div className="space-y-2">
+    <Box>
       {specs && specs.length > 0 ? (
         specs.map((spec, index) => (
-          <div key={index} className="p-2 border rounded">
-            <p>
-              <strong>{spec.specName}:</strong> {spec.specValue}
-            </p>
-          </div>
+          <Card 
+            key={index} 
+            elevation={1} 
+            sx={{ mb: 2, ...(index === specs.length - 1 ? {} : {}) }}
+          >
+            <CardContent>
+              <Typography variant="body2">
+                <strong>{spec.specName}:</strong> {spec.specValue}
+              </Typography>
+            </CardContent>
+          </Card>
         ))
       ) : (
-        <p className="text-gray-500">Chưa có thông số nào.</p>
+        <Typography variant="body2" color="text.secondary">
+          Chưa có thông số nào.
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }

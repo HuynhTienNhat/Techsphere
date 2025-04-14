@@ -1,88 +1,82 @@
 import React from "react";
+import { TextField, Select, MenuItem, FormControl, InputLabel, Stack } from "@mui/material";
 
 export default function BasicTab({ formData, brands, errors, onChange }) {
   return (
-    <div className="space-y-4">
-      <div>
-        <label className="block text-sm font-medium">Name</label>
-        <input
-          type="text"
-          name="name"
-          value={formData.name || ""}
-          onChange={onChange}
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-violet-500"
-        />
-        {errors.name && <p className="text-red-500 text-sm">{errors.name}</p>}
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Model</label>
-        <input
-          type="text"
-          name="model"
-          value={formData.model || ""}
-          onChange={onChange}
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-violet-500"
-        />
-        {errors.model && <p className="text-red-500 text-sm">{errors.model}</p>}
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Slug</label>
-        <input
-          type="text"
-          name="slug"
-          value={formData.slug || ""}
-          onChange={onChange}
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-violet-500"
-        />
-        {errors.slug && <p className="text-red-500 text-sm">{errors.slug}</p>}
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Base Price (VND)</label>
-        <input
-          type="number"
-          name="basePrice"
-          value={formData.basePrice || ""}
-          onChange={onChange}
-          min="500000"
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-violet-500"
-        />
-        {errors.basePrice && (
-          <p className="text-red-500 text-sm">{errors.basePrice}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Old Price (VND)</label>
-        <input
-          type="number"
-          name="oldPrice"
-          value={formData.oldPrice || ""}
-          onChange={onChange}
-          min="500000"
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-violet-500"
-        />
-        {errors.oldPrice && (
-          <p className="text-red-500 text-sm">{errors.oldPrice}</p>
-        )}
-      </div>
-      <div>
-        <label className="block text-sm font-medium">Brand</label>
-        <select
+    <Stack spacing={2}>
+      <TextField
+        label="Name"
+        name="name"
+        value={formData.name || ""}
+        onChange={onChange}
+        fullWidth
+        size="small"
+        error={!!errors.name}
+        helperText={errors.name}
+      />
+      <TextField
+        label="Model"
+        name="model"
+        value={formData.model || ""}
+        onChange={onChange}
+        fullWidth
+        size="small"
+        error={!!errors.model}
+        helperText={errors.model}
+      />
+      <TextField
+        label="Slug"
+        name="slug"
+        value={formData.slug || ""}
+        onChange={onChange}
+        fullWidth
+        size="small"
+        error={!!errors.slug}
+        helperText={errors.slug}
+      />
+      <TextField
+        label="Base Price (VND)"
+        type="number"
+        name="basePrice"
+        value={formData.basePrice || ""}
+        onChange={onChange}
+        fullWidth
+        size="small"
+        inputProps={{ min: 500000 }}
+        error={!!errors.basePrice}
+        helperText={errors.basePrice}
+      />
+      <TextField
+        label="Old Price (VND)"
+        type="number"
+        name="oldPrice"
+        value={formData.oldPrice || ""}
+        onChange={onChange}
+        fullWidth
+        size="small"
+        inputProps={{ min: 500000 }}
+        error={!!errors.oldPrice}
+        helperText={errors.oldPrice}
+      />
+      <FormControl fullWidth size="small" error={!!errors.brandName}>
+        <InputLabel>Brand</InputLabel>
+        <Select
           name="brandName"
           value={formData.brandName || ""}
           onChange={onChange}
-          className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-violet-500"
+          label="Brand"
         >
-          <option value="">Select Brand</option>
+          <MenuItem value="">Select Brand</MenuItem>
           {brands.map((brand) => (
-            <option key={brand.id} value={brand.name}>
+            <MenuItem key={brand.id} value={brand.name}>
               {brand.name}
-            </option>
+            </MenuItem>
           ))}
-        </select>
+        </Select>
         {errors.brandName && (
           <p className="text-red-500 text-sm">{errors.brandName}</p>
         )}
-      </div>
-    </div>
+      </FormControl>
+    </Stack>
   );
 }

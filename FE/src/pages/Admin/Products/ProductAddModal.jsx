@@ -1,8 +1,18 @@
 import React, { useState } from "react";
+import {
+  Modal,
+  Box,
+  Typography,
+  Tabs,
+  Tab,
+  Button,
+  IconButton,
+  TextField,
+  Stack
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 import BasicTab from "./ProductTabs/BasicTab";
 import VariantsTab from "./ProductTabs/VariantsTab";
-import SpecsTab from "./ProductTabs/SpecsTab";
-import ImagesTab from "./ProductTabs/ImagesTab";
 
 export default function ProductAddModal({ brands, onSave, onClose }) {
   const [activeTab, setActiveTab] = useState("basic");
@@ -36,8 +46,8 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    const newDisplayOrders = files.map((_, index) =>
-      formData.imageFiles.length + index
+    const newDisplayOrders = files.map(
+      (_, index) => formData.imageFiles.length + index
     );
     setFormData({
       ...formData,
@@ -114,7 +124,7 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Không thể thêm sản phẩm!");
-      }else{
+      } else {
         alert("Thêm sản phẩm thành công");
       }
 
@@ -127,33 +137,35 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-2xl p-6">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-bold">Add Product</h2>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
-            ✕
-          </button>
-        </div>
+    <Modal open={true} onClose={onClose}>
+      <Box
+        className="bg-white rounded-lg w-full max-w-2xl p-6 mx-auto mt-20"
+        sx={{ maxHeight: "80vh", overflowY: "auto" }}
+      >
+        <Box className="flex justify-between items-center mb-4">
+          <Typography variant="h6" fontWeight="bold">
+            Add Product
+          </Typography>
+          <IconButton onClick={onClose}>
+            <CloseIcon />
+          </IconButton>
+        </Box>
 
-        {/* Tabs */}
-        <div className="flex border-b mb-4">
+        <Tabs
+          value={activeTab}
+          onChange={(e, newValue) => setActiveTab(newValue)}
+          className="mb-4"
+        >
           {["basic", "variants", "specs", "images"].map((tab) => (
-            <button
+            <Tab
               key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 capitalize ${
-                activeTab === tab
-                  ? "border-b-2 border-violet-500 text-violet-500"
-                  : "text-gray-500"
-              }`}
-            >
-              {tab}
-            </button>
+              label={tab.charAt(0).toUpperCase() + tab.slice(1)}
+              value={tab}
+              className="capitalize"
+            />
           ))}
-        </div>
+        </Tabs>
 
-        {/* Tab Content */}
         {activeTab === "basic" && (
           <BasicTab
             formData={formData}
@@ -170,127 +182,124 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
           />
         )}
         {activeTab === "specs" && (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium">Screen</label>
-              <input
-                type="number"
-                name="screen"
-                value={formData.screen}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
-              {errors.screen && (
-                <p className="text-red-500 text-sm">{errors.screen}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium">RAM</label>
-              <input
-                type="number"
-                name="ram"
-                value={formData.ram}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
-              {errors.ram && <p className="text-red-500 text-sm">{errors.ram}</p>}
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Front Camera</label>
-              <input
-                type="number"
-                name="frontCamera"
-                value={formData.frontCamera}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
-              {errors.frontCamera && (
-                <p className="text-red-500 text-sm">{errors.frontCamera}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Rear Camera</label>
-              <input
-                type="text"
-                name="rearCamera"
-                value={formData.rearCamera}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
-              {errors.rearCamera && (
-                <p className="text-red-500 text-sm">{errors.rearCamera}</p>
-              )}
-            </div>
-            <div>
-              <label className="block text-sm font-medium">Pin</label>
-              <input
-                type="number"
-                name="pin"
-                value={formData.pin}
-                onChange={handleChange}
-                className="w-full border p-2 rounded"
-              />
-              {errors.pin && <p className="text-red-500 text-sm">{errors.pin}</p>}
-            </div>
-          </div>
+          <Stack spacing={2}>
+            <TextField
+              label="Screen"
+              type="number"
+              name="screen"
+              value={formData.screen}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+              error={!!errors.screen}
+              helperText={errors.screen}
+            />
+            <TextField
+              label="RAM"
+              type="number"
+              name="ram"
+              value={formData.ram}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+              error={!!errors.ram}
+              helperText={errors.ram}
+            />
+            <TextField
+              label="Front Camera"
+              type="number"
+              name="frontCamera"
+              value={formData.frontCamera}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+              error={!!errors.frontCamera}
+              helperText={errors.frontCamera}
+            />
+            <TextField
+              label="Rear Camera"
+              name="rearCamera"
+              value={formData.rearCamera}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+              error={!!errors.rearCamera}
+              helperText={errors.rearCamera}
+            />
+            <TextField
+              label="Pin"
+              type="number"
+              name="pin"
+              value={formData.pin}
+              onChange={handleChange}
+              fullWidth
+              size="small"
+              error={!!errors.pin}
+              helperText={errors.pin}
+            />
+          </Stack>
         )}
         {activeTab === "images" && (
-            <div className="space-y-4">
-                <div className="relative flex justify-center">
-                    <input
-                        type="file"
-                        multiple
-                        onChange={handleImageChange}
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        id="file-upload"
+          <Box className="space-y-4">
+            <Box className="flex justify-center">
+              <Button
+                variant="contained"
+                component="label"
+                className="bg-violet-500 hover:bg-violet-600"
+              >
+                Chọn ảnh
+                <input
+                  type="file"
+                  multiple
+                  hidden
+                  onChange={handleImageChange}
+                />
+              </Button>
+            </Box>
+            <Box className="grid grid-cols-2 gap-4 p-2 border rounded max-h-64 overflow-y-auto">
+              {formData.imageFiles.length > 0 ? (
+                formData.imageFiles.map((file, index) => (
+                  <Box key={index} className="p-2 border rounded">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt="Preview"
+                      className="w-full h-24 object-contain"
                     />
-                    <label
-                        htmlFor="file-upload"
-                        className="inline-block px-4 py-2 bg-violet-500 text-white rounded text-center cursor-pointer"
-                    >
-                        Chọn ảnh
-                    </label>
-                </div>
-                <div className="max-h-64 overflow-y-auto grid grid-cols-2 gap-4 p-2 border rounded">
-                {formData.imageFiles.length > 0 ? (
-                    formData.imageFiles.map((file, index) => (
-                    <div key={index} className="p-2 border rounded">
-                        <img
-                        src={URL.createObjectURL(file)}
-                        alt="Preview"
-                        className="w-full h-24 object-contain"
-                        />
-                        <p className="text-sm text-center">Order: {formData.displayOrders[index]}</p>
-                    </div>
-                    ))
-                ) : (
-                    <p className="text-gray-500 col-span-2 text-center">Chưa có hình ảnh nào.</p>
-                )}
-                </div>
-                {errors.imageFiles && (
-                <p className="text-red-500 text-sm">{errors.imageFiles}</p>
-                )}
-            </div>
+                    <Typography variant="caption" className="text-center block">
+                      Order: {formData.displayOrders[index]}
+                    </Typography>
+                  </Box>
+                ))
+              ) : (
+                <Typography variant="body2" color="text.secondary" className="col-span-2 text-center">
+                  Chưa có hình ảnh nào.
+                </Typography>
+              )}
+            </Box>
+            {errors.imageFiles && (
+              <Typography variant="body2" color="error">
+                {errors.imageFiles}
+              </Typography>
+            )}
+          </Box>
         )}
 
-        {/* Buttons */}
         {activeTab === "basic" && (
-          <div className="flex justify-end gap-2 mt-4">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border rounded text-gray-600 hover:bg-gray-100"
-            >
+          <Box className="flex justify-end gap-2 mt-4">
+            <Button variant="outlined" onClick={onClose}>
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
               onClick={handleSave}
-              className="px-4 py-2 bg-violet-500 text-white rounded hover:bg-violet-600"
+              className="bg-violet-500 hover:bg-violet-600"
             >
               Save
-            </button>
-          </div>
+            </Button>
+          </Box>
         )}
-      </div>
-    </div>
+      </Box>
+    </Modal>
   );
 }

@@ -1,9 +1,19 @@
 import React, { useState } from "react";
+import {
+  TextField,
+  Select,
+  MenuItem,
+  Button,
+  Checkbox,
+  FormControlLabel,
+  Card,
+  CardContent,
+  Typography,
+  Box,
+} from "@mui/material";
 
 export default function VariantsTab({ variants, onChange, errors }) {
-  // Danh sách các lựa chọn bộ nhớ cố định
   const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB"];
-
   const [newVariant, setNewVariant] = useState({
     color: "",
     storage: storageOptions[0],
@@ -28,7 +38,7 @@ export default function VariantsTab({ variants, onChange, errors }) {
     }
     setNewVariant({
       color: "",
-      storage: "",
+      storage: storageOptions[0],
       priceAdjustment: 0,
       stockQuantity: 0,
       default: false,
@@ -48,41 +58,39 @@ export default function VariantsTab({ variants, onChange, errors }) {
   };
 
   return (
-    <div className="space-y-4">
-      {/* Form thêm biến thể */}
-      <div className="border p-4 rounded">
-        <h3 className="text-lg font-semibold mb-2">Thêm biến thể</h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Color</label>
-            <input
-              type="text"
+    <Box className="space-y-4">
+      <Card className="p-4">
+        <CardContent>
+          <Typography variant="h6" gutterBottom>
+            Thêm biến thể
+          </Typography>
+          <Box className="grid grid-cols-2 gap-4">
+            <TextField
+              label="Color"
               value={newVariant.color}
               onChange={(e) =>
                 setNewVariant({ ...newVariant, color: e.target.value })
               }
-              className="w-full border p-2 rounded"
+              fullWidth
+              size="small"
             />
-          </div>
-          <div>
-          <label className="block text-sm font-medium mb-1">Storage</label>
-            <select
+            <Select
+              label="Storage"
               value={newVariant.storage}
               onChange={(e) =>
                 setNewVariant({ ...newVariant, storage: e.target.value })
               }
-              className="w-full border p-2 rounded"
+              fullWidth
+              size="small"
             >
               {storageOptions.map((option) => (
-                <option key={option} value={option}>
+                <MenuItem key={option} value={option}>
                   {option}
-                </option>
+                </MenuItem>
               ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Price Adjustment</label>
-            <input
+            </Select>
+            <TextField
+              label="Price Adjustment"
               type="number"
               value={newVariant.priceAdjustment}
               onChange={(e) =>
@@ -91,12 +99,11 @@ export default function VariantsTab({ variants, onChange, errors }) {
                   priceAdjustment: parseFloat(e.target.value),
                 })
               }
-              className="w-full border p-2 rounded"
+              fullWidth
+              size="small"
             />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Stock Quantity</label>
-            <input
+            <TextField
+              label="Stock Quantity"
               type="number"
               value={newVariant.stockQuantity}
               onChange={(e) =>
@@ -105,78 +112,81 @@ export default function VariantsTab({ variants, onChange, errors }) {
                   stockQuantity: parseInt(e.target.value),
                 })
               }
-              className="w-full border p-2 rounded"
+              fullWidth
+              size="small"
             />
-          </div>
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={newVariant.default}
-              onChange={(e) =>
-                setNewVariant({ ...newVariant, default: e.target.checked })
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={newVariant.default}
+                  onChange={(e) =>
+                    setNewVariant({ ...newVariant, default: e.target.checked })
+                  }
+                />
               }
-              className="mr-2"
+              label="Default"
             />
-            <label className="text-sm font-medium">Default</label>
-          </div>
-        </div>
-        <button
-          onClick={handleAddVariant}
-          className="mt-4 bg-violet-500 text-white px-4 py-2 rounded hover:bg-violet-600"
-        >
-          Add Variant
-        </button>
-      </div>
+          </Box>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddVariant}
+            className="mt-4 bg-violet-500 hover:bg-violet-600"
+          >
+            Add Variant
+          </Button>
+        </CardContent>
+      </Card>
 
-      {/* Danh sách biến thể */}
       {variants.length === 0 ? (
-        <p className="text-gray-500">Chưa có biến thể nào.</p>
+        <Typography variant="body2" color="text.secondary">
+          Chưa có biến thể nào.
+        </Typography>
       ) : (
-        <div className="max-h-64 overflow-y-auto space-y-2 p-2 border rounded">
+        <Box className="max-h-64 overflow-y-auto space-y-2 p-2 border rounded">
           {variants.map((variant, index) => (
-            <div
-              key={index}
-              className="flex items-center p-2 border rounded justify-between"
-            >
-              <div>
-                <p>
+            <Card key={index} className="flex items-center justify-between p-2">
+              <CardContent>
+                <Typography variant="body2">
                   <strong>Color:</strong> {variant.color}
-                </p>
-                <p>
+                </Typography>
+                <Typography variant="body2">
                   <strong>Storage:</strong> {variant.storage}
-                </p>
-                <p>
+                </Typography>
+                <Typography variant="body2">
                   <strong>Price Adjustment:</strong>{" "}
                   {variant.priceAdjustment.toLocaleString("vi-VN")} VND
-                </p>
-                <p>
+                </Typography>
+                <Typography variant="body2">
                   <strong>Stock:</strong> {variant.stockQuantity}
-                </p>
-                <p>
+                </Typography>
+                <Typography variant="body2">
                   <strong>Default:</strong> {variant.default ? "Yes" : "No"}
-                </p>
-              </div>
-              <div className="flex gap-2">
-                <button
+                </Typography>
+              </CardContent>
+              <Box className="flex gap-2 mr-4">
+                <Button
+                  color="primary"
                   onClick={() => handleToggleDefault(index)}
-                  className="text-blue-500 hover:underline"
                 >
                   Set Default
-                </button>
-                <button
+                </Button>
+                <Button
+                  color="error"
                   onClick={() => handleDeleteVariant(index)}
-                  className="text-red-500 hover:underline"
                 >
                   Delete
-                </button>
-              </div>
-            </div>
+                </Button>
+              </Box>
+            </Card>
           ))}
-        </div>
+        </Box>
       )}
       {errors.variants && (
-        <p className="text-red-500 text-sm">{errors.variants}</p>
+        <Typography variant="body2" color="error">
+          {errors.variants}
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }
