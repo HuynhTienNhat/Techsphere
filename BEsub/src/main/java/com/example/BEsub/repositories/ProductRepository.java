@@ -16,11 +16,18 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     @Query("SELECT p FROM Product p ORDER BY p.basePrice DESC")
     List<Product> findAllByOrderByBasePriceDesc();
 
-    // Sắp xếp theo giá (thấp -> cao)
     @Query("SELECT p FROM Product p ORDER BY p.basePrice ASC")
     List<Product> findAllByOrderByBasePriceAsc();
 
-    // Tìm kiếm theo tên hoặc model
     @Query("SELECT p FROM Product p WHERE p.name LIKE %:keyword% OR p.model LIKE %:keyword%")
     List<Product> searchByNameOrModel(String keyword);
+
+    //Lọc theo brand và sắp xếp tăng dần
+    @Query("SELECT p FROM Product p WHERE p.brand = :brand ORDER BY p.basePrice ASC")
+    List<Product> findByBrandOrderByBasePriceAsc(Brand brand);
+
+    // Lọc theo brand và sắp xếp giảm dần
+    @Query("SELECT p FROM Product p WHERE p.brand = :brand ORDER BY p.basePrice DESC")
+    List<Product> findByBrandOrderByBasePriceDesc(Brand brand);
 }
+

@@ -86,14 +86,14 @@ public class ProductServiceImpl implements ProductService {
             throw new AppException("Camera sau cannot be null or blank");
         }
         String[] rearCameraParts = request.getRearCamera().trim().split("\\s+");
-        if (rearCameraParts.length < 1 || rearCameraParts.length > 3) {
-            throw new AppException("Camera sau must have 1 to 3 values (e.g., '48 12')");
+        if (rearCameraParts.length < 1 || rearCameraParts.length > 5) {
+            throw new AppException("Camera sau must have 1 to 5 values (e.g., '48 12')");
         }
         for (String part : rearCameraParts) {
             try {
                 int camera = Integer.parseInt(part);
-                if (camera <= 0 || camera > 100) {
-                    throw new AppException("Each Camera sau value must be between 1 and 100");
+                if (camera <= 0 || camera > 500) {
+                    throw new AppException("Each Camera sau value must be between 1 and 500");
                 }
             } catch (NumberFormatException e) {
                 throw new AppException("Camera sau must contain valid numbers (e.g., '48 12')");
@@ -280,6 +280,25 @@ public class ProductServiceImpl implements ProductService {
             throw new AppException("Invalid sort order. Use 'asc' or 'desc'");
         }
     }
+
+    @Override
+    public List<ProductDTO> getProductsByBrandAndSort(String brandName, String sortBy) {
+        Brand brand = brandRepository.findByName(brandName)
+                .orElseThrow(() -> new AppException("Brand not found"));
+
+        List<Product> products;
+
+        if ("desc".equalsIgnoreCase(sortBy)) {
+            products = productRepository.findByBrandOrderByBasePriceDesc(brand);
+        } else if ("asc".equalsIgnoreCase(sortBy)) {
+            products = productRepository.findByBrandOrderByBasePriceAsc(brand);
+        } else {
+            products = productRepository.findByBrand(brand);
+        }
+
+        return products.stream().map(this::mapToDTO).collect(Collectors.toList());
+    }
+
 
     @Override
     public List<ReviewDTO> getProductReview(Long productId) {

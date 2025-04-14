@@ -13,7 +13,9 @@ public interface ProductService {
     List<ProductDTO> getAllProducts();
     List<ProductDTO> getProductsByBrand(String brandName);
     List<ProductDTO> getProductsSortedByPrice(String sortOrder); // "asc" hoặc "desc"
+    List<ProductDTO> getProductsByBrandAndSort(String brandName, String sortOrder);
     List<ProductDTO> searchProducts(String keyword);
     List<ReviewDTO> getProductReview(Long productId);
     AverageRatingDTO getAverageRating(Long productId);
 }
+

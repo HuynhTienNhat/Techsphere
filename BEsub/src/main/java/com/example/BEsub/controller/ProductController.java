@@ -142,6 +142,14 @@ public class ProductController {
         return ResponseEntity.ok(productService.searchProducts(keyword));
     }
 
+    // Lọc theo hãng và sắp xếp theo giá
+    @GetMapping("/by-brand")
+    public ResponseEntity<List<ProductDTO>> getProductsByBrandAndSort(
+            @RequestParam String brandName,
+            @RequestParam(defaultValue = "asc") String sortOrder) {
+        return ResponseEntity.ok(productService.getProductsByBrandAndSort(brandName, sortOrder));
+    }
+
     @GetMapping("/reviews/{productId}")
     public ResponseEntity<List<ReviewDTO>> getProductReview(@PathVariable Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReview(productId));
