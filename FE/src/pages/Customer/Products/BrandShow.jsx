@@ -1,5 +1,6 @@
 import React from 'react';
 import {fetchBrands} from './../../../services/api';
+
 export default function ProductFilter({ onSelectBrand }) {
     const [selectedBtn, setSelectedBtn] = React.useState("All");
     const [brands, setBrands] = React.useState([]);

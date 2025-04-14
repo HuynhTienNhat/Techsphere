@@ -8,9 +8,13 @@ import {
   Button,
   IconButton,
   TextField,
-  Stack
+  Stack,
+  Card,
+  CardMedia,
+  CardActions
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import DeleteIcon from "@mui/icons-material/Delete";
 import BasicTab from "./ProductTabs/BasicTab";
 import VariantsTab from "./ProductTabs/VariantsTab";
 
@@ -53,6 +57,20 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
       ...formData,
       imageFiles: [...formData.imageFiles, ...files],
       displayOrders: [...formData.displayOrders, ...newDisplayOrders],
+    });
+  };
+
+  const handleDeleteImage = (index) => {
+    const updatedImageFiles = [...formData.imageFiles];
+    
+    updatedImageFiles.splice(index, 1);
+    
+    const updatedDisplayOrders = updatedImageFiles.map((_, idx) => idx);
+    
+    setFormData({
+      ...formData,
+      imageFiles: updatedImageFiles,
+      displayOrders: updatedDisplayOrders,
     });
   };
 
@@ -121,8 +139,10 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
         body: formDataToSend,
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
+        console.error("Server response:", responseData);
         throw new Error(errorData.message || "Không thể thêm sản phẩm!");
       } else {
         alert("Thêm sản phẩm thành công");
@@ -136,13 +156,88 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
     }
   };
 
+  // Images Tab Component
+  const ImagesTab = () => (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Button
+          variant="contained"
+          component="label"
+          sx={{ bgcolor: 'rgb(139, 92, 246)', '&:hover': { bgcolor: 'rgb(124, 58, 237)' } }}
+        >
+          Chọn ảnh
+          <input
+            type="file"
+            multiple
+            hidden
+            onChange={handleImageChange}
+          />
+        </Button>
+      </Box>
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: 'repeat(2, 1fr)', 
+        gap: 2,
+        p: 2,
+        border: '1px solid',
+        borderColor: 'divider',
+        borderRadius: 1,
+        maxHeight: '16rem',
+        overflowY: 'auto'
+      }}>
+        {formData.imageFiles.length > 0 ? (
+          formData.imageFiles.map((file, index) => (
+            <Card key={index} sx={{ p: 1 }} elevation={1}>
+              <CardMedia
+                component="img"
+                src={URL.createObjectURL(file)}
+                alt="Preview"
+                sx={{ height: '6rem', objectFit: 'contain' }}
+              />
+              <Typography variant="caption" sx={{ display: 'block', textAlign: 'center' }}>
+                Order: {formData.displayOrders[index]}
+              </Typography>
+              <CardActions sx={{ justifyContent: 'center', p: 0, mt: 1 }}>
+                <IconButton 
+                  size="small" 
+                  color="error" 
+                  onClick={() => handleDeleteImage(index)}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </CardActions>
+            </Card>
+          ))
+        ) : (
+          <Typography variant="body2" color="text.secondary" sx={{ gridColumn: 'span 2', textAlign: 'center' }}>
+            Chưa có hình ảnh nào.
+          </Typography>
+        )}
+      </Box>
+      {errors.imageFiles && (
+        <Typography variant="body2" color="error">
+          {errors.imageFiles}
+        </Typography>
+      )}
+    </Box>
+  );
+
   return (
     <Modal open={true} onClose={onClose}>
       <Box
-        className="bg-white rounded-lg w-full max-w-2xl p-6 mx-auto mt-20"
-        sx={{ maxHeight: "80vh", overflowY: "auto" }}
+        sx={{ 
+          bgcolor: 'background.paper',
+          borderRadius: 1,
+          width: '100%',
+          maxWidth: '42rem',
+          p: 3,
+          mx: 'auto',
+          mt: '5rem',
+          maxHeight: '80vh',
+          overflowY: 'auto'
+        }}
       >
-        <Box className="flex justify-between items-center mb-4">
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
           <Typography variant="h6" fontWeight="bold">
             Add Product
           </Typography>
@@ -154,14 +249,14 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
         <Tabs
           value={activeTab}
           onChange={(e, newValue) => setActiveTab(newValue)}
-          className="mb-4"
+          sx={{ mb: 2 }}
         >
           {["basic", "variants", "specs", "images"].map((tab) => (
             <Tab
               key={tab}
               label={tab.charAt(0).toUpperCase() + tab.slice(1)}
               value={tab}
-              className="capitalize"
+              sx={{ textTransform: 'capitalize' }}
             />
           ))}
         </Tabs>
@@ -239,66 +334,21 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
             />
           </Stack>
         )}
-        {activeTab === "images" && (
-          <Box className="space-y-4">
-            <Box className="flex justify-center">
-              <Button
-                variant="contained"
-                component="label"
-                className="bg-violet-500 hover:bg-violet-600"
-              >
-                Chọn ảnh
-                <input
-                  type="file"
-                  multiple
-                  hidden
-                  onChange={handleImageChange}
-                />
-              </Button>
-            </Box>
-            <Box className="grid grid-cols-2 gap-4 p-2 border rounded max-h-64 overflow-y-auto">
-              {formData.imageFiles.length > 0 ? (
-                formData.imageFiles.map((file, index) => (
-                  <Box key={index} className="p-2 border rounded">
-                    <img
-                      src={URL.createObjectURL(file)}
-                      alt="Preview"
-                      className="w-full h-24 object-contain"
-                    />
-                    <Typography variant="caption" className="text-center block">
-                      Order: {formData.displayOrders[index]}
-                    </Typography>
-                  </Box>
-                ))
-              ) : (
-                <Typography variant="body2" color="text.secondary" className="col-span-2 text-center">
-                  Chưa có hình ảnh nào.
-                </Typography>
-              )}
-            </Box>
-            {errors.imageFiles && (
-              <Typography variant="body2" color="error">
-                {errors.imageFiles}
-              </Typography>
-            )}
-          </Box>
-        )}
+        {activeTab === "images" && <ImagesTab />}
 
-        {activeTab === "basic" && (
-          <Box className="flex justify-end gap-2 mt-4">
-            <Button variant="outlined" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleSave}
-              className="bg-violet-500 hover:bg-violet-600"
-            >
-              Save
-            </Button>
-          </Box>
-        )}
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, mt: 2 }}>
+          <Button variant="outlined" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleSave}
+            sx={{ bgcolor: 'rgb(139, 92, 246)', '&:hover': { bgcolor: 'rgb(124, 58, 237)' } }}
+          >
+            Save
+          </Button>
+        </Box>
       </Box>
     </Modal>
   );
