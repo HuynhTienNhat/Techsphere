@@ -71,8 +71,8 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
 
   return (
     <div
-      className="product-display mt-10 py-5 mx-6 md:mx-10 lg:mx-20 rounded-lg bg-gray-50"
-      style={{ boxShadow: "0px 8px 20px rgba(0,0,0,0.1)" }}
+      className="product-display mt-10 py-5 md:mx-10 lg:mx-20 rounded-lg bg-gray-50"
+      style={{ boxShadow: "0px 8px 20px rgba(0,0,0,0.1)" , marginLeft:"120px", marginRight:"120px"}}
     >
       <div className="mb-4 px-6 md:px-10 border-b border-gray-200 pb-4 flex justify-between items-center">
         <h3 className="text-lg font-semibold">

@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 import ProductImages from './ProductImages';
 import ProductVariants from './ProductVariants';
 import ProductPrice from './ProductPrice';
+import ProductBasicInfo from './BasicInformation';
+import ProductSpecs from './ProductSpecs';
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -15,11 +17,10 @@ const ProductDetail = () => {
     const fetchProduct = async () => {
       try {
         const response = await fetch(`http://localhost:8080/api/products/${slug}`);
-        console.log(response);
         
         if (!response.ok) throw new Error('Product not found');
         const data = await response.json();
-        console.log(data);
+        console.log(data)
         setProduct(data);
         setLoading(false);
       } catch (error) {
@@ -33,19 +34,25 @@ const ProductDetail = () => {
   if (!product) return <div className="text-center py-5 text-lg text-red-500">Sản phẩm không tồn tại</div>;
 
   return (
-    <div className="max-w-6xl mx-28 p-5"> {/* Sửa mx-29 thành mx-auto */}
-        <h1 className="text-2xl font-bold mb-5">
-            {product.name} {product.isOutOfStock && <span className="text-sm text-red-500 ml-2">Hết hàng</span>}
-        </h1>
+    <div className="mx-26 px-4 sm:px-6 lg:px-8 max-w-7xl mt-6">
+      <h1 className="text-2xl font-bold mb-5">
+        {product.name} {product.isOutOfStock && <span className="text-sm text-red-500 ml-2">Hết hàng</span>}
+      </h1>
 
-        <div className="flex justify-between items-start gap-30"> 
-            <ProductImages images={product.images} mainImageUrl={product.mainImageUrl} />
+      <div className="flex flex-col md:flex-row justify-between w-full pt-4 border-t-4 border-gray-300 gap-8"> 
+        <ProductImages images={product.images} mainImageUrl={product.mainImageUrl} />
 
-            <div className="flex flex flex-col w-auto">
-                <ProductVariants variants={product.variants} onVariantChange={setSelectedVariant}/>
-                <ProductPrice basePrice={product.basePrice} oldPrice={product.oldPrice} selectedVariant={selectedVariant}/>
-            </div>
+        <div className="flex flex-col w-full md:w-96 space-y-6">
+          <ProductVariants variants={product.variants} onVariantChange={setSelectedVariant}/>
+          <ProductPrice basePrice={product.basePrice} oldPrice={product.oldPrice} selectedVariant={selectedVariant}/>
         </div>
+      </div>
+
+      {/* Product Information and Specifications in same row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+        <ProductBasicInfo />
+        <ProductSpecs specs={product.specs} />
+      </div>
     </div>
   );
 };

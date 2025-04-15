@@ -18,9 +18,9 @@ export default function Products() {
 
     return (
         <div className="products-page">
-        <ProductFilter onSelectBrand={handleSelectedBtn} />
-        <ProductDisplay selectedBrand={selectedBrand} keyword={keyword} />
-        <GeneralInformation />
+            <ProductFilter onSelectBrand={handleSelectedBtn} />
+            <ProductDisplay selectedBrand={selectedBrand} keyword={keyword} />
+            <GeneralInformation />
         </div>
     );
 }
