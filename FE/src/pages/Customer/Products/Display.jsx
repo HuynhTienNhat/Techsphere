@@ -9,6 +9,13 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Reset sort order when keyword changes
+  useEffect(() => {
+    if (keyword) {
+      setSortOrder("");
+    }
+  }, [keyword]);
+
   useEffect(() => {
     loadProducts();
   }, [sortOrder, selectedBrand, keyword]);
@@ -20,11 +27,15 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
       const params = {};
       if (keyword) {
         params.keyword = keyword;
-      } else if (selectedBrand && selectedBrand !== "All") {
-        params.brand = selectedBrand;
-      }
-      if (sortOrder && !keyword) {
-        params.sortBy = sortOrder;
+        // Khi có keyword, không áp dụng sortOrder
+      } else {
+        // Chỉ áp dụng brand và sortOrder khi không có keyword
+        if (selectedBrand && selectedBrand !== "All") {
+          params.brand = selectedBrand;
+        }
+        if (sortOrder) {
+          params.sortBy = sortOrder;
+        }
       }
 
       const data = await fetchProducts(params);
@@ -39,6 +50,13 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
 
   const handleClick = (slug) => {
     navigate(`/products/${slug}`);
+  };
+
+  const handleSortChange = (e) => {
+    // Chỉ cho phép thay đổi sortOrder khi không có keyword
+    if (!keyword) {
+      setSortOrder(e.target.value);
+    }
   };
 
   // Fix the product card layout to ensure consistent text alignment
@@ -92,9 +110,11 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
           <label className="mr-2 text-sm font-medium">Sắp xếp theo: </label>
           <select
             value={sortOrder}
-            onChange={(e) => setSortOrder(e.target.value)}
-            className="border p-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-            disabled={keyword} // Chỉ vô hiệu hóa khi có keyword
+            onChange={handleSortChange}
+            className={`border p-2 rounded-md text-sm focus:outline-none ${
+              keyword ? "bg-gray-100 text-gray-500 cursor-not-allowed" : "focus:ring-2 focus:ring-violet-500"
+            }`}
+            disabled={!!keyword} // Đảm bảo vô hiệu hóa khi có keyword
           >
             <option value="">Mặc định</option>
             <option value="asc">Giá thấp → cao</option>

@@ -11,6 +11,15 @@ export default function Header() {
   const [searchKeyword, setSearchKeyword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token"));
 
+  // Khởi tạo searchKeyword từ URL khi component được mount
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const keywordFromUrl = searchParams.get("keyword") || "";
+    if (keywordFromUrl) {
+      setSearchKeyword(keywordFromUrl);
+    }
+  }, [location.search]);
+
   useEffect(() => {
     const handleTokenChange = () => {
       setToken(localStorage.getItem("token"));
@@ -69,8 +78,12 @@ export default function Header() {
   };
 
   const handleSearch = () => {
-    navigate(`/products?keyword=${encodeURIComponent(searchKeyword.trim())}`);
-    setSearchKeyword("");
+    if (searchKeyword.trim()) {
+      navigate(`/products?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+    } else {
+      // Nếu không có từ khóa, chuyển đến trang products mà không có query parameter
+      navigate("/products");
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -86,6 +99,16 @@ export default function Header() {
     setUser(null);
     navigate("/login");
     window.dispatchEvent(new Event("token-changed"));
+  };
+
+  // Xử lý khi click vào dấu X
+  const handleClearSearch = () => {
+    setSearchKeyword("");
+    
+    // Nếu đang ở trang products, cập nhật URL để xóa keyword
+    if (location.pathname === "/products") {
+      navigate("/products");
+    }
   };
 
   return (
@@ -131,7 +154,7 @@ export default function Header() {
               <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center pr-3"
-                onClick={() => setSearchKeyword("")}
+                onClick={handleClearSearch}
               >
                 <svg
                   className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer"

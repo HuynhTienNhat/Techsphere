@@ -9,7 +9,7 @@ function ForgetPassword() {
         <p className="mt-2 text-center text-sm text-gray-600">
           Nhập địa chỉ email của bạn để bắt đầu quá trình đặt lại mật khẩu
         </p>
-        <form className="mt-8 space-y-6" action="#" method="POST">
+        <form className="mt-8 space-y-6" action="#" method="POST" autoComplete="off">
           <div className="relative my-4">
             <input
               type="email"
@@ -35,7 +35,7 @@ function ForgetPassword() {
           </Link>
           <p className="block text-center">
             Đã có tài khoản?{" "}
-            <Link to={"/email-verify"} className="text-violet-600 hover:underline">
+            <Link to={"/login"} className="text-violet-600 hover:underline">
               Đăng nhập ngay
             </Link>
           </p>
