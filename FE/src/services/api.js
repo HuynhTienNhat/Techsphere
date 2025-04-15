@@ -124,3 +124,35 @@ export const fetchCart = async () => {
   }
   return response.json();
 };
+
+export const addToCart = async (variantId, quantity) => {
+  const token = localStorage.getItem('token'); 
+  const headers = {
+    'Content-Type': 'application/json',
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  } else {
+    throw new Error('Vui lòng đăng nhập để thêm vào giỏ hàng');
+  }
+
+  const response = await fetch("http://localhost:8080/api/cart/items", {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ variantId, quantity }),
+  });
+
+  if (!response.ok) {
+    let errorMessage = 'Không thể thêm vào giỏ hàng';
+    if (response.status === 500) {
+      errorMessage = '500';
+    } else {
+      const errorData = await response.json();
+      errorMessage = errorData.message || errorMessage;
+    }
+    throw new Error(errorMessage);
+  }
+
+  return response.json();
+};
