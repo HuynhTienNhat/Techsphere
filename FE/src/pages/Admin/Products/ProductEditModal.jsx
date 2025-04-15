@@ -13,6 +13,7 @@ import BasicTab from "./ProductTabs/BasicTab.jsx";
 import VariantsTab from "./ProductTabs/VariantsTab.jsx";
 import SpecsTab from "./ProductTabs/SpecsTab.jsx";
 import ImagesTab from "./ProductTabs/ImagesTab.jsx";
+import { toast } from "react-toastify";
 
 export default function ProductEditModal({ product, brands, onSave, onClose }) {
   const [activeTab, setActiveTab] = useState("basic");
@@ -89,17 +90,12 @@ export default function ProductEditModal({ product, brands, onSave, onClose }) {
         throw new Error(errorData.message || "Không thể lưu sản phẩm!");
       }
 
-      alert("Đã lưu sản phẩm thành công!");
+      toast.success("Đã lưu sản phẩm thành công!");
       onSave();
     } catch (error) {
-      console.error("Error saving product:", error);
-      alert(error.message || "Không thể lưu sản phẩm!");
+      toast.error(error.message || "Không thể lưu sản phẩm!");
     }
   };
-
-  useEffect(() => {
-    console.log("Form data updated:", formData);
-  }, [formData]);
 
   return (
     <Modal open={!!product} onClose={onClose}>

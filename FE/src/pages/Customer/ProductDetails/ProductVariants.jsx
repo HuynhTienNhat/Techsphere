@@ -11,7 +11,7 @@ const ProductVariants = ({ variants, onVariantChange }) => {
   const colors = [...new Set(variants.map(variant => variant.color))];
 
   // Find default variant
-  let defaultVariant = variants.find(variant => variant.isDefault) || variants[0];
+  let defaultVariant = variants.find(variant => variant.default) || variants[0];
 
   // If default variant is out of stock, select first in-stock variant
   if (defaultVariant.stockQuantity === 0) {

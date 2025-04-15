@@ -6,6 +6,7 @@ import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import React from 'react';
+import { toast } from 'react-toastify';
 
 export default function HomeHero() {
     const [brands, setBrands] = React.useState([])
@@ -26,7 +27,7 @@ export default function HomeHero() {
                 const data = await res.json();
                 setBrands(data);
             } catch (error) {
-                console.error("Error fetching brands:", error);
+                toast.error(error)
             }
         };
         fetchBrands();
