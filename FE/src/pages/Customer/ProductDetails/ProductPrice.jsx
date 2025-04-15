@@ -1,7 +1,7 @@
 import { Button } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { addToCart } from './../../../services/api';
+import { addToCart } from '../../../services/api';
 
 const ProductPrice = ({ basePrice, oldPrice, selectedVariant, product }) => {
   const navigate = useNavigate();

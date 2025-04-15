@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import UserDetailModal from './UserDetailModal';
-import { getAllUsers, deleteUser } from './../../../services/api';
+import { getAllUsers, deleteUser } from '../../../services/api';
 
 export default function Users() {
   const [users, setUsers] = useState([]);

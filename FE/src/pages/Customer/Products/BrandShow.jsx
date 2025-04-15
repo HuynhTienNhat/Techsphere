@@ -1,5 +1,6 @@
 import React from 'react';
-import {fetchBrands} from './../../../services/api';
+import {fetchBrands} from '../../../services/api';
+import { toast } from 'react-toastify';
 
 export default function ProductFilter({ onSelectBrand }) {
     const [selectedBtn, setSelectedBtn] = React.useState("All");
@@ -13,8 +14,7 @@ export default function ProductFilter({ onSelectBrand }) {
             const data = await fetchBrands();
             setBrands(data);
         } catch (error) {
-          console.error("Error fetching brands:", error);
-          alert("Không thể tải danh sách hãng!");
+          toast.error("Không thể tải danh sách hãng!");
         } finally {
           setIsLoading(false);
         }

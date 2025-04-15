@@ -15,7 +15,7 @@ import {
   Button,
 } from '@mui/material';
 import { format } from 'date-fns';
-import { getUserAddresses, getUserOrders, changeOrderStatus } from './../../../services/api';
+import { getUserAddresses, getUserOrders, changeOrderStatus } from '../../../services/api';
 import { toast } from 'react-toastify';
 
 const UserDetailModal = ({ open, onClose, user }) => {

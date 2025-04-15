@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaShoppingCart } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function Header() {
   const location = useLocation();
@@ -61,7 +62,7 @@ export default function Header() {
 
   const handleCartClick = () => {
     if (!user) {
-      alert("Bạn cần đăng nhập trước!");
+      toast.warning("Bạn cần đăng nhập trước!");
     } else {
       navigate("/cart");
     }

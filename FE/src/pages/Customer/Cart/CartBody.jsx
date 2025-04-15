@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaTrash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
-import { fetchCart, updateCartItemQuantity, removeCartItem } from './../../../services/api';
+import { fetchCart, updateCartItemQuantity, removeCartItem } from '../../../services/api';
 
 export default function CartBody() {
   const [isLoading, setIsLoading] = useState(false);

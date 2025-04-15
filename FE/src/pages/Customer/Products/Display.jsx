@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {fetchProducts} from './../../../services/api.js';
+import {fetchProducts} from '../../../services/api.js';
 
 export default function ProductDisplay({ selectedBrand, keyword }) {
   const [products, setProducts] = useState([]);
@@ -28,7 +28,6 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
       }
 
       const data = await fetchProducts(params);
-      console.log(data);
       
       setProducts(data);
     } catch (err) {

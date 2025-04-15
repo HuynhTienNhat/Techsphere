@@ -11,6 +11,7 @@ import {
   Typography,
   Box,
 } from "@mui/material";
+import { toast } from "react-toastify";
 
 export default function VariantsTab({ variants, onChange, errors }) {
   const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB"];
@@ -27,7 +28,7 @@ export default function VariantsTab({ variants, onChange, errors }) {
       (v) => v.color === newVariant.color && v.storage === newVariant.storage
     );
     if (exists) {
-      alert("Biến thể với màu và bộ nhớ này đã tồn tại!");
+      toast.warning("Biến thể với màu và bộ nhớ này đã tồn tại!");
       return;
     }
     if (newVariant.default) {
