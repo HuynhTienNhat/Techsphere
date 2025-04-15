@@ -10,7 +10,9 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.Console;
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -91,6 +93,7 @@ public class CartServiceImpl implements CartService {
         return mapToCartItemDTO(cartItem);
     }
 
+
     @Override
     @Transactional
     public void removeCartItem(Long cartItemId) {
@@ -136,7 +139,24 @@ public class CartServiceImpl implements CartService {
         return new CartDTO(cart.getId(), cart.getUser().getId(), cartItems, totalPrice);
     }
 
+    private CartItem mapToCartItem(CartItemDTO cartItemDTO, Cart cart){
+        CartItem cartItem =  new CartItem();
+        cartItem.setVariant(productVariantRepository.findById(cartItemDTO.getVariantId())
+                .orElseThrow(()->new AppException("Variant not found")));
+        cartItem.setQuantity(cartItemDTO.getQuantity());
+        cartItem.setUnitPrice(cartItemDTO.getUnitPrice());
+        cartItem.setCart(cart);
+        return cartItem;
+    }
+
     private CartItemDTO mapToCartItemDTO(CartItem cartItem) {
+        String mainImageUrl = null;
+        if (cartItem.getVariant().getProduct().getImages() != null && !cartItem.getVariant().getProduct().getImages().isEmpty()) {
+            mainImageUrl = cartItem.getVariant().getProduct().getImages().stream()
+                    .min(Comparator.comparing(ProductImage::getDisplayOrder))
+                    .map(ProductImage::getImgUrl)
+                    .orElse(null);
+        }
         return new CartItemDTO(
                 cartItem.getId(),
                 cartItem.getVariant().getId(),
@@ -144,7 +164,11 @@ public class CartServiceImpl implements CartService {
                 cartItem.getVariant().getColor(),
                 cartItem.getVariant().getStorage(),
                 cartItem.getQuantity(),
-                cartItem.getUnitPrice()
+                cartItem.getUnitPrice(),
+                cartItem.getVariant().getProduct().getBasePrice(),
+                cartItem.getVariant().getProduct().getOldPrice(),
+                mainImageUrl,
+                cartItem.getVariant().getProduct().getSlug()
         );
     }
 }

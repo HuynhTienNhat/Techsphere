@@ -140,7 +140,7 @@ public class ProductController {
     @GetMapping("/search")
     public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String keyword) {
         return ResponseEntity.ok(productService.searchProducts(keyword));
-    }
+    }   
 
     // Lọc theo hãng và sắp xếp theo giá
     @GetMapping("/by-brand")
