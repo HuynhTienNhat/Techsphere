@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react"
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function Register() {
   const [registerData, setRegisterData] = useState({
@@ -88,7 +89,7 @@ export default function Register() {
     // Validate form trước khi gửi
     const errorMessage = validateForm();
     if (errorMessage) {
-      alert(errorMessage);
+      toast.error(errorMessage);
       return;
     }
 
@@ -103,21 +104,17 @@ export default function Register() {
         body: JSON.stringify(registerData),
       });
 
-      console.log("Response Status:", response.status);
-
       const result = await response.json();
-      console.log("Response Data:", result);
 
       if (response.status === 201) {
-        alert("Đăng ký thành công!");
+        toast.success("Đăng ký thành công!");
         localStorage.setItem("token", result.token);
-        window.location.href = "../email-verify";
+        navigate("/email-verify")
       } else {
-        alert("Đăng ký thất bại: " + (result.error || "Lỗi không xác định"));
+        toast.error("Đăng ký thất bại: " + (result.error || "Lỗi không xác định"));
       }
     } catch (error) {
-      console.error("Lỗi đăng ký:", error);
-      alert("Đăng ký thất bại! Vui lòng thử lại sau.");
+      toast.error("Đăng ký thất bại! Vui lòng thử lại sau.");
     }
   };
 

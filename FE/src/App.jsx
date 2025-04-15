@@ -17,6 +17,8 @@ import ProtectedAdminRoute from './routes/ProtectedAdminRoute';
 import AdminProducts from './pages/Admin/Products/Products.jsx';
 import Users from './pages/Admin/Users/Users.jsx';
 import Cart from './pages/Customer/Cart/Cart.jsx';
+import Checkout from './pages/Customer/Checkout/Checkout.jsx';
+
 
 function AppContent() {
   const location = useLocation();
@@ -81,6 +83,14 @@ function AppContent() {
           }
         />
         <Route
+          path="/checkout"
+          element={
+            <CustomerLayout>
+              <Checkout />
+            </CustomerLayout>
+          }
+        />
+        <Route
           path="/register"
           element={
             <CustomerLayout>
@@ -128,7 +138,18 @@ function AppContent() {
           }
         />
       </Routes>
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </>
   );
 }

@@ -44,7 +44,7 @@ const ProductDetail = () => {
 
         <div className="flex flex-col w-full md:w-96 space-y-6">
           <ProductVariants variants={product.variants} onVariantChange={setSelectedVariant}/>
-          <ProductPrice basePrice={product.basePrice} oldPrice={product.oldPrice} selectedVariant={selectedVariant}/>
+          <ProductPrice basePrice={product.basePrice} oldPrice={product.oldPrice} selectedVariant={selectedVariant} product={product}/>
         </div>
       </div>
 

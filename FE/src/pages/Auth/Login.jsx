@@ -1,6 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [loginData, setLoginData] = useState({
@@ -30,7 +31,7 @@ export default function Login() {
 
     const errorMessage = validateForm();
     if (errorMessage) {
-      alert(errorMessage);
+      toast.error(errorMessage);
       return;
     }
 
@@ -45,14 +46,10 @@ export default function Login() {
         body: JSON.stringify(loginData),
       });
 
-      console.log("Response Status:", response.status);
-
       const result = await response.json();
-      console.log("Response Data:", result);
 
       if (response.status === 200) {
-        alert("Đăng nhập thành công!");
-        console.log(result.token);
+        toast.success("Đăng nhập thành công!");
         
         localStorage.setItem("token", result.token);
 
@@ -82,11 +79,10 @@ export default function Login() {
           navigate("/");
         }
       } else {
-        alert("Đăng nhập thất bại: " + (result.error || "Lỗi không xác định"));
+        toast.error("Đăng nhập thất bại: " + (result.error || "Lỗi không xác định"));
       }
     } catch (error) {
-      console.error("Lỗi đăng nhập:", error);
-      alert("Đăng nhập thất bại! Vui lòng thử lại sau.");
+      toast.error("Đăng nhập thất bại! Vui lòng thử lại sau.");
     }
   };
 
