@@ -109,49 +109,137 @@ export const fetchBrands = async () => {
   return response.json();
 };
 
+const API_BASE_URL = 'http://localhost:8080/api';
+
 export const fetchCart = async () => {
   const token = localStorage.getItem('token');
-  const response = await fetch("http://localhost:8080/api/cart", {
-    method: "GET",
+  if (!token) {
+    throw new Error('Vui lòng đăng nhập để xem giỏ hàng');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/cart`, {
+    method: 'GET',
     headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
   });
+
   if (!response.ok) {
-    console.log("Error response:", await response.text());
-    throw new Error("Không thể tải giỏ hàng!");
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể tải giỏ hàng');
   }
+
   return response.json();
 };
 
 export const addToCart = async (variantId, quantity) => {
-  const token = localStorage.getItem('token'); 
-  const headers = {
-    'Content-Type': 'application/json',
-  };
-
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  } else {
+  const token = localStorage.getItem('token');
+  if (!token) {
     throw new Error('Vui lòng đăng nhập để thêm vào giỏ hàng');
   }
 
-  const response = await fetch("http://localhost:8080/api/cart/items", {
+  const response = await fetch(`${API_BASE_URL}/cart/items`, {
     method: 'POST',
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
     body: JSON.stringify({ variantId, quantity }),
   });
 
   if (!response.ok) {
-    let errorMessage = 'Không thể thêm vào giỏ hàng';
-    if (response.status === 500) {
-      errorMessage = '500';
-    } else {
-      const errorData = await response.json();
-      errorMessage = errorData.message || errorMessage;
-    }
-    throw new Error(errorMessage);
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể thêm vào giỏ hàng');
+  }
+
+  return response.json();
+};
+
+export const updateCartItemQuantity = async (cartItemId, quantity) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Vui lòng đăng nhập để cập nhật giỏ hàng');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/cart/items/${cartItemId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ quantity }),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể cập nhật số lượng');
+  }
+
+  return response.json(); // Trả về CartItemDTO
+};
+
+export const removeCartItem = async (cartItemId) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Vui lòng đăng nhập để xóa sản phẩm');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/cart/items/${cartItemId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể xóa sản phẩm');
+  }
+
+  return true; // DELETE trả về 204, không có body
+};
+
+export const getAddresses = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Vui lòng đăng nhập để xem địa chỉ');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/users/addresses`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể tải địa chỉ');
+  }
+
+  return response.json();
+};
+
+export const createOrder = async (orderCreateDTO) => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    throw new Error('Vui lòng đăng nhập để tạo đơn hàng');
+  }
+
+  const response = await fetch(`${API_BASE_URL}/orders`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(orderCreateDTO),
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể tạo đơn hàng');
   }
 
   return response.json();
