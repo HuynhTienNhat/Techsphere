@@ -48,8 +48,8 @@ public class ProductServiceImpl implements ProductService {
         }
         try {
             double screenSize = Double.parseDouble(request.getScreen());
-            if (screenSize <= 0 || screenSize > 10) {
-                throw new AppException("Màn hình must be a number between 0 and 10");
+            if (screenSize <= 0 || screenSize > 20) {
+                throw new AppException("Màn hình must be a number between 0 and 20");
             }
         } catch (NumberFormatException e) {
             throw new AppException("Màn hình must be a valid number (e.g., 6.7)");
@@ -81,7 +81,7 @@ public class ProductServiceImpl implements ProductService {
             throw new AppException("Camera trước must be a valid number (e.g., 12)");
         }
 
-        // Camera sau: 1-3 số
+        // Camera sau: 1-5 số
         if (request.getRearCamera() == null || request.getRearCamera().isBlank()) {
             throw new AppException("Camera sau cannot be null or blank");
         }
