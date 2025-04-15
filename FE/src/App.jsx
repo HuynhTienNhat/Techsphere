@@ -9,6 +9,9 @@ import Products from './pages/Customer/Products/Products';
 import ProductDetail from './pages/Customer/ProductDetails/ProductDetails.jsx';
 import Login from './pages/Auth/Login';
 import Register from './pages/Auth/Register';
+import ForgetPassword from './pages/Auth/ForgetPassword.jsx'
+import ResetPassword from './pages/Auth/ResetPassword.jsx'
+import EmailVerify from './pages/Auth/EmailVerify.jsx'
 import AdminDashBoard from './pages/Admin/Dashboard/Dashboard';
 import ProtectedAdminRoute from './routes/ProtectedAdminRoute';
 import AdminProducts from './pages/Admin/Products/Products.jsx';
@@ -82,6 +85,30 @@ function AppContent() {
           element={
             <CustomerLayout>
               <Register />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/forget-password"
+          element={
+            <CustomerLayout>
+              <ForgetPassword />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/reset-password"
+          element={
+            <CustomerLayout>
+              <ResetPassword />
+            </CustomerLayout>
+          }
+        />
+        <Route
+          path="/email-verify"
+          element={
+            <CustomerLayout>
+              <EmailVerify />
             </CustomerLayout>
           }
         />
