@@ -1,8 +1,11 @@
 import React from 'react'
 import { useState } from "react";
+import { toast } from 'react-toastify';
+
 
 function ResetPassword() {
     const [resetData, setResetData] = useState({
+        email: `${location.state?.email}`,
         password: "",
     });
 
@@ -21,10 +24,10 @@ function ResetPassword() {
     
     const validateForm = () => {
         if (!resetData.password || !confirmPassword) {
-            return "Vui lòng điền đầy đủ mật khẩu và xác nhận mật khẩu.";
+            toast.error("Vui lòng điền đầy đủ mật khẩu và xác nhận mật khẩu.");
         }
         if (resetData.password !== confirmPassword) {
-            return "Mật khẩu và xác nhận mật khẩu không khớp.";
+            toast.error("Mật khẩu và xác nhận mật khẩu không khớp.");
         }
         return null;
     }
@@ -43,7 +46,7 @@ function ResetPassword() {
             console.log("Reset Data:", resetData);
 
             const response = await fetch("http://localhost:8080/api/users/reset-password", {
-                method: "POST",
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
@@ -56,10 +59,10 @@ function ResetPassword() {
             console.log("Response Data:", result);
 
             if (response.status === 200) {
-                alert("Đặt lại mật khẩu thành công!");
+                toast.error("Đặt lại mật khẩu thành công!");
                 window.location.href = "../login";
             } else {
-                alert(result.message || "Đặt lại mật khẩu thất bại.");
+              toast.error(result.message || "Đặt lại mật khẩu thất bại.");
             }
         } catch (error) {
             console.error("Error:", error);

@@ -1,7 +1,12 @@
 import React from 'react'
+import { sendOTP, verifyOTP } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 function EmailVerify() {
     const inputRef = React.useRef([]);
+    const email = location.state?.email;
+    const navigate = useNavigate();
 
     const handleInput = (e, index) => {
         const value = e.target.value;
@@ -15,6 +20,29 @@ function EmailVerify() {
             inputRef.current[index - 1].focus();
         }
     }
+
+    const handleClick = async () => {
+        if(inputRef.current.length != 6 ){
+            toast.error("Mã otp phải đủ 6 số!");
+            inputRef.current.value = [];
+        }
+        try {
+            const result = await verifyOTP(inputRef.current.value, email);
+        
+            if (result) {
+              navigate('/reset-password', { state: { email } });
+            } else {
+              toast.error("Mã OTP sai!");
+              inputRef.current.forEach((input) => (input.value = ""));
+            }
+          } catch (error) {
+            console.error("Lỗi verify OTP:", error);
+            toast.error("Lỗi kết nối đến server hoặc OTP không hợp lệ!");
+            inputRef.current.forEach((input) => (input.value = ""));
+          }
+    }
+        
+
 
   return (
     <div id="emailVerifyForm" className="flex min-h-full flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
@@ -32,13 +60,16 @@ function EmailVerify() {
                     />
                 ))}
             </div>
-            <button className="w-full mb-4 cursor-pointer text-[18px] mt-6 rounded-full bg-violet-600 text-white hover:bg-violet-800 py-2">
+            <button onClick={()=>{handleClick()}} className="w-full mb-4 cursor-pointer text-[18px] mt-6 rounded-full bg-violet-600 text-white hover:bg-violet-800 py-2">
                 Tiếp tục
             </button>
             <p className="block text-center">
                 Không nhận được mã?{" "}
-                <a href="/login" className="text-violet-600 hover:underline">
-                    Gửi lại
+                <a onClick={()=>{
+                    sendOTP(email);
+                    toast.success("Đã gửi lại mã OTP");
+                }} className="text-violet-600 hover:underline">
+                    Gửi lại 
                 </a>
             </p>
             

@@ -244,3 +244,32 @@ export const createOrder = async (orderCreateDTO) => {
 
   return response.json();
 };
+
+export const sendOTP = async (email) => {
+  const response = await fetch(`${API_BASE_URL}/otp?email=${email}`,{
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể gửi email');
+  }
+
+  return response.json();
+}
+
+export const verifyOTP = async (enteredOtp, email) => {
+  const response = await fetch(`${API_BASE_URL}/otp?enteredOtp=${enteredOtp}&email=${email}`,{
+    method: 'GET',
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  if(!response.ok){
+    const errorData = await response.json();
+    throw new Error(errorData.message || 'Không thể gửi xác thực otp');
+  }
+  return response.data === "Valid";
+}

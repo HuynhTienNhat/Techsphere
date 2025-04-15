@@ -227,6 +227,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void resetPassword(String email, String password) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new AppException("User not found"));
+
+        user.setPasswordHash(passwordEncoder.encode(password));
+        userRepository.save(user);
+    }
+
+    @Override
     public List<AdminProfileDTO> getAllUsers(){
         List<User> users = userRepository.findAll();
         return users.stream().map(this::mapToAdminProfileDTO).collect(Collectors.toList());

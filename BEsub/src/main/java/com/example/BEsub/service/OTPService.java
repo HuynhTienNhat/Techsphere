@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -33,13 +34,26 @@ public class OTPService {
         LocalDateTime created = LocalDateTime.now();
         LocalDateTime expired = LocalDateTime.now().plusMinutes(OTP_EXPIRATION_MINUTES);
 
-        OTP otpSave = OTP.builder()
-                .otp(passwordEncoder.encode(otp))
-                .created_at(created)
-                .expired_at(expired)
-                .email(email)
-                .tryTime(0)
-                .build();
+        String hashedOtp = passwordEncoder.encode(otp);
+        Optional<OTP> existingOtp = otpRepository.findByEmail(email);
+
+        if (existingOtp.isPresent()) {
+            OTP otpSave = existingOtp.get();
+            otpSave.setOtp(hashedOtp);
+            otpSave.setCreated_at(created);
+            otpSave.setExpired_at(expired);
+            otpSave.setTryTime(0);
+            otpRepository.save(otpSave);
+        } else {
+            OTP otpSave = OTP.builder()
+                    .otp(hashedOtp)
+                    .created_at(created)
+                    .expired_at(expired)
+                    .email(email)
+                    .tryTime(0)
+                    .build();
+            otpRepository.save(otpSave);
+        }
 
         try {
             SimpleMailMessage message = new SimpleMailMessage();
@@ -53,7 +67,6 @@ public class OTPService {
             throw new AppException("Lỗi gửi email: "+e.getMessage());
         }
 
-        otpRepository.save(otpSave);
     }
 
     public boolean verifyOTP(String enteredOtp,String email){
