@@ -40,7 +40,6 @@ public class CartController {
         return ResponseEntity.ok(cartItemDTO);
     }
 
-
     // Xóa sản phẩm khỏi giỏ hàng
     @DeleteMapping("/items/{cartItemId}")
     public ResponseEntity<Void> removeCartItem(@PathVariable Long cartItemId) {
