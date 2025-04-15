@@ -42,29 +42,40 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
     navigate(`/products/${slug}`);
   };
 
+  // Fix the product card layout to ensure consistent text alignment
   const productElements = products.map((product) => (
     <div
       key={product.productId}
       onClick={() => handleClick(product.slug)}
-      className="transition-transform transform hover:-translate-y-2 max-w-55 max-h-78 hover:shadow-lg p-4 flex flex-col justify-between rounded-md shadow-md bg-white border-[0.5px] border-gray-100 cursor-pointer"
+      className="transition-transform transform hover:-translate-y-2 max-w-50 max-h-74 hover:shadow-lg px-1 pt-2 flex flex-col justify-between rounded-md shadow-md bg-white border-[0.5px] border-gray-100 cursor-pointer"
     >
-      <img
-        src={product.mainImageUrl || "https://via.placeholder.com/150"}
-        alt={product.name}
-        className="w-full h-48 object-contain rounded-md"
-        loading="lazy"
-      />
+      {/* Container with fixed height for image */}
+      <div className="h-40 flex items-center justify-center mb-2">
+        <img
+          src={product.mainImageUrl || "https://via.placeholder.com/150"}
+          alt={product.name}
+          className="max-w-full max-h-40 object-contain rounded-md"
+          loading="lazy"
+        />
+      </div>
       <hr className="my-2 border-gray-200" />
-      <div className="mt-2 flex flex-col flex-grow">
-        <h2 className="text-lg font-semibold truncate">{product.name}</h2>
-        <p className="text-violet-500 font-bold mt-1">
-          {product.basePrice.toLocaleString("vi-VN")} đ
-        </p>
-        {product.oldPrice && (
-          <p className="text-gray-500 line-through text-sm">
-            {product.oldPrice.toLocaleString("vi-VN")} đ
+      {/* Container with fixed height for product info */}
+      <div className="flex flex-col justify-between flex-grow">
+        {/* Title with fixed height */}
+        <div className="h-6 overflow-hidden">
+          <h2 className="text-sm font-semibold line-clamp-2">{product.name}</h2>
+        </div>
+        {/* Price container with consistent spacing */}
+        <div className="mt-1">
+          <p className="text-violet-500 font-bold">
+            {product.basePrice.toLocaleString("vi-VN")} đ
           </p>
-        )}
+          {product.oldPrice && (
+            <p className="text-gray-500 line-through text-sm">
+              {product.oldPrice.toLocaleString("vi-VN")} đ
+            </p>
+          )}
+        </div>
       </div>
     </div>
   ));
@@ -103,7 +114,8 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
             <p className="text-red-500">{error}</p>
           </div>
         ) : products.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          // Thêm cột thứ 6 cho màn hình lớn và giảm khoảng cách
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-2">
             {productElements}
           </div>
         ) : (
