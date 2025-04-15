@@ -1,0 +1,78 @@
+Index: BEsub/src/main/resources/application.properties
+===================================================================
+diff --git a/BEsub/src/main/resources/application.properties b/BEsub/src/main/resources/application.properties
+deleted file mode 100644
+--- a/BEsub/src/main/resources/application.properties	(revision fea464d10cd80f90127e462e2123193bc4f209f6)
++++ /dev/null	(revision fea464d10cd80f90127e462e2123193bc4f209f6)
+@@ -1,28 +0,0 @@
+-# =============== APPLICATION CONFIG ===============
+-spring.application.name=BEsub
+-
+-# =============== DATABASE CONFIG (MySQL) ===============
+-spring.datasource.url=jdbc:mysql://localhost:3306/TechSphere?useSSL=false&allowPublicKeyRetrieval=true
+-spring.datasource.username=root
+-spring.datasource.password=Bonbone@0403
+-
+-# =============== HIBERNATE/JPA CONFIG ===============
+-spring.jpa.hibernate.ddl-auto=update
+-spring.sql.init.mode=always
+-
+-# Logs SQL queries (helpful for debugging)
+-spring.jpa.show-sql=true
+-
+-# Pretty-prints SQL
+-spring.jpa.properties.hibernate.format_sql=true
+-
+-# MySQL dialect
+-spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+-
+-#JWT key
+-jwt.secret=university-project-2024-secret-key-@1234567890!
+-
+-# Cloudinary configuration
+-cloudinary.cloud-name=dpdm3ezp5
+-cloudinary.api-key=276872866791819
+-cloudinary.api-secret=CI0g-52N2CNVL426f4GBxQ92Jko
+\ No newline at end of file
+Index: BEsub/src/main/resources/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BEsub/src/main/resources/application.yml b/BEsub/src/main/resources/application.yml
+new file mode 100644
+--- /dev/null	(date 1744480037935)
++++ b/BEsub/src/main/resources/application.yml	(date 1744480037935)
+@@ -0,0 +1,32 @@
++server:
++  port: 8080
++
++spring:
++  datasource:
++    url: jdbc:mysql://localhost:3306/pbl3?useSSL=false&serverTimezone=UTC
++    username: root
++    password: 123456
++    driver-class-name: com.mysql.cj.jdbc.Driver
++  jpa:
++    database-platform: org.hibernate.dialect.MySQL8Dialect
++    hibernate:
++      ddl-auto: update
++    show-sql: true
++  mail:
++    host: smtp.gmail.com
++    port: 587
++    username: NguyenDuyHoang.11B1.2122@gmail.com
++    password: kcyt xcwl buri uqbm
++    properties:
++      mail:
++        smtp:
++          auth: true
++          starttls:
++            enable: true
++jwt:
++  secret: "university-project-2024-secret-key-@1234567890!"
++cloudinary:
++  cloud-name: dpdm3ezp5
++  api-key: 276872866791819
++  api-secret: CI0g-52N2CNVL426f4GBxQ92Jko
++

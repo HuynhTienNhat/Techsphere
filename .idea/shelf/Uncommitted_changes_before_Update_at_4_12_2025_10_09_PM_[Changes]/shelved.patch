@@ -1,0 +1,58 @@
+Index: BEsub/src/main/resources/application.properties
+===================================================================
+diff --git a/BEsub/src/main/resources/application.properties b/BEsub/src/main/resources/application.properties
+deleted file mode 100644
+--- a/BEsub/src/main/resources/application.properties	(revision 1866a40b5a366cd4d91b486cabb08ff4ef395de0)
++++ /dev/null	(revision 1866a40b5a366cd4d91b486cabb08ff4ef395de0)
+@@ -1,23 +0,0 @@
+-# =============== APPLICATION CONFIG ===============
+-spring.application.name=BEsub
+-
+-# =============== DATABASE CONFIG (MySQL) ===============
+-spring.datasource.url=jdbc:mysql://localhost:3306/TechSphere?useSSL=false&allowPublicKeyRetrieval=true
+-spring.datasource.username=root
+-spring.datasource.password=Bonbone@0403
+-
+-# =============== HIBERNATE/JPA CONFIG ===============
+-spring.jpa.hibernate.ddl-auto=update
+-spring.sql.init.mode=always
+-
+-# Logs SQL queries (helpful for debugging)
+-spring.jpa.show-sql=true
+-
+-# Pretty-prints SQL
+-spring.jpa.properties.hibernate.format_sql=true
+-
+-# MySQL dialect
+-spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+-
+-#JWT key
+-jwt.secret=university-project-2024-secret-key-@1234567890!
+\ No newline at end of file
+Index: BEsub/src/main/resources/application.yaml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BEsub/src/main/resources/application.yaml b/BEsub/src/main/resources/application.yaml
+new file mode 100644
+--- /dev/null	(date 1744397301770)
++++ b/BEsub/src/main/resources/application.yaml	(date 1744397301770)
+@@ -0,0 +1,17 @@
++server:
++  port: 8080
++
++spring:
++  datasource:
++    url: jdbc:mysql://localhost:3306/pbl3?useSSL=false&serverTimezone=UTC
++    username: root
++    password: 123456
++    driver-class-name: com.mysql.cj.jdbc.Driver
++  jpa:
++    database-platform: org.hibernate.dialect.MySQL8Dialect
++    hibernate:
++      ddl-auto: update
++    show-sql: true
++jwt:
++  secret: "university-project-2024-secret-key-@1234567890!"
++

@@ -1,0 +1,188 @@
+Index: BEsub/src/main/java/com/example/BEsub/controller/ProductController.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.BEsub.controller;\r\n\r\n\r\nimport com.example.BEsub.dtos.*;\r\nimport com.example.BEsub.exception.AppException;\r\nimport com.example.BEsub.service.*;\r\nimport com.fasterxml.jackson.core.JsonProcessingException;\r\nimport com.fasterxml.jackson.core.type.TypeReference;\r\nimport com.fasterxml.jackson.databind.ObjectMapper;\r\nimport jakarta.validation.Valid;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.http.HttpStatus;\r\nimport org.springframework.http.ResponseEntity;\r\nimport org.springframework.security.access.prepost.PreAuthorize;\r\nimport org.springframework.web.bind.annotation.*;\r\nimport org.springframework.web.multipart.MultipartFile;\r\n\r\nimport java.math.BigDecimal;\r\nimport java.util.List;\r\n\r\n@RestController\r\n@RequestMapping(\"/api/products\")\r\npublic class ProductController {\r\n\r\n    @Autowired\r\n    private ProductService productService;\r\n\r\n    @PreAuthorize(\"hasRole('ADMIN')\")\r\n    @PostMapping\r\n    public ResponseEntity<ProductDTO> createProduct(\r\n            @RequestParam(\"name\") String name,\r\n            @RequestParam(\"model\") String model,\r\n            @RequestParam(\"slug\") String slug,\r\n            @RequestParam(\"basePrice\") BigDecimal basePrice,\r\n            @RequestParam(value = \"oldPrice\", required = false) BigDecimal oldPrice,\r\n            @RequestParam(\"brandName\") String brandName,\r\n            @RequestParam(\"variants\") String variantsJson,\r\n            @RequestParam(\"screen\") String screen,\r\n            @RequestParam(\"ram\") String ram,\r\n            @RequestParam(\"frontCamera\") String frontCamera,\r\n            @RequestParam(\"rearCamera\") String rearCamera,\r\n            @RequestParam(\"pin\") String pin,\r\n            @RequestParam(\"imageFiles\") List<MultipartFile> imageFiles,\r\n            @RequestParam(\"displayOrders\") List<Integer> displayOrders) throws Exception {\r\n\r\n        // Kiểm tra dữ liệu đầu vào\r\n        if (imageFiles == null || imageFiles.isEmpty()) {\r\n            throw new AppException(\"At least one image is required\");\r\n        }\r\n        if (imageFiles.size() != displayOrders.size()) {\r\n            throw new AppException(\"Number of images and display orders must match\");\r\n        }\r\n        if (variantsJson == null || variantsJson.trim().isEmpty()) {\r\n            throw new AppException(\"At least one variant is required\");\r\n        }\r\n\r\n        // Tạo ProductCreateRequest\r\n        ProductCreateRequest request = new ProductCreateRequest();\r\n        request.setName(name);\r\n        request.setModel(model);\r\n        request.setSlug(slug);\r\n        request.setBasePrice(basePrice);\r\n        request.setOldPrice(oldPrice);\r\n        request.setBrandName(brandName);\r\n        request.setImageFiles(imageFiles);\r\n        request.setDisplayOrders(displayOrders);\r\n\r\n        // Gán specs\r\n        request.setScreen(screen);\r\n        request.setRam(ram);\r\n        request.setFrontCamera(frontCamera);\r\n        request.setRearCamera(rearCamera);\r\n        request.setPin(pin);\r\n\r\n        // Chuyển JSON variants\r\n        ObjectMapper objectMapper = new ObjectMapper();\r\n        List<ProductVariantDTO> variants;\r\n        try {\r\n            variants = objectMapper.readValue(variantsJson, new TypeReference<List<ProductVariantDTO>>() {});\r\n        } catch (JsonProcessingException e) {\r\n            throw new AppException(\"Invalid variants JSON format: \" + e.getMessage());\r\n        }\r\n        if (variants.isEmpty()) {\r\n            throw new AppException(\"At least one variant is required\");\r\n        }\r\n        request.setVariants(variants);\r\n\r\n        ProductDTO productDTO = productService.createProduct(request);\r\n        return ResponseEntity.ok(productDTO);\r\n    }\r\n\r\n    // Cập nhật sản phẩm\r\n    @PreAuthorize(\"hasRole('ADMIN')\")\r\n    @PutMapping(\"/{productId}\")\r\n    public ResponseEntity<ProductDTO> updateProduct(\r\n            @PathVariable Long productId,\r\n            @RequestBody @Valid ProductDTO productDTO) {\r\n        return ResponseEntity.ok(productService.updateProduct(productId, productDTO));\r\n    }\r\n\r\n    @GetMapping(\"/id/{id}\")\r\n    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {\r\n        return ResponseEntity.ok(productService.getProductById(id));\r\n    }\r\n\r\n    // Xóa sản phẩm\r\n    @PreAuthorize(\"hasRole('ADMIN')\")\r\n    @DeleteMapping(\"/{productId}\")\r\n    public ResponseEntity<Void> deleteProduct(@PathVariable Long productId) {\r\n        productService.deleteProduct(productId);\r\n        return ResponseEntity.noContent().build();\r\n    }\r\n\r\n    // Lấy chi tiết sản phẩm theo slug\r\n    @GetMapping(\"/{slug}\")\r\n    public ResponseEntity<ProductDTO> getProductBySlug(@PathVariable String slug) {\r\n        return ResponseEntity.ok(productService.getProductBySlug(slug));\r\n    }\r\n\r\n    // Lấy tất cả sản phẩm\r\n    @GetMapping\r\n    public ResponseEntity<List<ProductDTO>> getAllProducts() {\r\n        return ResponseEntity.ok(productService.getAllProducts());\r\n    }\r\n\r\n    // Lọc theo hãng\r\n    @GetMapping(\"/brand/{brandName}\")\r\n    public ResponseEntity<List<ProductDTO>> getProductsByBrand(@PathVariable String brandName) {\r\n        return ResponseEntity.ok(productService.getProductsByBrand(brandName));\r\n    }\r\n\r\n    // Sắp xếp theo giá\r\n    @GetMapping(\"/sort\")\r\n    public ResponseEntity<List<ProductDTO>> getProductsSortedByPrice(\r\n            @RequestParam(defaultValue = \"asc\") String order) {\r\n        return ResponseEntity.ok(productService.getProductsSortedByPrice(order));\r\n    }\r\n\r\n    // Tìm kiếm sản phẩm\r\n    @GetMapping(\"/search\")\r\n    public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String keyword) {\r\n        return ResponseEntity.ok(productService.searchProducts(keyword));\r\n    }\r\n\r\n    @GetMapping(\"/reviews/{productId}\")\r\n    public ResponseEntity<List<ReviewDTO>> getProductReview(@PathVariable Long productId) {\r\n        return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReview(productId));\r\n    }\r\n\r\n    @GetMapping(\"/reviews/{productId}/averageRating\")\r\n    public ResponseEntity<AverageRatingDTO> getAverageRating(@PathVariable Long productId) {\r\n        return ResponseEntity.status(HttpStatus.OK).body(productService.getAverageRating(productId));\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BEsub/src/main/java/com/example/BEsub/controller/ProductController.java b/BEsub/src/main/java/com/example/BEsub/controller/ProductController.java
+--- a/BEsub/src/main/java/com/example/BEsub/controller/ProductController.java	(revision 5564163f94a56f60867da15c9a36e6676e605ddb)
++++ b/BEsub/src/main/java/com/example/BEsub/controller/ProductController.java	(date 1744567539009)
+@@ -140,7 +140,7 @@
+     @GetMapping("/search")
+     public ResponseEntity<List<ProductDTO>> searchProducts(@RequestParam String keyword) {
+         return ResponseEntity.ok(productService.searchProducts(keyword));
+-    }
++    }   
+ 
+     @GetMapping("/reviews/{productId}")
+     public ResponseEntity<List<ReviewDTO>> getProductReview(@PathVariable Long productId) {
+Index: BEsub/src/main/java/com/example/BEsub/service/CartServiceImpl.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.BEsub.service;\r\n\r\nimport com.example.BEsub.dtos.*;\r\nimport com.example.BEsub.exception.AppException;\r\nimport com.example.BEsub.models.*;\r\nimport com.example.BEsub.repositories.*;\r\nimport org.springframework.beans.factory.annotation.Autowired;\r\nimport org.springframework.security.core.Authentication;\r\nimport org.springframework.security.core.context.SecurityContextHolder;\r\nimport org.springframework.stereotype.Service;\r\nimport org.springframework.transaction.annotation.Transactional;\r\n\r\nimport java.math.BigDecimal;\r\nimport java.util.List;\r\nimport java.util.stream.Collectors;\r\n\r\n@Service\r\npublic class CartServiceImpl implements CartService {\r\n    @Autowired\r\n    private CartRepository cartRepository;\r\n\r\n    @Autowired\r\n    private CartItemRepository cartItemRepository;\r\n\r\n    @Autowired\r\n    private ProductVariantRepository productVariantRepository;\r\n\r\n    @Autowired\r\n    private UserRepository userRepository;\r\n\r\n    @Override\r\n    @Transactional(readOnly = true)\r\n    public CartDTO getCartByUser() {\r\n        Long userId = getCurrentUserId();\r\n        Cart cart = cartRepository.findByUserId(userId)\r\n                .orElseThrow(() -> new AppException(\"Cart not found for user\"));\r\n        return mapToCartDTO(cart);\r\n    }\r\n\r\n    @Override\r\n    @Transactional\r\n    public CartItemDTO addToCart(Long variantId, Integer quantity) {\r\n        Long userId = getCurrentUserId();\r\n        Cart cart = cartRepository.findByUserId(userId)\r\n                .orElseGet(() -> createNewCart(userId));\r\n\r\n        ProductVariant variant = productVariantRepository.findById(variantId)\r\n                .orElseThrow(() -> new AppException(\"Product variant not found\"));\r\n\r\n        boolean exists = cart.getCartItems().stream()\r\n                .anyMatch(item -> item.getVariant().getId().equals(variantId));\r\n\r\n        if (exists) {\r\n            throw new AppException(\"Sản phẩm đã tồn tại trong giỏ\");\r\n        }\r\n\r\n        // Tính unitPrice = basePrice + priceAdjustment\r\n        BigDecimal unitPrice = variant.getProduct().getBasePrice().add(variant.getPriceAdjustment());\r\n\r\n        CartItem cartItem = new CartItem();\r\n        cartItem.setCart(cart);\r\n        cartItem.setVariant(variant);\r\n        cartItem.setQuantity(quantity != null && quantity > 0 ? quantity : 1); // Mặc định quantity = 1\r\n        cartItem.setUnitPrice(unitPrice);\r\n\r\n        cart.getCartItems().add(cartItem);\r\n        cartItemRepository.save(cartItem);\r\n\r\n        return mapToCartItemDTO(cartItem);\r\n    }\r\n\r\n    @Override\r\n    @Transactional\r\n    public CartItemDTO updateCartItemQuantity(Long cartItemId, Integer quantity) {\r\n        CartItem cartItem = cartItemRepository.findById(cartItemId)\r\n                .orElseThrow(() -> new AppException(\"Cart item not found\"));\r\n\r\n        // Kiểm tra user hiện tại sở hữu cartItem\r\n        Long userId = getCurrentUserId();\r\n        if (!cartItem.getCart().getUser().getId().equals(userId)) {\r\n            throw new AppException(\"You do not have permission to update this cart item\");\r\n        }\r\n\r\n        // Đảm bảo quantity tối thiểu là 1\r\n        if (quantity < 1) {\r\n            throw new AppException(\"Quantity must be at least 1\");\r\n        }\r\n        cartItem.setQuantity(quantity);\r\n        cartItemRepository.save(cartItem);\r\n\r\n        return mapToCartItemDTO(cartItem);\r\n    }\r\n\r\n    @Override\r\n    @Transactional\r\n    public void removeCartItem(Long cartItemId) {\r\n        CartItem cartItem = cartItemRepository.findById(cartItemId)\r\n                .orElseThrow(() -> new AppException(\"Cart item not found\"));\r\n\r\n        // Kiểm tra quyền sở hữu\r\n        Long userId = getCurrentUserId();\r\n        if (!cartItem.getCart().getUser().getId().equals(userId)) {\r\n            throw new AppException(\"You do not have permission to remove this cart item\");\r\n        }\r\n\r\n        cartItem.getCart().getCartItems().remove(cartItem); // Xóa khỏi danh sách\r\n        cartItemRepository.delete(cartItem); // Xóa khỏi DB\r\n    }\r\n\r\n    // Helper methods\r\n    private Long getCurrentUserId() {\r\n        String username = SecurityContextHolder.getContext().getAuthentication().getName();\r\n        return userRepository.findByUsername(username)\r\n                .orElseThrow(()->new AppException(\"User not found\"))\r\n                .getId();\r\n    }\r\n\r\n    private Cart createNewCart(Long userId) {\r\n        User user = userRepository.findById(userId)\r\n                .orElseThrow(() -> new AppException(\"User not found\"));\r\n        Cart cart = new Cart();\r\n        cart.setUser(user);\r\n        return cartRepository.save(cart);\r\n    }\r\n\r\n    private CartDTO mapToCartDTO(Cart cart) {\r\n        List<CartItemDTO> cartItems = cart.getCartItems().stream()\r\n                .map(this::mapToCartItemDTO)\r\n                .collect(Collectors.toList());\r\n\r\n        // Tính totalPrice\r\n        BigDecimal totalPrice = cartItems.stream()\r\n                .map(item -> item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())))\r\n                .reduce(BigDecimal.ZERO, BigDecimal::add);\r\n\r\n        return new CartDTO(cart.getId(), cart.getUser().getId(), cartItems, totalPrice);\r\n    }\r\n\r\n    private CartItemDTO mapToCartItemDTO(CartItem cartItem) {\r\n        return new CartItemDTO(\r\n                cartItem.getId(),\r\n                cartItem.getVariant().getId(),\r\n                cartItem.getVariant().getProduct().getName(),\r\n                cartItem.getVariant().getColor(),\r\n                cartItem.getVariant().getStorage(),\r\n                cartItem.getQuantity(),\r\n                cartItem.getUnitPrice()\r\n        );\r\n    }\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BEsub/src/main/java/com/example/BEsub/service/CartServiceImpl.java b/BEsub/src/main/java/com/example/BEsub/service/CartServiceImpl.java
+--- a/BEsub/src/main/java/com/example/BEsub/service/CartServiceImpl.java	(revision 5564163f94a56f60867da15c9a36e6676e605ddb)
++++ b/BEsub/src/main/java/com/example/BEsub/service/CartServiceImpl.java	(date 1744568105876)
+@@ -11,6 +11,7 @@
+ import org.springframework.transaction.annotation.Transactional;
+ 
+ import java.math.BigDecimal;
++import java.util.Comparator;
+ import java.util.List;
+ import java.util.stream.Collectors;
+ 
+@@ -137,6 +138,13 @@
+     }
+ 
+     private CartItemDTO mapToCartItemDTO(CartItem cartItem) {
++        String mainImageUrl = null;
++        if (cartItem.getVariant().getProduct().getImages() != null && !cartItem.getVariant().getProduct().getImages().isEmpty()) {
++            mainImageUrl = cartItem.getVariant().getProduct().getImages().stream()
++                    .min(Comparator.comparing(ProductImage::getDisplayOrder))
++                    .map(ProductImage::getImgUrl)
++                    .orElse(null);
++        }
+         return new CartItemDTO(
+                 cartItem.getId(),
+                 cartItem.getVariant().getId(),
+@@ -144,7 +152,11 @@
+                 cartItem.getVariant().getColor(),
+                 cartItem.getVariant().getStorage(),
+                 cartItem.getQuantity(),
+-                cartItem.getUnitPrice()
++                cartItem.getUnitPrice(),
++                cartItem.getVariant().getProduct().getBasePrice(),
++                cartItem.getVariant().getProduct().getOldPrice(),
++                mainImageUrl,
++                cartItem.getVariant().getProduct().getSlug()
+         );
+     }
+ }
+Index: BEsub/src/main/resources/application.properties
+===================================================================
+diff --git a/BEsub/src/main/resources/application.properties b/BEsub/src/main/resources/application.properties
+deleted file mode 100644
+--- a/BEsub/src/main/resources/application.properties	(revision 5564163f94a56f60867da15c9a36e6676e605ddb)
++++ /dev/null	(revision 5564163f94a56f60867da15c9a36e6676e605ddb)
+@@ -1,36 +0,0 @@
+-# =============== APPLICATION CONFIG ===============
+-spring.application.name=BEsub
+-
+-# =============== DATABASE CONFIG (MySQL) ===============
+-spring.datasource.url=jdbc:mysql://localhost:3306/TechSphere?useSSL=false&allowPublicKeyRetrieval=true
+-spring.datasource.username=root
+-spring.datasource.password=Bonbone@0403
+-
+-# =============== HIBERNATE/JPA CONFIG ===============
+-spring.jpa.hibernate.ddl-auto=update
+-spring.sql.init.mode=always
+-
+-# Logs SQL queries (helpful for debugging)
+-spring.jpa.show-sql=true
+-
+-# Pretty-prints SQL
+-spring.jpa.properties.hibernate.format_sql=true
+-
+-# MySQL dialect
+-spring.jpa.database-platform=org.hibernate.dialect.MySQL8Dialect
+-
+-#JWT key
+-jwt.secret=university-project-2024-secret-key-@1234567890!
+-
+-# Cloudinary configuration
+-cloudinary.cloud-name=dpdm3ezp5
+-cloudinary.api-key=276872866791819
+-cloudinary.api-secret=CI0g-52N2CNVL426f4GBxQ92Jko
+-
+-# =============== REDIS CONFIG ===============
+-spring.mail.host=smtp.gmail.com
+-spring.mail.port=587
+-spring.mail.username=huynhtiennhat0403@gmail.com
+-spring.mail.password=Bonbone@0403
+-spring.mail.properties.mail.smtp.auth=true
+-spring.mail.properties.mail.smtp.starttls.enable=true
+\ No newline at end of file
+Index: BEsub/src/main/java/com/example/BEsub/dtos/CartItemDTO.java
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.example.BEsub.dtos;\r\n\r\nimport lombok.*;\r\n\r\nimport java.math.BigDecimal;\r\n\r\n@Getter\r\n@Setter\r\n@NoArgsConstructor\r\n@AllArgsConstructor\r\n@Builder\r\npublic class CartItemDTO {\r\n    private Long id;\r\n    private Long variantId;\r\n    private String productName; // Tên sản phẩm\r\n    private String color;      // Màu sắc\r\n    private String storage;    // Dung lượng\r\n    private Integer quantity;  // Số lượng (mặc định 1, có thể tăng/giảm)\r\n    private BigDecimal unitPrice; // Giá đơn vị\r\n}\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BEsub/src/main/java/com/example/BEsub/dtos/CartItemDTO.java b/BEsub/src/main/java/com/example/BEsub/dtos/CartItemDTO.java
+--- a/BEsub/src/main/java/com/example/BEsub/dtos/CartItemDTO.java	(revision 5564163f94a56f60867da15c9a36e6676e605ddb)
++++ b/BEsub/src/main/java/com/example/BEsub/dtos/CartItemDTO.java	(date 1744568085880)
+@@ -17,4 +17,8 @@
+     private String storage;    // Dung lượng
+     private Integer quantity;  // Số lượng (mặc định 1, có thể tăng/giảm)
+     private BigDecimal unitPrice; // Giá đơn vị
++    private BigDecimal basePrice;
++    private BigDecimal oldPrice;
++    private String mainImageUrl;
++    private String slug;
+ }
+Index: FE/src/components/customer/Header.jsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { Link, useLocation, useNavigate } from \"react-router-dom\";\r\nimport { useState, useEffect } from \"react\";\r\nimport { FaShoppingCart } from \"react-icons/fa\";\r\n\r\nexport default function Header() {\r\n  const location = useLocation();\r\n  const navigate = useNavigate();\r\n  const [user, setUser] = useState(null);\r\n  const [isLoading, setIsLoading] = useState(true);\r\n  const [searchKeyword, setSearchKeyword] = useState(\"\");\r\n  const [token, setToken] = useState(localStorage.getItem(\"token\"));\r\n\r\n  useEffect(() => {\r\n    const handleTokenChange = () => {\r\n      setToken(localStorage.getItem(\"token\"));\r\n    };\r\n\r\n    window.addEventListener(\"token-changed\", handleTokenChange);\r\n    window.addEventListener(\"storage\", handleTokenChange);\r\n    setToken(localStorage.getItem(\"token\"));\r\n\r\n    return () => {\r\n      window.removeEventListener(\"token-changed\", handleTokenChange);\r\n      window.removeEventListener(\"storage\", handleTokenChange);\r\n    };\r\n  }, []);\r\n\r\n  useEffect(() => {\r\n    if (token) {\r\n      setIsLoading(true);\r\n      fetch(\"http://localhost:8080/api/users/profile\", {\r\n        method: \"GET\",\r\n        headers: {\r\n          \"Content-Type\": \"application/json\",\r\n          Authorization: `Bearer ${token}`,\r\n        },\r\n      })\r\n        .then((response) => {\r\n          if (response.ok) {\r\n            return response.json();\r\n          }\r\n          throw new Error(\"Failed to fetch user profile!\");\r\n        })\r\n        .then((data) => {\r\n          setUser(data);\r\n          setIsLoading(false);\r\n        })\r\n        .catch((error) => {\r\n          console.error(error);\r\n          localStorage.removeItem(\"token\");\r\n          localStorage.removeItem(\"role\"); // Xóa role nếu token không hợp lệ\r\n          setToken(null);\r\n          setUser(null);\r\n          setIsLoading(false);\r\n        });\r\n    } else {\r\n      setUser(null);\r\n      setIsLoading(false);\r\n    }\r\n  }, [token]);\r\n\r\n  const handleCartClick = () => {\r\n    if (!user) {\r\n      alert(\"Bạn cần đăng nhập trước!\");\r\n    } else {\r\n      navigate(\"/cart\");\r\n    }\r\n  };\r\n\r\n  const handleSearch = () => {\r\n    navigate(`/products?keyword=${encodeURIComponent(searchKeyword.trim())}`);\r\n    setSearchKeyword(\"\");\r\n  };\r\n\r\n  const handleKeyDown = (e) => {\r\n    if (e.key === \"Enter\") {\r\n      handleSearch();\r\n    }\r\n  };\r\n\r\n  const handleLogout = () => {\r\n    localStorage.removeItem(\"token\");\r\n    localStorage.removeItem(\"role\"); // Xóa role khi đăng xuất\r\n    setToken(null);\r\n    setUser(null);\r\n    navigate(\"/login\");\r\n    window.dispatchEvent(new Event(\"token-changed\"));\r\n  };\r\n\r\n  return (\r\n    <header className=\"px-30 py-4 dark:bg-gray-100 dark:text-gray-800\">\r\n      <div className=\"container flex justify-between h-16 items-center\">\r\n        <ul className=\"items-stretch hidden space-x-3 lg:flex\">\r\n          <li className=\"flex\">\r\n            <Link\r\n              to=\"/\"\r\n              className={`flex items-center px-4 -mb-1 border-b-2 ${\r\n                location.pathname === \"/\" ? \"dark:border-violet-600 dark:text-violet-600\" : \"border-transparent hover:border-gray-300\"\r\n              }`}\r\n            >\r\n              Home\r\n            </Link>\r\n          </li>\r\n          <li className=\"flex\">\r\n            <Link\r\n              to=\"/products\"\r\n              className={`flex items-center px-4 -mb-1 border-b-2 ${\r\n                location.pathname === \"/products\" ? \"dark:border-violet-600 dark:text-violet-600\" : \"border-transparent hover:border-gray-300\"\r\n              }`}\r\n            >\r\n              Products\r\n            </Link>\r\n          </li>\r\n        </ul>\r\n\r\n        <Link to={\"/\"} href=\"\" aria-label=\"Back to homepage\" className=\"flex items-center p-2\">\r\n          <span className=\"text-2xl font-bold text-purple-600 dark:text-violet-600\">TechSphere</span>\r\n        </Link>\r\n\r\n        <div className=\"flex items-center space-x-6\">\r\n          <div className=\"relative w-[280px]\">\r\n            <span className=\"absolute inset-y-0 left-0 flex items-center pl-2\">\r\n              <button type=\"submit\" title=\"Search\" className=\"p-1 focus:outline-none focus:ring\" onClick={handleSearch}>\r\n                <svg fill=\"currentColor\" viewBox=\"0 0 512 512\" className=\"w-4 h-4 dark:text-gray-800\">\r\n                  <path d=\"M479.6,399.716l-81.084-81.084-62.368-25.767A175.014,175.014,0,0,0,368,192c0-97.047-78.953-176-176-176S16,94.953,16,192,94.953,368,192,368a175.034,175.034,0,0,0,101.619-32.377l25.7,62.2L400.4,478.911a56,56,0,1,0,79.2-79.195ZM48,192c0-79.4,64.6-144,144-144s144,64.6,144,144S271.4,336,192,336,48,271.4,48,192ZM456.971,456.284a24.028,24.028,0,0,1-33.942,0l-76.572-76.572-23.894-57.835L380.4,345.771l76.573,76.572A24.028,24.028,0,0,1,456.971,456.284Z\"></path>\r\n                </svg>\r\n              </button>\r\n            </span>\r\n            {searchKeyword && (\r\n              <button\r\n                type=\"button\"\r\n                className=\"absolute inset-y-0 right-0 flex items-center pr-3\"\r\n                onClick={() => setSearchKeyword(\"\")}\r\n              >\r\n                <svg\r\n                  className=\"w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer\"\r\n                  fill=\"none\"\r\n                  stroke=\"currentColor\"\r\n                  viewBox=\"0 0 24 24\"\r\n                  xmlns=\"http://www.w3.org/2000/svg\"\r\n                ></svg>\r\n              </button>\r\n            )}\r\n            <input\r\n              type=\"search\"\r\n              name=\"Search\"\r\n              value={searchKeyword}\r\n              onChange={(e) => setSearchKeyword(e.target.value)}\r\n              onKeyDown={handleKeyDown}\r\n              placeholder=\"Search products...\"\r\n              className=\"w-full px-2 py-2 pl-10 text-base rounded-md focus:outline-none dark:bg-gray-100 dark:text-gray-800 focus:dark:bg-gray-50 border border-gray-300 shadow-sm\"\r\n            />\r\n          </div>\r\n\r\n          <button\r\n            type=\"button\"\r\n            className=\"p-2 cursor-pointer rounded-full dark:bg-violet-600 dark:text-gray-50 hover:dark:bg-violet-700 transition-colors\"\r\n            onClick={handleCartClick}\r\n            title=\"Giỏ hàng\"\r\n          >\r\n            <FaShoppingCart className=\"w-5 h-5\" />\r\n          </button>\r\n\r\n          {isLoading ? (\r\n            <span className=\"px-6 py-2 font-semibold\">Đang tải...</span>\r\n          ) : user ? (\r\n            <div className=\"flex items-center space-x-4\">\r\n              <span className=\"px-6 py-2 font-semibold text-violet-600\">\r\n                Xin chào {user.name}\r\n              </span>\r\n              <button\r\n                type=\"button\"\r\n                className=\"px-6 cursor-pointer py-2 font-semibold rounded dark:bg-gray-300 dark:text-gray-800 hover:dark:bg-gray-400 transition-colors\"\r\n                onClick={handleLogout}\r\n              >\r\n                Đăng xuất\r\n              </button>\r\n            </div>\r\n          ) : (\r\n            <button\r\n              type=\"button\"\r\n              className=\"hidden cursor-pointer px-6 py-2 font-semibold rounded lg:block dark:bg-violet-600 dark:text-gray-50 hover:dark:bg-violet-700 transition-colors\"\r\n            >\r\n              <Link to=\"/login\" className=\"text-gray-50\">\r\n                Log in\r\n              </Link>\r\n            </button>\r\n          )}\r\n        </div>\r\n      </div>\r\n    </header>\r\n  );\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/FE/src/components/customer/Header.jsx b/FE/src/components/customer/Header.jsx
+--- a/FE/src/components/customer/Header.jsx	(revision 5564163f94a56f60867da15c9a36e6676e605ddb)
++++ b/FE/src/components/customer/Header.jsx	(date 1744543610739)
+@@ -158,6 +158,8 @@
+             onClick={handleCartClick}
+             title="Giỏ hàng"
+           >
++            <Link to="/home">
++            </Link>
+             <FaShoppingCart className="w-5 h-5" />
+           </button>
+ 
+Index: BEsub/src/main/resources/application.yml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/BEsub/src/main/resources/application.yml b/BEsub/src/main/resources/application.yml
+new file mode 100644
+--- /dev/null	(date 1744542782264)
++++ b/BEsub/src/main/resources/application.yml	(date 1744542782264)
+@@ -0,0 +1,32 @@
++server:
++  port: 8080
++
++spring:
++  datasource:
++    url: jdbc:mysql://localhost:3306/pbl3?useSSL=false&serverTimezone=UTC
++    username: root
++    password: 123456
++    driver-class-name: com.mysql.cj.jdbc.Driver
++  jpa:
++    database-platform: org.hibernate.dialect.MySQL8Dialect
++    hibernate:
++      ddl-auto: update
++    show-sql: true
++  mail:
++    host: smtp.gmail.com
++    port: 587
++    username: NguyenDuyHoang.11B1.2122@gmail.com
++    password: kcyt xcwl buri uqbm
++    properties:
++      mail:
++        smtp:
++          auth: true
++          starttls:
++            enable: true
++jwt:
++  secret: "university-project-2024-secret-key-@1234567890!"
++cloudinary:
++  cloud-name: dpdm3ezp5
++  api-key: 276872866791819
++  api-secret: CI0g-52N2CNVL426f4GBxQ92Jko
++
