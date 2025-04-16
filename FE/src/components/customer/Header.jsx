@@ -167,9 +167,11 @@ export default function Header() {
             <span className="px-6 py-2 font-semibold">Đang tải...</span>
           ) : user ? (
             <div className="flex items-center space-x-4">
-              <span className="px-6 py-2 font-semibold text-violet-600">
-                Xin chào {user.name}
+              <Link to="/profile">
+                <span className="px-6 py-2 font-semibold text-violet-600">
+                  Xin chào {user.name}
               </span>
+              </Link>
               <button
                 type="button"
                 className="px-6 cursor-pointer py-2 font-semibold rounded dark:bg-gray-300 dark:text-gray-800 hover:dark:bg-gray-400 transition-colors"
