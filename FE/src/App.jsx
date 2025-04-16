@@ -18,7 +18,7 @@ import AdminProducts from './pages/Admin/Products/Products.jsx';
 import Users from './pages/Admin/Users/Users.jsx';
 import Cart from './pages/Customer/Cart/Cart.jsx';
 import Checkout from './pages/Customer/Checkout/Checkout.jsx';
-
+import Profile from './pages/Customer/Profile/Profile.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -119,6 +119,15 @@ function AppContent() {
           element={
             <CustomerLayout>
               <EmailVerify />
+            </CustomerLayout>
+          }
+        />
+
+        <Route
+          path='/profile'
+          element={
+            <CustomerLayout>
+              <Profile />
             </CustomerLayout>
           }
         />

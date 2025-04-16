@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const ADMIN_USER_MANAGEMENT_URL = 'http://localhost:8080/api/admin';
+const API_BASE_URL = 'http://localhost:8080/api';
 
 const api = axios.create({
   baseURL: ADMIN_USER_MANAGEMENT_URL,
@@ -12,6 +13,23 @@ const api = axios.create({
 // Interceptor để thêm token vào header
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('token'); // Lấy token từ localStorage
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// API chung
+const commonApi = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Interceptor cho commonApi
+commonApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -43,206 +61,108 @@ export const fetchProducts = async (
 
   if (keyword) {
     // Tìm kiếm theo từ khóa
-    url = new URL(`http://localhost:8080/api/products/search`);
-    url.searchParams.append("keyword", encodeURIComponent(keyword));
+    url = `/products/search?keyword=${encodeURIComponent(keyword)}`;
   } else if (brand && brand !== "All" && sortBy) {
     // Lọc theo hãng và sắp xếp
-    url = new URL(`http://localhost:8080/api/products/by-brand`);
-    url.searchParams.append("brandName", encodeURIComponent(brand));
-    url.searchParams.append("sortOrder", sortBy);
+    url = `/products/by-brand?brandName=${encodeURIComponent(brand)}&sortOrder=${sortBy}`;
   } else if (brand && brand !== "All") {
     // Chỉ lọc theo hãng, không sắp xếp
-    url = new URL(`http://localhost:8080/api/products/brand/${encodeURIComponent(brand)}`);
+    url = `/products/brand/${encodeURIComponent(brand)}`;
   } else if (sortBy) {
     // Chỉ sắp xếp, không lọc
-    url = new URL(`http://localhost:8080/api/products/sort`);
-    url.searchParams.append("order", sortBy);
-    console.log("Sorting URL:", url.toString());
+    url = `/products/sort?order=${sortBy}`;
+    console.log("Sorting URL:", API_BASE_URL + url);
   } else {
     // Lấy tất cả sản phẩm, không lọc, không sắp xếp
-    url = new URL(`http://localhost:8080/api/products`);
-  }
-
-  const headers = {
-    "Content-Type": "application/json",
-  };
-  if (requiresAuth) {
-    const token = localStorage.getItem("token");
-    if (token) {
-      headers.Authorization = `Bearer ${token}`;
-    }
+    url = `/products`;
   }
 
   try {
-    const response = await fetch(url, {
-      method: "GET",
-      headers,
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.log("Error status:", response.status);
-      console.log("Error response:", errorText);
-      throw new Error(
-        response.status === 404 ? "Hãng không tồn tại!" : "Không thể tải sản phẩm!"
-      );
+    const config = {};
+    if (requiresAuth) {
+      // Token sẽ được thêm tự động bởi interceptor
+      return (await commonApi.get(url, config)).data;
+    } else {
+      // Không cần token, tạo một axios request riêng
+      return (await axios.get(API_BASE_URL + url, {
+        headers: { 'Content-Type': 'application/json' }
+      })).data;
     }
-
-    return response.json();
   } catch (error) {
     console.error("Fetch error:", error);
-    throw error;
+    if (error.response && error.response.status === 404) {
+      throw new Error("Hãng không tồn tại!");
+    }
+    throw new Error("Không thể tải sản phẩm!");
   }
 };
 
 export const fetchBrands = async () => {
-  const response = await fetch("http://localhost:8080/api/brands", {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  if (!response.ok) {
-    console.log("Error response:", await response.text());
+  try {
+    const response = await axios.get(`${API_BASE_URL}/brands`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.log("Error response:", error.response?.data);
     throw new Error("Không thể tải danh sách hãng!");
   }
-  return response.json();
 };
 
-const API_BASE_URL = 'http://localhost:8080/api';
-
 export const fetchCart = async () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để xem giỏ hàng');
+  try {
+    const response = await commonApi.get('/cart');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Vui lòng đăng nhập để xem giỏ hàng');
   }
-
-  const response = await fetch(`${API_BASE_URL}/cart`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Không thể tải giỏ hàng');
-  }
-
-  return response.json();
 };
 
 export const addToCart = async (variantId, quantity) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để thêm vào giỏ hàng');
+  try {
+    const response = await commonApi.post('/cart/items', { variantId, quantity });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể thêm vào giỏ hàng');
   }
-
-  const response = await fetch(`${API_BASE_URL}/cart/items`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ variantId, quantity }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Không thể thêm vào giỏ hàng');
-  }
-
-  return response.json();
 };
 
 export const updateCartItemQuantity = async (cartItemId, quantity) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để cập nhật giỏ hàng');
+  try {
+    const response = await commonApi.put(`/cart/items/${cartItemId}`, { quantity });
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể cập nhật số lượng');
   }
-
-  const response = await fetch(`${API_BASE_URL}/cart/items/${cartItemId}`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify({ quantity }),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Không thể cập nhật số lượng');
-  }
-
-  return response.json(); // Trả về CartItemDTO
 };
 
 export const removeCartItem = async (cartItemId) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để xóa sản phẩm');
+  try {
+    await commonApi.delete(`/cart/items/${cartItemId}`);
+    return true;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể xóa sản phẩm');
   }
-
-  const response = await fetch(`${API_BASE_URL}/cart/items/${cartItemId}`, {
-    method: 'DELETE',
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Không thể xóa sản phẩm');
-  }
-
-  return true; // DELETE trả về 204, không có body
 };
 
 export const getAddresses = async () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để xem địa chỉ');
+  try {
+    const response = await commonApi.get('/users/addresses');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải địa chỉ');
   }
-
-  const response = await fetch(`${API_BASE_URL}/users/addresses`, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Không thể tải địa chỉ');
-  }
-
-  return response.json();
 };
 
 export const createOrder = async (orderCreateDTO) => {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    throw new Error('Vui lòng đăng nhập để tạo đơn hàng');
+  try {
+    const response = await commonApi.post('/orders', orderCreateDTO);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tạo đơn hàng');
   }
-
-  const response = await fetch(`${API_BASE_URL}/orders`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-    body: JSON.stringify(orderCreateDTO),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message || 'Không thể tạo đơn hàng');
-  }
-
-  return response.json();
 };
 
 export const sendOTP = async (email) => {
@@ -271,5 +191,6 @@ export const verifyOTP = async (enteredOtp, email) => {
     const errorData = await response.json();
     throw new Error(errorData.message || 'Không thể gửi xác thực otp');
   }
-  return response.data === "Valid";
-}
+
+  return response.json();
+};
