@@ -12,7 +12,12 @@ function ForgetPassword() {
 
   const handleClick = () => {
     sendOTP(email); 
-    navigate('/email-verify', { state: { email } }); 
+    localStorage.setItem('resetEmail', email);
+    navigate('/email-verify',{
+      state: {
+        name: "forgetPassword",
+      }
+    }); 
   };
 
   return (
@@ -22,7 +27,7 @@ function ForgetPassword() {
         <p className="mt-2 text-center text-sm text-gray-600">
           Nhập địa chỉ email của bạn để bắt đầu quá trình đặt lại mật khẩu
         </p>
-        <form className="mt-8 space-y-6" action="#" method="POST" autoComplete="off">
+        <form className="mt-8 space-y-6" action={() => {handleClick()}} method="POST" autoComplete="off">
           <div className="relative my-4">
             <input
               type="email"
@@ -44,7 +49,6 @@ function ForgetPassword() {
           <button
             className="w-full mb-4 cursor-pointer text-[18px] mt-6 rounded-full bg-violet-600 text-white hover:bg-violet-800 py-2"
             type="submit"
-            onClick={() => {handleClick()}}
           >
             Tiếp tục
           </button>

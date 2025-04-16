@@ -1,12 +1,14 @@
 import React from 'react'
 import { sendOTP, verifyOTP } from '../../services/api';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 function EmailVerify() {
+    const location = useLocation();
     const inputRef = React.useRef([]);
-    const email = location.state?.email;
+    const email = localStorage.getItem("resetEmail");
     const navigate = useNavigate();
+    const { name } = location.state || {};
 
     const handleInput = (e, index) => {
         const value = e.target.value;
@@ -22,25 +24,37 @@ function EmailVerify() {
     }
 
     const handleClick = async () => {
-        if(inputRef.current.length != 6 ){
-            toast.error("Mã otp phải đủ 6 số!");
-            inputRef.current.value = [];
+        const otp = inputRef.current.map(input => input?.value || '').join('').trim();
+      
+        if (otp.length < 6) {
+          toast.warn("Vui lòng nhập đầy đủ 6 chữ số OTP!");
+          return;
         }
+      
         try {
-            const result = await verifyOTP(inputRef.current.value, email);
-        
-            if (result) {
-              navigate('/reset-password', { state: { email } });
-            } else {
-              toast.error("Mã OTP sai!");
-              inputRef.current.forEach((input) => (input.value = ""));
-            }
-          } catch (error) {
-            console.error("Lỗi verify OTP:", error);
-            toast.error("Lỗi kết nối đến server hoặc OTP không hợp lệ!");
+          const result = await verifyOTP(otp, email);
+      
+          console.log("OTP gửi đi:", otp);
+          console.log("Email xác thực:", email);
+      
+          if (result) {
+            localStorage.setItem('resetEmail', email);
+            console.log(name);
+            if (name === "forgetPassword") {
+                navigate('/reset-password');
+              } else {
+                navigate("/register", { state: { isVerify: "yes" } })
+              }
+          } else {
+            toast.error(result?.message || "Mã OTP sai!");
             inputRef.current.forEach((input) => (input.value = ""));
           }
-    }
+        } catch (error) {
+          console.error("Lỗi verify OTP:", error);
+          toast.error("Lỗi kết nối đến server hoặc OTP không hợp lệ!");
+          inputRef.current.forEach((input) => (input.value = ""));
+        }
+      };
         
 
 
