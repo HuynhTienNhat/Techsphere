@@ -17,6 +17,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DeleteIcon from "@mui/icons-material/Delete";
 import BasicTab from "./ProductTabs/BasicTab";
 import VariantsTab from "./ProductTabs/VariantsTab";
+import { toast } from "react-toastify";
 
 export default function ProductAddModal({ brands, onSave, onClose }) {
   const [activeTab, setActiveTab] = useState("basic");
@@ -142,17 +143,15 @@ export default function ProductAddModal({ brands, onSave, onClose }) {
       const responseData = await response.json();
 
       if (!response.ok) {
-        console.error("Server response:", responseData);
         throw new Error(errorData.message || "Không thể thêm sản phẩm!");
       } else {
-        alert("Thêm sản phẩm thành công");
+        toast.success("Thêm sản phẩm thành công");
       }
 
       onSave();
       onClose();
     } catch (error) {
-      console.error("Error adding product:", error);
-      alert(error.message);
+      toast.error(error.message);
     }
   };
 

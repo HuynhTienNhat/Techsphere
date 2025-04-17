@@ -63,6 +63,12 @@ public class UserController {
         return ResponseEntity.ok("Password changed successfully");
     }
 
+    @PutMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
+        userService.resetPassword(request.getEmail(), request.getPassword());
+        return ResponseEntity.ok("Password changed successfully");
+    }
+
     // Thêm địa chỉ
     @PostMapping("/addresses")
     public ResponseEntity<UserAddressDTO> addAddress(@RequestBody @Valid UserAddressDTO addressDTO) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchProducts, fetchBrands } from "./../../../services/api";
+import { fetchProducts, fetchBrands } from "../../../services/api";
 import ProductList from "./ProductList";
 import ProductEditModal from "./ProductEditModal";
 import ProductAddModal from "./ProductAddModal";
@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearIcon from "@mui/icons-material/Clear";
+import { toast } from "react-toastify";
 
 export default function Products() {
   const [products, setProducts] = useState([]);
@@ -41,8 +42,7 @@ export default function Products() {
       const response = await fetchBrands();
       setBrands(response);
     } catch (error) {
-      console.error("Error loading brands:", error);
-      alert("Không thể tải danh sách hãng!");
+      toast.error("Không thể tải danh sách hãng!");
     }
   };
 
@@ -61,8 +61,7 @@ export default function Products() {
       setProducts(response);
       setTotalPages(Math.ceil(response.length / productsPerPage));
     } catch (error) {
-      console.error("Error loading products:", error);
-      alert("Không thể tải sản phẩm!");
+      toast.error("Không thể tải sản phẩm!");
     } finally {
       setIsLoading(false);
     }
@@ -90,8 +89,7 @@ export default function Products() {
       });
       loadProducts();
     } catch (error) {
-      console.error("Error deleting product:", error);
-      alert("Không thể xóa sản phẩm!");
+      toast.error("Không thể xóa sản phẩm!");
     }
   };
 

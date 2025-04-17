@@ -17,6 +17,10 @@ import ProtectedAdminRoute from './routes/ProtectedAdminRoute';
 import AdminProducts from './pages/Admin/Products/Products.jsx';
 import Users from './pages/Admin/Users/Users.jsx';
 import Cart from './pages/Customer/Cart/Cart.jsx';
+<<<<<<< HEAD
+=======
+import Checkout from './pages/Customer/Checkout/Checkout.jsx';
+>>>>>>> ba2c2548017b1aed4e0060f4afb8445106f67dd0
 import Profile from './pages/Customer/Profile/Profile.jsx';
 
 function AppContent() {
@@ -82,6 +86,14 @@ function AppContent() {
           }
         />
         <Route
+          path="/checkout"
+          element={
+            <CustomerLayout>
+              <Checkout />
+            </CustomerLayout>
+          }
+        />
+        <Route
           path="/register"
           element={
             <CustomerLayout>
@@ -113,8 +125,14 @@ function AppContent() {
             </CustomerLayout>
           }
         />
+<<<<<<< HEAD
         <Route
           path="/profile/*"
+=======
+
+        <Route
+          path='/profile'
+>>>>>>> ba2c2548017b1aed4e0060f4afb8445106f67dd0
           element={
             <CustomerLayout>
               <Profile />
@@ -137,7 +155,18 @@ function AppContent() {
           }
         />
       </Routes>
-      <ToastContainer />
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </>
   );
 }

@@ -18,7 +18,11 @@ export default function Products() {
 
     return (
         <div className="products-page">
-            <ProductFilter onSelectBrand={handleSelectedBtn} />
+            <ProductFilter 
+                onSelectBrand={handleSelectedBtn} 
+                keyword={keyword}
+                disabled={!!keyword} // Vô hiệu hóa filter khi có keyword
+            />
             <ProductDisplay selectedBrand={selectedBrand} keyword={keyword} />
             <GeneralInformation />
         </div>

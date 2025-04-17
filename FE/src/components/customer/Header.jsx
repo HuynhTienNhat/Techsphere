@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FaShoppingCart } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 export default function Header() {
   const location = useLocation();
@@ -9,6 +10,15 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token"));
+
+  // Khởi tạo searchKeyword từ URL khi component được mount
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const keywordFromUrl = searchParams.get("keyword") || "";
+    if (keywordFromUrl) {
+      setSearchKeyword(keywordFromUrl);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     const handleTokenChange = () => {
@@ -61,15 +71,19 @@ export default function Header() {
 
   const handleCartClick = () => {
     if (!user) {
-      alert("Bạn cần đăng nhập trước!");
+      toast.warning("Bạn cần đăng nhập trước!");
     } else {
       navigate("/cart");
     }
   };
 
   const handleSearch = () => {
-    navigate(`/products?keyword=${encodeURIComponent(searchKeyword.trim())}`);
-    setSearchKeyword("");
+    if (searchKeyword.trim()) {
+      navigate(`/products?keyword=${encodeURIComponent(searchKeyword.trim())}`);
+    } else {
+      // Nếu không có từ khóa, chuyển đến trang products mà không có query parameter
+      navigate("/products");
+    }
   };
 
   const handleKeyDown = (e) => {
@@ -86,6 +100,33 @@ export default function Header() {
     navigate("/login");
     window.dispatchEvent(new Event("token-changed"));
   };
+
+  // Xử lý khi click vào dấu X
+  const handleClearSearch = () => {
+    setSearchKeyword("");
+    
+    // Nếu đang ở trang products, cập nhật URL để xóa keyword
+    if (location.pathname === "/products") {
+      navigate("/products");
+    }
+  };
+
+  // Hàm tạo viết tắt từ tên người dùng
+  const getInitials = (name) => {
+    if (!name) return "U";
+    return name.split(' ')
+      .map(word => word[0])
+      .join('')
+      .substring(0, 2)
+      .toUpperCase();
+  };
+
+  const getName = (fullname) => {
+    const words = fullname.trim().split(" ")
+    const lastName = words[words.length - 1]
+    
+    return lastName
+  }
 
   return (
     <header className="px-30 py-4 dark:bg-gray-100 dark:text-gray-800">
@@ -120,7 +161,7 @@ export default function Header() {
         <div className="flex items-center space-x-6">
           <div className="relative w-[280px]">
             <span className="absolute inset-y-0 left-0 flex items-center pl-2">
-              <button type="submit" title="Search" className="p-1 focus:outline-none focus:ring" onClick={handleSearch}>
+              <button type="submit" title="Search" className="p-1 focus:outline-none focus:ring-0 cursor-pointer focus:ring" onClick={handleSearch}>
                 <svg fill="currentColor" viewBox="0 0 512 512" className="w-4 h-4 dark:text-gray-800">
                   <path d="M479.6,399.716l-81.084-81.084-62.368-25.767A175.014,175.014,0,0,0,368,192c0-97.047-78.953-176-176-176S16,94.953,16,192,94.953,368,192,368a175.034,175.034,0,0,0,101.619-32.377l25.7,62.2L400.4,478.911a56,56,0,1,0,79.2-79.195ZM48,192c0-79.4,64.6-144,144-144s144,64.6,144,144S271.4,336,192,336,48,271.4,48,192ZM456.971,456.284a24.028,24.028,0,0,1-33.942,0l-76.572-76.572-23.894-57.835L380.4,345.771l76.573,76.572A24.028,24.028,0,0,1,456.971,456.284Z"></path>
                 </svg>
@@ -129,8 +170,8 @@ export default function Header() {
             {searchKeyword && (
               <button
                 type="button"
-                className="absolute inset-y-0 right-0 flex items-center pr-3"
-                onClick={() => setSearchKeyword("")}
+                className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
+                onClick={handleClearSearch}
               >
                 <svg
                   className="w-5 h-5 text-gray-400 hover:text-gray-600 cursor-pointer"
@@ -167,10 +208,20 @@ export default function Header() {
             <span className="px-6 py-2 font-semibold">Đang tải...</span>
           ) : user ? (
             <div className="flex items-center space-x-4">
+<<<<<<< HEAD
               <Link to="/profile">
                 <span className="px-6 py-2 font-semibold text-violet-600">
                   Xin chào {user.name}
               </span>
+=======
+              <Link to="/profile" className="flex items-center space-x-2">
+                <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold shadow-md hover:bg-violet-300 transition-colors">
+                  {getInitials(user.name)}
+                </div>
+                <span className="font-semibold text-violet-600">
+                  Xin chào {getName(user.name)}
+                </span>
+>>>>>>> ba2c2548017b1aed4e0060f4afb8445106f67dd0
               </Link>
               <button
                 type="button"

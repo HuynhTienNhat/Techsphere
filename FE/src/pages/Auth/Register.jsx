@@ -1,6 +1,8 @@
-import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react"
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react"
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { toast } from "react-toastify";
+import { sendOTP } from "../../services/api";
 
 export default function Register() {
   const [registerData, setRegisterData] = useState({
@@ -15,8 +17,10 @@ export default function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const location = useLocation();
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -25,6 +29,17 @@ export default function Register() {
       [name]: value,
     }));
   };
+
+  useEffect(() => {
+    if (location.state?.isVerify === "yes") {
+      const savedData = JSON.parse(localStorage.getItem("registerData"));
+      if (savedData) {
+        regiserUser(savedData);
+        localStorage.removeItem("registerData");
+        navigate("/login");
+      }
+    }
+  }, []);
 
   const validateForm = () => {
     // Kiểm tra các trường bắt buộc
@@ -82,43 +97,43 @@ export default function Register() {
     return null;
   };
 
-  const handleInputChange = async (event) => {
-    event.preventDefault();
-
-    // Validate form trước khi gửi
-    const errorMessage = validateForm();
-    if (errorMessage) {
-      alert(errorMessage);
-      return;
-    }
-
+  const regiserUser = async (data) => {
     try {
-      console.log("Register Data:", registerData);
 
       const response = await fetch("http://localhost:8080/api/users/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(registerData),
+        body: JSON.stringify(data),
       });
 
-      console.log("Response Status:", response.status);
-
       const result = await response.json();
-      console.log("Response Data:", result);
 
       if (response.status === 201) {
-        alert("Đăng ký thành công!");
+        toast.success("Đăng ký thành công!");
         localStorage.setItem("token", result.token);
-        window.location.href = "../email-verify";
+        
       } else {
-        alert("Đăng ký thất bại: " + (result.error || "Lỗi không xác định"));
+        toast.error("Đăng ký thất bại: " + (result.error || "Lỗi không xác định"));
       }
     } catch (error) {
-      console.error("Lỗi đăng ký:", error);
-      alert("Đăng ký thất bại! Vui lòng thử lại sau.");
+      toast.error("Đăng ký thất bại! Vui lòng thử lại sau.");
     }
+  }
+
+  const handleInputChange = async (event) => {
+    event.preventDefault();
+  
+    const errorMessage = validateForm();
+    if (errorMessage) {
+      toast.error(errorMessage);
+      return;
+    }
+    localStorage.setItem("registerData", JSON.stringify(registerData));
+    navigate("/email-verify", { state:"register"});
+    await sendOTP(registerData.email);
+    
   };
 
   return (

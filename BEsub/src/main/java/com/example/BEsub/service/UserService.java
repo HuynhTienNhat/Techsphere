@@ -18,4 +18,5 @@ public interface UserService {
     Long getUserIdByUsername(String username);
     void deleteAddress(Long userId, Long addressId);
     List<AdminProfileDTO> getAllUsers(); // Admin
+    void resetPassword(String email, String password);
 }

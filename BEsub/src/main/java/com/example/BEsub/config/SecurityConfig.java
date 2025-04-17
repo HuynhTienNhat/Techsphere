@@ -39,6 +39,11 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/sort").permitAll() // Add this line
                         .requestMatchers(HttpMethod.GET, "/api/products/by-brand").permitAll() // Add this line
                         .requestMatchers(HttpMethod.GET, "/api/brand/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/reset-password").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/cart").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.POST, "/api/cart/items").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT, "/api/cart/items/**").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/cart/items/**").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/otp").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/otp").permitAll()

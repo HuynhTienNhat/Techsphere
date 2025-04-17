@@ -1,70 +1,84 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useState } from "react";
+import { toast } from 'react-toastify';
+
 
 function ResetPassword() {
-    const [resetData, setResetData] = useState({
-        password: "",
-    });
+  const email = localStorage.getItem("resetEmail") ;
 
-    const [confirmPassword, setConfirmPassword] = useState("");
+  const [resetData, setResetData] = useState({
+      email: "",
+      password: "",
+  });
 
-    const [showPassword, setShowPassword] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
+  useEffect(() => {
+    setResetData((prevData) => ({
+      ...prevData,
+      email: email || '', 
+    }));
+  }, []);
+  
+  const [confirmPassword, setConfirmPassword] = useState("");
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setResetData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    }
-    
-    const validateForm = () => {
-        if (!resetData.password || !confirmPassword) {
-            return "Vui lòng điền đầy đủ mật khẩu và xác nhận mật khẩu.";
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const handleChange = (e) => {
+      const { name, value } = e.target;
+      setResetData((prevData) => ({
+          ...prevData,
+          [name]: value,
+      }));
+  }
+  
+  const validateForm = () => {
+      if (!resetData.password || !confirmPassword) {
+          toast.error("Vui lòng điền đầy đủ mật khẩu và xác nhận mật khẩu.");
+      }
+      if (resetData.password !== confirmPassword) {
+          toast.error("Mật khẩu và xác nhận mật khẩu không khớp.");
+      }
+      return null;
+  }
+
+  const handleInputChange = async (event) => {
+      event.preventDefault();
+
+      // Validate form trước khi gửi
+      const errorMessage = validateForm();
+      if (errorMessage) {
+          alert(errorMessage);
+          return;
+      }
+
+      try {
+        console.log("Reset Data:", resetData);
+      
+        const response = await fetch("http://localhost:8080/api/users/reset-password", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(resetData),
+        });
+      
+        console.log("Response Status:", response.status);
+      
+        const text = await response.text(); 
+        console.log("Response Text:", text);
+      
+        if (response.status === 200) {
+          toast.success("Đặt lại mật khẩu thành công!");
+          window.location.href = "../login";
+        } else {
+          toast.error(text || "Đặt lại mật khẩu thất bại.");
         }
-        if (resetData.password !== confirmPassword) {
-            return "Mật khẩu và xác nhận mật khẩu không khớp.";
-        }
-        return null;
-    }
-
-    const handleInputChange = async (event) => {
-        event.preventDefault();
-
-        // Validate form trước khi gửi
-        const errorMessage = validateForm();
-        if (errorMessage) {
-            alert(errorMessage);
-            return;
-        }
-
-        try {
-            console.log("Reset Data:", resetData);
-
-            const response = await fetch("http://localhost:8080/api/users/reset-password", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(resetData),
-            });
-
-            console.log("Response Status:", response.status);
-
-            const result = await response.json();
-            console.log("Response Data:", result);
-
-            if (response.status === 200) {
-                alert("Đặt lại mật khẩu thành công!");
-                window.location.href = "../login";
-            } else {
-                alert(result.message || "Đặt lại mật khẩu thất bại.");
-            }
-        } catch (error) {
-            console.error("Error:", error);
-        }
-    }
+      } catch (error) {
+        console.error("Error:", error);
+        toast.error("Lỗi hệ thống khi đặt lại mật khẩu.");
+      }
+      
+  }
 
   return (
     <div id="resetPwForm" className="flex min-h-full flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">

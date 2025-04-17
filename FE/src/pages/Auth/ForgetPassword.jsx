@@ -1,7 +1,25 @@
 import React from 'react'
 import { Link } from "react-router-dom"
+import { useState } from 'react';
+import { sendOTP } from '../../services/api';
+import { useNavigate } from 'react-router-dom';
+
+
 
 function ForgetPassword() {
+  const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+
+  const handleClick = () => {
+    sendOTP(email); 
+    localStorage.setItem('resetEmail', email);
+    navigate('/email-verify',{
+      state: {
+        name: "forgetPassword",
+      }
+    }); 
+  };
+
   return (
     <div id="forgetPwForm" className="flex min-h-full flex-1 flex-col justify-center items-center px-6 py-12 lg:px-8">
       <div className='border border-slate-400 rounded-md p-8 shadow-lg backdrop-filter backdrop-blur-sm bg-opacity-50 relative'>
@@ -9,7 +27,7 @@ function ForgetPassword() {
         <p className="mt-2 text-center text-sm text-gray-600">
           Nhập địa chỉ email của bạn để bắt đầu quá trình đặt lại mật khẩu
         </p>
-        <form className="mt-8 space-y-6" action="#" method="POST">
+        <form className="mt-8 space-y-6" action={() => {handleClick()}} method="POST" autoComplete="off">
           <div className="relative my-4">
             <input
               type="email"
@@ -17,6 +35,8 @@ function ForgetPassword() {
               className="block w-full py-2.5 px-0 text-sm border-0 border-b-2 focus:outline-none focus:border-violet-600 peer appearance-none"
               placeholder=""
               required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <label
               htmlFor=""
@@ -25,17 +45,17 @@ function ForgetPassword() {
               Địa chỉ Email
             </label>
           </div>
-          <Link to={'/email-verify'}>
-            <button
-              className="w-full mb-4 cursor-pointer text-[18px] mt-6 rounded-full bg-violet-600 text-white hover:bg-violet-800 py-2"
-              type="submit"
-            >
-              Tiếp tục
-            </button>
-          </Link>
+          
+          <button
+            className="w-full mb-4 cursor-pointer text-[18px] mt-6 rounded-full bg-violet-600 text-white hover:bg-violet-800 py-2"
+            type="submit"
+          >
+            Tiếp tục
+          </button>
+          
           <p className="block text-center">
             Đã có tài khoản?{" "}
-            <Link to={"/email-verify"} className="text-violet-600 hover:underline">
+            <Link to={"/login"} className="text-violet-600 hover:underline">
               Đăng nhập ngay
             </Link>
           </p>
