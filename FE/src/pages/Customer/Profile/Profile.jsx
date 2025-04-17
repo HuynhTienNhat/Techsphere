@@ -1,43 +1,29 @@
-import React, { useState } from "react";
+import React from "react";
+import { Routes, Route, useLocation } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import ProfileInfo from "./ProfileInfo";
-import Orders from "./Orders";
-import Address from "./Address";
+import Orders from "./Order";
+import Addresses from "./Addresses";
 import ChangePassword from "./ChangePassword";
+import Support from "./Support";
 
 export default function Profile() {
-  const [activeTab, setActiveTab] = useState("profile");
-  
-  const menuItems = [
-    {
-      label: "Thông tin cá nhân",
-      onClick: () => setActiveTab("profile"),
-    },
-    {
-      label: "Đơn hàng của tôi",
-      onClick: () => setActiveTab("orders"),
-    },
-    {
-      label: "Địa chỉ nhận hàng",
-      onClick: () => setActiveTab("addresses"),
-    },
-    {
-      label: "Thay đổi mật khẩu",
-      onClick: () => setActiveTab("changePassword"),
-    },
-  ];
-
   return (
-    
-    <div id="profile-form" className="container mx-auto mt-5 flex">
-      <div className="">
-        <Sidebar menuItems={menuItems} />
-      </div>
-      <div className="flex-grow">
-        {activeTab === "profile" && <ProfileInfo />}
-        {activeTab === "orders" && <Orders />}
-        {activeTab === "addresses" && <Address />}
-        {activeTab === "changePassword" && <ChangePassword />}
+    <div className="mx-6 mt-2">
+      <div className="flex">
+        {/* Fixed width sidebar */}
+        <Sidebar />
+        
+        {/* Main content */}
+        <div className="flex-1 ml-6">
+          <Routes>
+            <Route index element={<ProfileInfo />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="addresses" element={<Addresses />} />
+            <Route path="change-password" element={<ChangePassword />} />
+            <Route path="support" element={<Support />} />
+          </Routes>
+        </div>
       </div>
     </div>
   );

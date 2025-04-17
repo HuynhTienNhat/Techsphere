@@ -114,7 +114,7 @@ function AppContent() {
           }
         />
         <Route
-          path="/profile"
+          path="/profile/*"
           element={
             <CustomerLayout>
               <Profile />
