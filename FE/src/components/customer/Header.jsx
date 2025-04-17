@@ -208,12 +208,6 @@ export default function Header() {
             <span className="px-6 py-2 font-semibold">Đang tải...</span>
           ) : user ? (
             <div className="flex items-center space-x-4">
-<<<<<<< HEAD
-              <Link to="/profile">
-                <span className="px-6 py-2 font-semibold text-violet-600">
-                  Xin chào {user.name}
-              </span>
-=======
               <Link to="/profile" className="flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold shadow-md hover:bg-violet-300 transition-colors">
                   {getInitials(user.name)}
@@ -221,7 +215,6 @@ export default function Header() {
                 <span className="font-semibold text-violet-600">
                   Xin chào {getName(user.name)}
                 </span>
->>>>>>> ba2c2548017b1aed4e0060f4afb8445106f67dd0
               </Link>
               <button
                 type="button"
