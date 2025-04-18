@@ -35,6 +35,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/search").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/users/addresses").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/users/addresses").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/addresses/**").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.DELETE, "/api/users/addresses/**").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/users/profile").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/profile").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/api/products/brand/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/sort").permitAll() // Add this line
                         .requestMatchers(HttpMethod.GET, "/api/products/by-brand").permitAll() // Add this line

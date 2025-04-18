@@ -1,5 +1,6 @@
 package com.example.BEsub.models;
 
+import com.example.BEsub.enums.TypeOfAddress;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,13 +13,16 @@ import java.util.List;
 public class UserAddress extends BaseEntity {
     private String city;
 
-    private String street;
+    private String district;
 
-    @Column(name = "house_number")
-    private String houseNumber;
+    @Column(name = "street_and_house_number")
+    private String streetAndHouseNumber;
 
     @Column(name = "is_default")
     private Boolean isDefault;
+
+    @Column(name = "type_of_address")
+    private String typeOfAddress;
 
     // Quan hệ Many-to-One với USERS
     @ManyToOne(fetch = FetchType.LAZY)

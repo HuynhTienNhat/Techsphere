@@ -97,6 +97,17 @@ public class UserController {
         return ResponseEntity.ok("Default address set successfully");
     }
 
+    // Chỉnh sửa địa chỉ
+    @PutMapping("/addresses/{addressId}")
+    public ResponseEntity<UserAddressDTO> updateAddress(
+            @PathVariable Long addressId,
+            @RequestBody @Valid UserAddressDTO addressDTO) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userService.getUserIdByUsername(userName);
+        UserAddressDTO updatedAddress = userService.updateAddress(userId, addressId, addressDTO);
+        return ResponseEntity.ok(updatedAddress);
+    }
+
     // Xóa địa chỉ
     @DeleteMapping("/addresses/{addressId}")
     public ResponseEntity<String> deleteAddress(@PathVariable Long addressId) {

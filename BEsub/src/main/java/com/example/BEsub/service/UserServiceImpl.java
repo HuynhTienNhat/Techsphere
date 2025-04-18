@@ -28,6 +28,10 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
+    // Hàm kiểm tra typeOfAddress hợp lệ
+    private boolean isValidTypeOfAddress(String type) {
+        return type != null && (type.equals("Nhà riêng") || type.equals("Văn phòng"));
+    }
 
     @Override
     public UserResponseDTO login(UserLoginDTO loginDTO) {
@@ -113,10 +117,16 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found"));
 
+        // Kiểm tra typeOfAddress hợp lệ
+        if (!isValidTypeOfAddress(addressDTO.getTypeOfAddress())) {
+            throw new AppException("Invalid address type: " + addressDTO.getTypeOfAddress());
+        }
+
         UserAddress address = new UserAddress();
         address.setCity(addressDTO.getCity());
-        address.setStreet(addressDTO.getStreet());
-        address.setHouseNumber(addressDTO.getHouseNumber());
+        address.setDistrict(addressDTO.getDistrict());
+        address.setStreetAndHouseNumber(addressDTO.getStreetAndHouseNumber());
+        address.setTypeOfAddress(addressDTO.getTypeOfAddress());
         address.setUser(user);
 
         // Nếu đây là địa chỉ đầu tiên, đặt làm mặc định
@@ -227,6 +237,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserAddressDTO updateAddress(Long userId, Long addressId, UserAddressDTO addressDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Kiểm tra typeOfAddress hợp lệ
+        if (!isValidTypeOfAddress(addressDTO.getTypeOfAddress())) {
+            throw new AppException("Invalid address type: " + addressDTO.getTypeOfAddress());
+        }
+
+        UserAddress address = user.getAddresses().stream()
+                .filter(addr -> addr.getId().equals(addressId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        address.setCity(addressDTO.getCity());
+        address.setDistrict(addressDTO.getDistrict());
+        address.setStreetAndHouseNumber(addressDTO.getStreetAndHouseNumber());
+        address.setTypeOfAddress(addressDTO.getTypeOfAddress());
+        address.setIsDefault(addressDTO.getIsDefault() != null && addressDTO.getIsDefault());
+
+        // Nếu đặt địa chỉ này làm mặc định, bỏ mặc định các địa chỉ khác
+        if (address.getIsDefault()) {
+            user.getAddresses().forEach(addr -> {
+                if (!addr.getId().equals(addressId)) {
+                    addr.setIsDefault(false);
+                }
+            });
+        }
+
+        userRepository.save(user);
+        return mapToUserAddressDTO(address);
+    }
+
+
+    @Override
     public void resetPassword(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("User not found"));
@@ -261,9 +306,10 @@ public class UserServiceImpl implements UserService {
         UserAddressDTO dto = new UserAddressDTO();
         dto.setId(address.getId());
         dto.setCity(address.getCity());
-        dto.setStreet(address.getStreet());
-        dto.setHouseNumber(address.getHouseNumber());
+        dto.setDistrict(address.getDistrict());
+        dto.setStreetAndHouseNumber(address.getStreetAndHouseNumber());
         dto.setIsDefault(address.getIsDefault());
+        dto.setTypeOfAddress(address.getTypeOfAddress());
         return dto;
     }
 
