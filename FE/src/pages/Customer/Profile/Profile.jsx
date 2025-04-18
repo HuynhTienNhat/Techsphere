@@ -9,7 +9,7 @@ import Support from "./Support";
 
 export default function Profile() {
   return (
-    <div className="mx-6 mt-2">
+    <div className="mx-30 mt-2">
       <div className="flex">
         {/* Fixed width sidebar */}
         <Sidebar />

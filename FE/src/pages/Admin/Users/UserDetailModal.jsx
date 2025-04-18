@@ -178,11 +178,10 @@ const UserDetailModal = ({ open, onClose, user }) => {
                   className="mb-4 p-4 border rounded-lg"
                 >
                   <Typography>
-                    {address.street}, {address.city}, {address.state},{' '}
-                    {address.postalCode}, {address.country}
+                    {address.streetAndHouseNumber}, {address.district}, {address.city}{' '}
                   </Typography>
                   {address.isDefault && (
-                    <Typography className="text-blue-500">
+                    <Typography className="text-green-500">
                       Default Address
                     </Typography>
                   )}

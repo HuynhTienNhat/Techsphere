@@ -156,6 +156,46 @@ export const getAddresses = async () => {
   }
 };
 
+// Thêm địa chỉ mới
+export const addAddress = async (addressData) => {
+  try {
+    const response = await commonApi.post('/users/addresses', addressData);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể thêm địa chỉ');
+  }
+};
+
+// Cập nhật địa chỉ
+export const updateAddress = async (addressId, addressData) => {
+  try {
+    const response = await commonApi.put(`/users/addresses/${addressId}`, addressData); // Sử dụng commonApi
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể cập nhật địa chỉ');
+  }
+};
+
+// Xóa địa chỉ
+export const deleteAddress = async (addressId) => {
+  try {
+    const response = await commonApi.delete(`/users/addresses/${addressId}`); // Sử dụng commonApi
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể xóa địa chỉ');
+  }
+};
+
+// Đặt địa chỉ mặc định
+export const setDefaultAddress = async (addressId) => {
+  try {
+    const response = await commonApi.put(`/users/addresses/${addressId}/default`); // Sử dụng commonApi
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể đặt địa chỉ mặc định');
+  }
+};
+
 export const createOrder = async (orderCreateDTO) => {
   try {
     const response = await commonApi.post('/orders', orderCreateDTO);
@@ -193,4 +233,30 @@ export const verifyOTP = async (enteredOtp, email) => {
   }
 
   return response.json();
+};
+
+// Lấy thông tin profile
+export const getProfile = async () => {
+  try {
+    const response = await commonApi.get('/users/profile');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải thông tin profile');
+  }
+};
+
+// Cập nhật thông tin profile
+export const updateProfile = async (profileData) => {
+  try {
+    console.log('Updating profile with data:', profileData);
+    const response = await commonApi.put('/users/profile', profileData);
+    return response.data;
+  } catch (error) {
+    console.error('Update profile error:', {
+      status: error.response?.status,
+      data: error.response?.data,
+      message: error.response?.data?.message,
+    });
+    throw new Error(error.response?.data?.message || 'Không thể cập nhật profile');
+  }
 };

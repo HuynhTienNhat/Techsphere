@@ -35,23 +35,25 @@ export default function Order() {
                     </li>
                 ))}
             </ul>
+            
             {/* Example order items */}
             <div className="border rounded-md p-4">
-            <div className="flex justify-between mb-2">
-                <span className="font-medium">Đơn hàng #12345</span>
-                <span className="text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs">Đã giao hàng</span>
-            </div>
-            <div className="text-sm text-gray-600">Ngày đặt: 15/04/2025</div>
-            <div className="text-sm font-medium mt-2">2.590.000 ₫</div>
-            </div>
-    
-            <div className="border rounded-md p-4">
-            <div className="flex justify-between mb-2">
-                <span className="font-medium">Đơn hàng #12344</span>
-                <span className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full text-xs">Đang giao hàng</span>
-            </div>
-            <div className="text-sm text-gray-600">Ngày đặt: 10/04/2025</div>
-            <div className="text-sm font-medium mt-2">1.890.000 ₫</div>
+                <div className="flex justify-between mb-2">
+                    <span className="font-medium">Đơn hàng #12345</span>
+                    <span className="text-green-600 bg-green-100 px-2 py-1 rounded-full text-xs">Đã giao hàng</span>
+                </div>
+                <div className="text-sm text-gray-600">Ngày đặt: 15/04/2025</div>
+                <div className="text-sm font-medium mt-2">2.590.000 ₫</div>
+                </div>
+        
+                <div className="border rounded-md p-4">
+                <div className="flex justify-between mb-2">
+                    <span className="font-medium">Đơn hàng #12344</span>
+                    <span className="text-yellow-600 bg-yellow-100 px-2 py-1 rounded-full text-xs">Đang giao hàng</span>
+                </div>
+                
+                <div className="text-sm text-gray-600">Ngày đặt: 10/04/2025</div>
+                <div className="text-sm font-medium mt-2">1.890.000 ₫</div>
             </div>
         </div>
         </div>
