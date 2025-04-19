@@ -17,6 +17,7 @@ public interface OrderService {
     void cancelOrder(Long orderId);
 
     // Admin
+    List<OrderDTO> getAllOrders(); // Lấy tất cả đơn hàng
     List<OrderDTO> getAllOrdersByUserId(Long userId);
     void changeStatusOfOrder(OrderStatusChangeDTO orderStatusChangeDTO);
     List<OrderDTO> getAllOrdersByStatus(OrderStatus status); // Lọc toàn bộ đơn hàng theo trạng thái

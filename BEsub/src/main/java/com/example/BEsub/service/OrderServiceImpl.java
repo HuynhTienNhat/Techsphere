@@ -8,14 +8,14 @@ import com.example.BEsub.enums.OrderStatus;
 import com.example.BEsub.exception.AppException;
 import com.example.BEsub.models.*;
 import com.example.BEsub.repositories.*;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,49 +35,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     UserAddressRepository addressRepository;
-
-    @Override
-    public List<OrderDTO> getAllOrdersOfUser() {
-        User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
-        List<Order> orders = user.getOrders();
-
-        return orders.stream().map(this::mapToOrderDTO).toList();
-    }
-
-    @Override
-    public List<OrderDTO> getAllOrdersByUserId(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
-        List<Order> orders = user.getOrders();
-
-        return orders.stream().map(this::mapToOrderDTO).toList();
-    }
-
-    @Override
-    public void changeStatusOfOrder(OrderStatusChangeDTO orderStatusChangeDTO) {
-        User user = userRepository.findById(orderStatusChangeDTO.getUserId()).orElseThrow(() -> new AppException("User not found"));
-        List<Order> orders = user.getOrders();
-
-        Order orderChange = orders.stream()
-                .filter(o -> o.getId().equals(orderStatusChangeDTO.getOrderId()))
-                .findFirst()
-                .orElseThrow(() -> new AppException("Order not found"));
-
-        orderChange.setStatus(OrderStatus.fromString(orderStatusChangeDTO.getStatus()));
-        orderRepository.save(orderChange);
-    }
-
-    @Override
-    public OrderDTO getOrder(Long orderId) {
-        User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
-        List<Order> orders = user.getOrders();
-
-        Order order = orders.stream()
-                .filter(o -> o.getId().equals(orderId))
-                .findFirst()
-                .orElseThrow(() -> new AppException("Order not found"));
-
-        return mapToOrderDTO(order);
-    }
 
     @Override
     @Transactional
@@ -136,23 +93,89 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAll(Sort.by(Sort.Direction.DESC, "orderDate"));
+        return orders.stream()
+                .map(this::mapToOrderDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<OrderDTO> getAllOrdersOfUser() {
+        User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
+        List<Order> orders = user.getOrders();
+
+        return orders.stream()
+                .sorted(Comparator.comparing(Order::getOrderDate, Comparator.reverseOrder()))
+                .map(this::mapToOrderDTO)
+                .toList();
+    }
+
+    @Override
+    public List<OrderDTO> getAllOrdersByUserId(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new AppException("User not found"));
+        List<Order> orders = user.getOrders();
+
+        return orders.stream()
+                .sorted(Comparator.comparing(Order::getOrderDate, Comparator.reverseOrder()))
+                .map(this::mapToOrderDTO)
+                .toList();
+    }
+
+    @Override
+    public void changeStatusOfOrder(OrderStatusChangeDTO orderStatusChangeDTO) {
+        User user = userRepository.findById(orderStatusChangeDTO.getUserId()).orElseThrow(() -> new AppException("User not found"));
+        List<Order> orders = user.getOrders();
+
+        Order orderChange = orders.stream()
+                .filter(o -> o.getId().equals(orderStatusChangeDTO.getOrderId()))
+                .findFirst()
+                .orElseThrow(() -> new AppException("Order not found"));
+
+        orderChange.setStatus(OrderStatus.fromString(orderStatusChangeDTO.getStatus()));
+        orderRepository.save(orderChange);
+    }
+
+    @Override
+    public OrderDTO getOrder(Long orderId) {
+        User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
+        List<Order> orders = user.getOrders();
+
+        Order order = orders.stream()
+                .filter(o -> o.getId().equals(orderId))
+                .findFirst()
+                .orElseThrow(() -> new AppException("Order not found"));
+
+        return mapToOrderDTO(order);
+    }
+
+    @Override
     public List<OrderDTO> getOrdersByStatus(Long userId, OrderStatus status) {
-        List<Order> orders = orderRepository.findByUserIdAndStatus(userId, status);
-        return orders.stream().map(this::mapToOrderDTO).toList();
+        Sort sort = Sort.by(Sort.Direction.DESC, "orderDate");
+        List<Order> orders = orderRepository.findByUserIdAndStatus(userId, status, sort);
+        return orders.stream()
+                .map(this::mapToOrderDTO)
+                .toList();
     }
 
     @Override
     public List<OrderDTO> getOrdersByMonthAndYear(Long userId, int month, int year) {
         LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
         LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
-        List<Order> orders = orderRepository.findByUserIdAndOrderDateBetween(userId, startDate, endDate);
-        return orders.stream().map(this::mapToOrderDTO).toList();
+        Sort sort = Sort.by(Sort.Direction.DESC, "orderDate");
+        List<Order> orders = orderRepository.findByUserIdAndOrderDateBetween(userId, startDate, endDate, sort);
+        return orders.stream()
+                .map(this::mapToOrderDTO)
+                .toList();
     }
 
     @Override
     public List<OrderDTO> getAllOrdersByStatus(OrderStatus status) {
-        List<Order> orders = orderRepository.findByStatus(status);
-        return orders.stream().map(this::mapToOrderDTO).toList();
+        Sort sort = Sort.by(Sort.Direction.DESC, "orderDate");
+        List<Order> orders = orderRepository.findByStatus(status, sort);
+        return orders.stream()
+                .map(this::mapToOrderDTO)
+                .toList();
     }
 
     @Override
@@ -173,8 +196,11 @@ public class OrderServiceImpl implements OrderService {
     public List<OrderDTO> getAllOrdersByMonthAndYear(int month, int year) {
         LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
         LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
-        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate);
-        return orders.stream().map(this::mapToOrderDTO).toList();
+        Sort sort = Sort.by(Sort.Direction.DESC, "orderDate");
+        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate, sort);
+        return orders.stream()
+                .map(this::mapToOrderDTO)
+                .toList();
     }
 
     private OrderItem mapCartItemToOrderItem(CartItem cartItem, Order order) {
@@ -206,16 +232,16 @@ public class OrderServiceImpl implements OrderService {
         return dto;
     }
 
-    private OrderItem mapToOrderItem(OrderItemDTO orderItemDTO, Order order){
+    private OrderItem mapToOrderItem(OrderItemDTO orderItemDTO, Order order) {
         return OrderItem.builder()
                 .quantity(orderItemDTO.getQuantity())
                 .unitPrice(orderItemDTO.getUnitPrice())
                 .order(order)
-                .variant(productVariantRepository.findById(orderItemDTO.getVariantId()).orElseThrow(()->new AppException("Variant not found")))
+                .variant(productVariantRepository.findById(orderItemDTO.getVariantId()).orElseThrow(() -> new AppException("Variant not found")))
                 .build();
     }
 
-    public OrderItemDTO mapToOrderItemDTO(OrderItem orderItem){
+    public OrderItemDTO mapToOrderItemDTO(OrderItem orderItem) {
         OrderItemDTO orderItemDTO = new OrderItemDTO();
 
         orderItemDTO.setQuantity(orderItem.getQuantity());
@@ -251,18 +277,17 @@ public class OrderServiceImpl implements OrderService {
 
         if (dto.getOrderItems() != null) {
             List<OrderItemDTO> orderItemDTOS = dto.getOrderItems();
-            List<OrderItem> orderItems = orderItemDTOS.stream().map((item)->mapToOrderItem(item,order)).toList();
+            List<OrderItem> orderItems = orderItemDTOS.stream().map((item) -> mapToOrderItem(item, order)).toList();
             order.setOrderItems(orderItems);
         }
 
         return order;
     }
 
-
     private Long getCurrentUserId() {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         return userRepository.findByUsername(username)
-                .orElseThrow(()->new AppException("User not found"))
+                .orElseThrow(() -> new AppException("User not found"))
                 .getId();
     }
 }
