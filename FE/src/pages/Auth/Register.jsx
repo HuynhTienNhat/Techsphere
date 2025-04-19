@@ -130,7 +130,7 @@ export default function Register() {
       toast.error(errorMessage);
       return;
     }
-    localStorage.setItem("registerData", JSON.stringify(registerData));
+    localStorage.setItem("registerEmail", registerData.email);
     navigate("/email-verify", { state:"register"});
     await sendOTP(registerData.email);
     

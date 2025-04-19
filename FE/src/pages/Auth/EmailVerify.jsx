@@ -7,6 +7,7 @@ function EmailVerify() {
     const location = useLocation();
     const inputRef = React.useRef([]);
     const email = localStorage.getItem("resetEmail");
+    const registerEmail = localStorage.getItem("registerEmail");
     const navigate = useNavigate();
     const { name } = location.state || {};
 
@@ -32,10 +33,11 @@ function EmailVerify() {
         }
       
         try {
-          const result = await verifyOTP(otp, email);
+          const result = name === "forgetPassword" ? await verifyOTP(otp,email) : await verifyOTP(otp,registerEmail);
       
           console.log("OTP gửi đi:", otp);
           console.log("Email xác thực:", email);
+          console.log("Email đăng kí:", registerEmail);
       
           if (result) {
             localStorage.setItem('resetEmail', email);
