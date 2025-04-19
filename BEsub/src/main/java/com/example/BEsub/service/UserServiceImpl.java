@@ -203,6 +203,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserAddressDTO getAddressByIdAndUserId(Long userId, Long addressId) {
+        UserAddress address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new AppException("Address not found"));
+        return mapToUserAddressDTO(address);
+    }
+
+    @Override
     @Transactional
     public void setDefaultAddress(Long userId, Long addressId) {
         User user = userRepository.findById(userId)
@@ -295,6 +302,13 @@ public class UserServiceImpl implements UserService {
         return users.stream().map(this::mapToAdminProfileDTO).collect(Collectors.toList());
     }
 
+    @Override
+    public AdminProfileDTO getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found"));
+        return mapToAdminProfileDTO(user);
+    }
+
     // Helper methods to map Entity to DTO
     private UserResponseDTO mapToUserResponseDTO(User user) {
         UserResponseDTO dto = new UserResponseDTO();
@@ -340,7 +354,7 @@ public class UserServiceImpl implements UserService {
         dto.setRole(user.getRole());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setLastLogin(user.getLastLogin());
-        dto.setAddresses(getUserAddresses(user.getId())); // Lấy danh sách địa chỉ
+        dto.setAddresses(getUserAddresses(user.getId()));
         return dto;
     }
 

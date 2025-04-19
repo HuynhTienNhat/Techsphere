@@ -51,11 +51,26 @@ public class AdminController {
         return ResponseEntity.ok(users);
     }
 
+    // Lấy thông tin người dùng theo id
+    @GetMapping("/users/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<AdminProfileDTO> getUserById(@PathVariable Long userId) {
+        AdminProfileDTO user = userService.getUserById(userId);
+        return ResponseEntity.ok(user);
+    }
+
     @GetMapping("/users/{userId}/addresses")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserAddressDTO>> getUserAddresses(@PathVariable Long userId) {
         List<UserAddressDTO> addresses = userService.getUserAddresses(userId);
         return ResponseEntity.ok(addresses);
+    }
+
+    @GetMapping("/users/{userId}/addresses/{addressId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserAddressDTO> getUserAddressById(@PathVariable Long userId, @PathVariable Long addressId) {
+        UserAddressDTO address = userService.getAddressByIdAndUserId(userId, addressId);
+        return ResponseEntity.ok(address);
     }
 
     @GetMapping("/orders")
