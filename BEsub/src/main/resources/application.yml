@@ -1,0 +1,47 @@
+# =============== APPLICATION CONFIG ===============
+spring:
+  application:
+    name: BEsub
+
+  # =============== DATABASE CONFIG (MySQL) ===============
+  datasource:
+    url: jdbc:mysql://localhost:3306/pbl3?useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: 123456
+
+  # =============== HIBERNATE/JPA CONFIG ===============
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  sql:
+    init:
+      mode: always
+
+  # =============== MAIL CONFIG ===============
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: NguyenDuyHoang.11B1.2122@gmail.com
+    password: mtky zrfa bsfb isyl
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# =============== JWT CONFIG ===============
+jwt:
+  secret: university-project-2024-secret-key-@1234567890!
+
+# =============== CLOUDINARY CONFIG ===============
+cloudinary:
+  cloud-name: dpdm3ezp5
+  api-key: 276872866791819
+  api-secret: CI0g-52N2CNVL426f4GBxQ92Jko
