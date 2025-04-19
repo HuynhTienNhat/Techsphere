@@ -58,6 +58,12 @@ public class AdminController {
         return ResponseEntity.ok(addresses);
     }
 
+    @GetMapping("/orders")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderDTO>> getAllOrders() {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrders());
+    }
+
     @GetMapping("/orders/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDTO>> getAllOrdersByUserId(@PathVariable Long userId) {
