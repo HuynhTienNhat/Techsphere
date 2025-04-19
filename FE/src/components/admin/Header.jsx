@@ -25,8 +25,8 @@ export default function AdminHeader() {
                 <nav className="md:mr-auto md:ml-4 md:py-1 md:pl-4 md:border-l md:border-gray-400	flex flex-wrap items-center text-base justify-center">
                     <Link to='/admin/users' className={`mr-5 cursor-pointer hover:text-gray-900 ${location.pathname=='/admin/users' ? "text-violet-500":""}`}>Users</Link>
                     <Link to='/admin/products' className={`mr-5 cursor-pointer hover:text-gray-900 ${location.pathname=='/admin/products' ? "text-violet-500":""}`}>Products</Link>
-                    {/* <Link to='/users' class="mr-5 cursor-pointer hover:text-gray-900">Orders</Link>
-                    <Link to='/users' class="mr-5 cursor-pointer hover:text-gray-900">Revenue</Link> */}
+                    <Link to='/admin/orders' class="mr-5 cursor-pointer hover:text-gray-900">Orders</Link>
+                    {/* <Link to='/users' class="mr-5 cursor-pointer hover:text-gray-900">Revenue</Link> */}
                 </nav>
                 <button onClick={handleLogout} className="inline-flex cursor-pointer items-center bg-violet-300 border-0 py-2 px-3 focus:outline-none hover:bg-violet-200 rounded text-base mt-4 md:mt-0">Đăng xuất
                     <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" className="w-4 h-4 ml-1" viewBox="0 0 24 24">
