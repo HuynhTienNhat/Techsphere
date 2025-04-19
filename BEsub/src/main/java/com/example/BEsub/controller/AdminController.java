@@ -1,9 +1,6 @@
 package com.example.BEsub.controller;
 
-import com.example.BEsub.dtos.AdminProfileDTO;
-import com.example.BEsub.dtos.OrderDTO;
-import com.example.BEsub.dtos.OrderStatusChangeDTO;
-import com.example.BEsub.dtos.UserAddressDTO;
+import com.example.BEsub.dtos.*;
 import com.example.BEsub.enums.OrderStatus;
 import com.example.BEsub.exception.AppException;
 import com.example.BEsub.service.OrderService;
@@ -49,6 +46,18 @@ public class AdminController {
     public ResponseEntity<List<AdminProfileDTO>> getAllUsers() {
         List<AdminProfileDTO> users = userService.getAllUsers();
         return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/orders/getInfor/{year}")
+    @PreAuthorize("hasRole('ADMIN')")
+    ResponseEntity<DashboardInformationDTO> getDashboardInformation(@PathVariable int year){
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getDashboardInformation(year));
+    }
+
+    @GetMapping("/orders/getYears")
+    @PreAuthorize("hasRole('ADMIN')")
+    ResponseEntity<List<Integer>> getDistinctOrderYears(){
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getDistinctOrderYears());
     }
 
     // Lấy thông tin người dùng theo id

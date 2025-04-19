@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { toast } from 'react-toastify';
 import { 
   Box, 
   Typography, 
@@ -8,8 +9,11 @@ import {
   Card,
   CardContent,
   CardHeader,
-  Divider
+  Divider,
+  Select,
+  MenuItem
 } from "@mui/material";
+
 import { 
   TrendingUp, 
   People, 
@@ -17,14 +21,76 @@ import {
   AttachMoney,
   Dashboard as DashboardIcon
 } from "@mui/icons-material";
+import { getDashboardInformation, getYears } from "../../../services/api";
+import RevenueChart from "./RevenueChart";
 
 export default function AdminDashboard() {
+  const [dashboardData, setdashboardData] = useState();
+  const [year, setYear] = useState(2025);
+  const [years, setYears] = useState([]);
+
+  useEffect(()=>{
+    loadYears();
+    loadData();
+  },[])
+
+  const loadYears = async () => {
+    try {
+      const data = await getYears();
+      console.log('Years data:', data);
+      if (data) {
+        setYears(data);
+        setYear(data.at(0));
+      } else {
+        throw new Error('Không thể tải dữ liệu');
+      }
+    } catch (err) {
+        toast.error(err.message);
+    }
+  }
+
+  const loadData = async () => {
+    try {
+      const data = await getDashboardInformation(year);
+      console.log('Dashboard data:', data);
+      if (data) {
+        setdashboardData(data);
+      } else {
+        throw new Error('Không thể tải dữ liệu');
+      }
+    } catch (err) {
+        toast.error(err.message);
+    }
+  }
+
+  const recentOrders = dashboardData?.recentOrders.map((order) => (
+    <Box key={order.orderId} sx={{ mb: 2, pb: 2, borderBottom: '1px solid #eee' }}>
+      <Typography variant="body2" color="text.secondary">
+        {order.orderDate.split("T")[0]}
+      </Typography>
+      <Typography variant="body1">
+        <strong>ĐH-{order.orderId}</strong> -{" "}
+        {order.status === "CONFIRMING" ? "Đang chờ xác nhận" : 
+         order.status === "PREPARING" ? "Đang chuẩn bị hàng" :
+         order.status === "DELIVERING" ? "Đang vận chuyển" :
+         order.status === "COMPLETED" ? "Đã hoàn thành đơn" :
+         "Đã hủy"}
+      </Typography>
+    </Box>
+  ));
+  
+
+  const formatCurrency = (number) =>
+    new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+    }).format(number);
   // Số liệu mẫu để hiển thị
   const stats = [
-    { title: "Tổng doanh thu", value: "850,000,000 VND", icon: <AttachMoney color="primary" fontSize="large" />, color: "#e3f2fd" },
-    { title: "Đơn hàng mới", value: "24", icon: <TrendingUp color="success" fontSize="large" />, color: "#e8f5e9" },
-    { title: "Khách hàng", value: "1,458", icon: <People color="info" fontSize="large" />, color: "#e0f7fa" },
-    { title: "Sản phẩm", value: "68", icon: <Inventory color="warning" fontSize="large" />, color: "#fff8e1" },
+    { title: "Tổng doanh thu theo năm", value: formatCurrency(dashboardData?.totalRevenue), icon: <AttachMoney color="primary" fontSize="large" />, color: "#e3f2fd" },
+    { title: "Đơn hàng mới", value: dashboardData?.newOrders, icon: <TrendingUp color="success" fontSize="large" />, color: "#e8f5e9" },
+    { title: "Khách hàng", value: dashboardData?.customers, icon: <People color="info" fontSize="large" />, color: "#e0f7fa" },
+    { title: "Sản phẩm", value: dashboardData?.products, icon: <Inventory color="warning" fontSize="large" />, color: "#fff8e1" },
   ];
 
   return (
@@ -39,7 +105,7 @@ export default function AdminDashboard() {
         
         <Paper elevation={0} sx={{ p: 2, mb: 5, borderRadius: 2, bgcolor: 'rgba(0,0,0,0.03)' }}>
           <Typography variant="body1">
-            Chào mừng quay trở lại! Bạn có <strong>5</strong> thông báo mới và <strong>12</strong> đơn hàng cần xử lý.
+            Chào mừng quay trở lại!
           </Typography>
         </Paper>
         
@@ -72,12 +138,26 @@ export default function AdminDashboard() {
         <Grid container spacing={3}>
           <Grid item xs={12} md={8}>
             <Card elevation={2} sx={{ borderRadius: 2 }}>
-              <CardHeader title="Thống kê doanh thu" />
+            <CardHeader
+              title="Thống kê doanh thu theo năm "
+              action={
+                <Select
+                  sx={{ marginLeft: 36 }}
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  size="small"
+                >
+                  {years.map((y) => (
+                    <MenuItem key={y} value={y}>
+                      {y}
+                    </MenuItem>
+                  ))}
+                </Select>
+              }
+            />
               <Divider />
-              <CardContent sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <Typography color="text.secondary">
-                  Biểu đồ doanh thu sẽ được hiển thị tại đây
-                </Typography>
+              <CardContent sx={{ height: 300, display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                <RevenueChart data={dashboardData?.ordersCompletedByYear} />
               </CardContent>
             </Card>
           </Grid>
@@ -86,18 +166,7 @@ export default function AdminDashboard() {
               <CardHeader title="Đơn hàng gần đây" />
               <Divider />
               <CardContent>
-                <Box sx={{ mb: 2, pb: 2, borderBottom: '1px solid #eee' }}>
-                  <Typography variant="body2" color="text.secondary">12/04/2025</Typography>
-                  <Typography variant="body1"><strong>ĐH-12345</strong> - Đã giao hàng</Typography>
-                </Box>
-                <Box sx={{ mb: 2, pb: 2, borderBottom: '1px solid #eee' }}>
-                  <Typography variant="body2" color="text.secondary">11/04/2025</Typography>
-                  <Typography variant="body1"><strong>ĐH-12344</strong> - Đang giao hàng</Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2" color="text.secondary">10/04/2025</Typography>
-                  <Typography variant="body1"><strong>ĐH-12343</strong> - Chờ xác nhận</Typography>
-                </Box>
+                {recentOrders}
               </CardContent>
             </Card>
           </Grid>

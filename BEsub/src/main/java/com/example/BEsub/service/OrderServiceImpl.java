@@ -1,10 +1,9 @@
 package com.example.BEsub.service;
 
-import com.example.BEsub.dtos.OrderCreateDTO;
-import com.example.BEsub.dtos.OrderDTO;
-import com.example.BEsub.dtos.OrderItemDTO;
-import com.example.BEsub.dtos.OrderStatusChangeDTO;
+import ch.qos.logback.core.net.SyslogOutputStream;
+import com.example.BEsub.dtos.*;
 import com.example.BEsub.enums.OrderStatus;
+import com.example.BEsub.enums.Role;
 import com.example.BEsub.exception.AppException;
 import com.example.BEsub.models.*;
 import com.example.BEsub.repositories.*;
@@ -14,7 +13,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -90,6 +92,43 @@ public class OrderServiceImpl implements OrderService {
 
         // Trả về DTO của đơn hàng
         return mapToOrderDTO(order);
+    }
+
+    @Override
+    public List<Integer> getDistinctOrderYears() {
+        return orderRepository.findDistinctOrderYears();
+    }
+
+    @Override
+    public DashboardInformationDTO getDashboardInformation(int year) {
+        DashboardInformationDTO informationDTO = new DashboardInformationDTO();
+        try {
+            BigDecimal customers = userRepository.countByRole(Role.CUSTOMER);
+            informationDTO.setCustomers(customers);
+
+            BigDecimal newOrders = orderRepository.countByStatus(OrderStatus.CONFIRMING);
+            informationDTO.setNewOrders(newOrders);
+
+            informationDTO.setProducts(BigDecimal.valueOf(productVariantRepository.count()));
+
+            BigDecimal totalRevenue = orderRepository.getTotalRevenueByYear(year);
+            informationDTO.setTotalRevenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO);
+
+            List<Order> orders = orderRepository.findTop3LatestOrders();
+            informationDTO.setRecentOrders(orders != null ? orders.stream().map(this::mapToDashboardOrderDTO).toList() : new ArrayList<>());
+
+            List<Order> ordersByYear = orderRepository.findAllByYear(year);
+            List<ChartDataDTO> defaultChartData = new ArrayList<>();
+            List<BigDecimal> revenues = getRevenues(ordersByYear);
+            for (int i = 1; i <= 12; i++) {
+                defaultChartData.add(new ChartDataDTO("Tháng " + i, revenues.get(i-1)));
+            }
+            informationDTO.setOrdersCompletedByYear(ordersByYear != null ? defaultChartData : new ArrayList<>());
+        }catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        return informationDTO;
     }
 
     @Override
@@ -211,6 +250,31 @@ public class OrderServiceImpl implements OrderService {
         orderItem.setOrder(order);
         return orderItem;
     }
+
+    private DashboardOrderDTO mapToDashboardOrderDTO(Order order){
+        DashboardOrderDTO orderDTO = new DashboardOrderDTO();
+        orderDTO.setOrderDate(order.getOrderDate());
+        orderDTO.setOrderId(order.getId());
+        orderDTO.setStatus(order.getStatus());
+        orderDTO.setTotalAmount(order.getTotalAmount());
+        return orderDTO;
+    }
+
+    private List<BigDecimal> getRevenues(List<Order> orders) {
+        List<BigDecimal> monthlyRevenues = new ArrayList<>(Collections.nCopies(12, BigDecimal.ZERO));
+
+        for (Order order : orders) {
+            if (order.getOrderDate() != null && order.getTotalAmount() != null) {
+                int month = order.getOrderDate().getMonthValue();
+                BigDecimal currentRevenue = monthlyRevenues.get(month - 1);
+                monthlyRevenues.set(month - 1, currentRevenue.add(order.getTotalAmount()));
+            }
+        }
+
+        return monthlyRevenues;
+    }
+
+
 
     private OrderDTO mapToOrderDTO(Order order) {
         if (order == null) return null;
