@@ -221,18 +221,20 @@ export const sendOTP = async (email) => {
 }
 
 export const verifyOTP = async (enteredOtp, email) => {
-  const response = await fetch(`${API_BASE_URL}/otp?enteredOtp=${enteredOtp}&email=${email}`,{
+  const response = await fetch(`${API_BASE_URL}/otp?enteredOtp=${enteredOtp}&email=${email}`, {
     method: 'GET',
     headers: {
       "Content-Type": "application/json",
     },
   });
-  if(!response.ok){
+
+  if (!response.ok) {
     const errorData = await response.json();
     throw new Error(errorData.message || 'Không thể gửi xác thực otp');
   }
 
-  return response.json();
+  const data = await response.text();
+  return data === "Valid";
 };
 
 // Lấy thông tin profile
