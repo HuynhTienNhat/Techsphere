@@ -66,8 +66,6 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(orderChange);
     }
 
-
-
     @Override
     public OrderDTO getOrder(Long orderId) {
         User user = userRepository.findById(getCurrentUserId()).orElseThrow(() -> new AppException("User not found"));
@@ -88,8 +86,9 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderDate(LocalDateTime.now());
         order.setDiscountAmount(orderCreateDTO.getDiscountAmount());
         order.setDiscountCode(orderCreateDTO.getDiscountCode());
-        order.setStatus(OrderStatus.PROCESSING);
+        order.setStatus(OrderStatus.CONFIRMING);
         order.setSubtotal(orderCreateDTO.getSubtotal());
+        order.setPaymentMethod(orderCreateDTO.getPaymentMethod());
         order.setShippingFee(orderCreateDTO.getShippingFee());
         order.setTotalAmount(order.caculateTotalAmount());
 
@@ -136,18 +135,46 @@ public class OrderServiceImpl implements OrderService {
         return mapToOrderDTO(order);
     }
 
+    @Override
+    public List<OrderDTO> getOrdersByStatus(Long userId, OrderStatus status) {
+        List<Order> orders = orderRepository.findByUserIdAndStatus(userId, status);
+        return orders.stream().map(this::mapToOrderDTO).toList();
+    }
 
     @Override
-    public void deleteOrder(Long orderId) {
-        User user = userRepository.findById(getCurrentUserId())
-                .orElseThrow(() -> new AppException("User not found"));
-        Order order = user.getOrders()
-                .stream().filter((od) -> od.getId().equals(orderId))
-                .findFirst()
+    public List<OrderDTO> getOrdersByMonthAndYear(Long userId, int month, int year) {
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
+        List<Order> orders = orderRepository.findByUserIdAndOrderDateBetween(userId, startDate, endDate);
+        return orders.stream().map(this::mapToOrderDTO).toList();
+    }
+
+    @Override
+    public List<OrderDTO> getAllOrdersByStatus(OrderStatus status) {
+        List<Order> orders = orderRepository.findByStatus(status);
+        return orders.stream().map(this::mapToOrderDTO).toList();
+    }
+
+    @Override
+    public void cancelOrder(Long orderId) {
+        Long userId = getCurrentUserId();
+        Order order = orderRepository.findByIdAndUserId(orderId, userId)
                 .orElseThrow(() -> new AppException("Order not found"));
-        if (order.getStatus().equals(OrderStatus.DELIVERED)) throw new AppException("Order was delivered");
+
+        if (order.getStatus() != OrderStatus.CONFIRMING && order.getStatus() != OrderStatus.PREPARING) {
+            throw new AppException("Cannot cancel order. Only orders in CONFIRMING or PREPARING status can be cancelled.");
+        }
+
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
+    }
+
+    @Override
+    public List<OrderDTO> getAllOrdersByMonthAndYear(int month, int year) {
+        LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime endDate = startDate.plusMonths(1).minusSeconds(1);
+        List<Order> orders = orderRepository.findByOrderDateBetween(startDate, endDate);
+        return orders.stream().map(this::mapToOrderDTO).toList();
     }
 
     private OrderItem mapCartItemToOrderItem(CartItem cartItem, Order order) {

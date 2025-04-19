@@ -4,6 +4,7 @@ import com.example.BEsub.dtos.AdminProfileDTO;
 import com.example.BEsub.dtos.OrderDTO;
 import com.example.BEsub.dtos.OrderStatusChangeDTO;
 import com.example.BEsub.dtos.UserAddressDTO;
+import com.example.BEsub.enums.OrderStatus;
 import com.example.BEsub.exception.AppException;
 import com.example.BEsub.service.OrderService;
 import com.example.BEsub.service.UserService;
@@ -68,5 +69,18 @@ public class AdminController {
     public ResponseEntity<String> changeStatusOfOrder(@RequestBody OrderStatusChangeDTO orderStatusChangeDTO) {
         orderService.changeStatusOfOrder(orderStatusChangeDTO);
         return ResponseEntity.status(HttpStatus.OK).body("Change status of order successfully");
+    }
+
+    @GetMapping("/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderDTO>> getAllOrdersByStatus(@RequestParam String status) {
+        OrderStatus orderStatus = OrderStatus.fromString(status);
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrdersByStatus(orderStatus));
+    }
+
+    @GetMapping("/month-year")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<OrderDTO>> getAllOrdersByMonthAndYear(@RequestParam int month, @RequestParam int year) {
+        return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrdersByMonthAndYear(month, year));
     }
 }

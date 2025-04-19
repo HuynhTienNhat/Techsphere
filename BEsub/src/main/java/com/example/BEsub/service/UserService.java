@@ -10,6 +10,7 @@ public interface UserService {
     UserResponseDTO register(UserRegisterDTO registerDTO);
     CustomerProfileDTO getCustomerProfile(Long userId);
     UserAddressDTO addAddress(Long userId, UserAddressDTO addressDTO);
+    UserAddressDTO getAddressById(Long addressId);
     List<UserAddressDTO> getUserAddresses(Long userId);
     void setDefaultAddress(Long userId, Long addressId);
     CustomerProfileDTO updateProfile(Long userId, UserUpdateDTO updateDTO); // Customer
@@ -20,4 +21,5 @@ public interface UserService {
     List<AdminProfileDTO> getAllUsers(); // Admin
     void resetPassword(String email, String password);
     UserAddressDTO updateAddress(Long userId, Long addressId, UserAddressDTO addressDTO);
+    Long getCurrentUserId();
 }

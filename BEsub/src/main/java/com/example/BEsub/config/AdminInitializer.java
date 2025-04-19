@@ -39,5 +39,24 @@ public class AdminInitializer implements CommandLineRunner {
         } else {
             System.out.println("Admin account already exists.");
         }
+
+        if (userRepository.findByRole(Role.CUSTOMER).isEmpty()){
+            User sampleCustomer = new User();
+            sampleCustomer.setEmail("sampleCustomer@gmail.com");
+            sampleCustomer.setUsername("sampleCustomer");
+            sampleCustomer.setName("Sample Customer");
+            sampleCustomer.setPhone("0337939487");
+            sampleCustomer.setGender(Gender.MALE);
+            sampleCustomer.setPasswordHash(passwordEncoder.encode("123456"));
+            sampleCustomer.setDateOfBirth(LocalDate.of(2005, 3, 4));
+            sampleCustomer.setCreatedAt(LocalDateTime.now());
+            sampleCustomer.setRole(Role.CUSTOMER);
+
+            userRepository.save(sampleCustomer);
+
+            System.out.println("CUSTOMER account created with username: sampleCustomer, password: 123456");
+        } else  {
+            System.out.println("CUSTOMER account already exists.");
+        }
     }
 }

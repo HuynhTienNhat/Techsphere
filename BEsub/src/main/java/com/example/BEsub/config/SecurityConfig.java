@@ -39,7 +39,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/users/addresses").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.PUT, "/api/users/addresses/**").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.DELETE, "/api/users/addresses/**").hasRole("CUSTOMER")
-                        .requestMatchers(HttpMethod.GET, "/api/users/profile").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/users/addresses/{addressId}").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/users/profile").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/users/profile").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.GET, "/api/products/brand/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/sort").permitAll() // Add this line
@@ -50,6 +51,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/cart/items").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.PUT, "/api/cart/items/**").hasRole("CUSTOMER")
                         .requestMatchers(HttpMethod.DELETE, "/api/cart/items/**").hasRole("CUSTOMER")
+
+                        // Orders' endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/orders").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/{orderId}").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.POST, "/api/orders").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/status").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/orders/month-year").hasRole("CUSTOMER")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/orders/{userId}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/admin/orders").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/orders/status").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/admin/orders/month-year").hasRole("ADMIN")
+
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/otp").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/otp").permitAll()

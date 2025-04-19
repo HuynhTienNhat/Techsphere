@@ -1,8 +1,10 @@
 package com.example.BEsub.enums;
 
 public enum OrderStatus {
-    PROCESSING,
-    DELIVERED,
+    CONFIRMING,
+    PREPARING,
+    DELIVERING,
+    COMPLETED,
     CANCELLED;
 
     public static OrderStatus fromString(String status) {

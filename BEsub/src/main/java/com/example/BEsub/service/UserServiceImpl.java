@@ -8,6 +8,7 @@ import com.example.BEsub.repositories.*;
 import com.example.BEsub.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -194,6 +195,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserAddressDTO getAddressById(Long addressId) {
+        Long userId = getCurrentUserId();
+        UserAddress address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new AppException("Address not found"));
+        return mapToUserAddressDTO(address);
+    }
+
+    @Override
     @Transactional
     public void setDefaultAddress(Long userId, Long addressId) {
         User user = userRepository.findById(userId)
@@ -333,5 +342,13 @@ public class UserServiceImpl implements UserService {
         dto.setLastLogin(user.getLastLogin());
         dto.setAddresses(getUserAddresses(user.getId())); // Lấy danh sách địa chỉ
         return dto;
+    }
+
+    @Override
+    public Long getCurrentUserId() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException("User not found"))
+                .getId();
     }
 }
