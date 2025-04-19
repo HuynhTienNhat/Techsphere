@@ -59,8 +59,8 @@ export default function OrderConfirmationModal({ order, addresses, formatCurrenc
         </p>
         <p className="text-gray-700">
           Địa chỉ giao hàng:{' '}
-          {addresses.find((addr) => addr.id === order.userAddressId)?.houseNumber},{' '}
-          {addresses.find((addr) => addr.id === order.userAddressId)?.street},{' '}
+          {addresses.find((addr) => addr.id === order.userAddressId)?.streetAndHouseNumber},{' '}
+          {addresses.find((addr) => addr.id === order.userAddressId)?.district},{' '}
           {addresses.find((addr) => addr.id === order.userAddressId)?.city}
         </p>
       </DialogContent>
@@ -74,7 +74,7 @@ export default function OrderConfirmationModal({ order, addresses, formatCurrenc
         </Button>
         <Button
           component={Link}
-          to={`/orders/${order.orderId}`}
+          to="/profile/orders"
           sx={{
             textTransform: 'none',
             backgroundColor: '#8b5cf6',

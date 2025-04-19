@@ -260,3 +260,63 @@ export const updateProfile = async (profileData) => {
     throw new Error(error.response?.data?.message || 'Không thể cập nhật profile');
   }
 };
+
+// Lấy danh sách đơn hàng của khách hàng hiện tại
+export const getCustomerOrders = async () => {
+  try {
+    const response = await commonApi.get('/orders');
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải danh sách đơn hàng');
+  }
+};
+
+// Lấy danh sách đơn hàng theo trạng thái
+export const getOrdersByStatus = async (status) => {
+  try {
+    const response = await commonApi.get(`/orders/status?status=${status}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải đơn hàng theo trạng thái');
+  }
+};
+
+// Lọc đơn hàng theo tháng/năm
+export const getOrdersByMonthAndYear = async (month, year) => {
+  try {
+    const response = await commonApi.get(`/orders/month-year?month=${month}&year=${year}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải đơn hàng theo tháng/năm');
+  }
+};
+
+// Hủy đơn hàng
+export const cancelOrder = async (orderId) => {
+  try {
+    const response = await commonApi.put(`/orders/${orderId}/cancel`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể hủy đơn hàng');
+  }
+};
+
+// Lấy chi tiết đơn hàng
+export const getOrderDetails = async (orderId) => {
+  try {
+    const response = await commonApi.get(`/orders/${orderId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải chi tiết đơn hàng');
+  }
+};
+
+// Lấy chi tiết địa chỉ
+export const getAddressById = async (addressId) => {
+  try {
+    const response = await commonApi.get(`/users/addresses/${addressId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải chi tiết địa chỉ');
+  }
+};
