@@ -88,6 +88,8 @@ export default function Orders() {
         setSelectedOrder(order);
         if (order.userAddressId) {
           const address = await getAddressById(order.userAddressId);
+          console.log(address);
+          
           setSelectedAddress(address);
         } else {
           setSelectedAddress(null);
