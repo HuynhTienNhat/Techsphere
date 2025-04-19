@@ -36,8 +36,30 @@ commonApi.interceptors.request.use((config) => {
   return config;
 });
 
+// Lấy danh sách tất cả đơn hàng (cho admin)
+export const getAllOrders = () => api.get('/orders');
+
 // Lấy danh sách user
 export const getAllUsers = () => api.get('/users');
+
+// Lấy thông tin người dùng theo ID (cho admin)
+export const getUserById = async (userId) => {
+  try {
+    const response = await api.get(`/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải thông tin người dùng');
+  }
+};
+
+export const getAddressByIdAndUserId = async(userId, addressId) => {
+  try {
+    const res = await api.get(`/users/${userId}/addresses/${addressId}`)
+    return res.data
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải địa chỉ.');
+  }
+}
 
 // Lấy danh sách địa chỉ của user
 export const getUserAddresses = (userId) => api.get(`/users/${userId}/addresses`);
