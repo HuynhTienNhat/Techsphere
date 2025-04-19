@@ -27,6 +27,7 @@ pom.xml.next
 ### === Application Configs === ###
 # Ignore local properties (sensitive)
 src/main/resources/application.properties          # Blocks default properties file
+src/main/resources/application.yml
 
 ### === Logs/Temporary Files === ###
 logs/

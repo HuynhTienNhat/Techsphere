@@ -344,3 +344,21 @@ export const getAddressById = async (addressId) => {
     throw new Error(error.response?.data?.message || 'Không thể tải chi tiết địa chỉ');
   }
 };
+
+export const getDashboardInformation = async (year) => {
+  try{
+    const response = await commonApi.get(`/admin/orders/getInfor/${year}`);
+    return response.data;
+  }catch(error){
+    throw new Error(error.response?.data?.message || 'Không thể load thông tin thống kê');
+  }
+}
+
+export const getYears = async () => {
+  try{
+    const response = await commonApi.get(`/admin/orders/getYears`);
+    return response.data;
+  }catch(error){
+    throw new Error(error.response?.data?.message || 'Không thể load năm');
+  }
+}

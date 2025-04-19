@@ -1,5 +1,7 @@
 package com.example.BEsub.service;
 
+import com.example.BEsub.dtos.DashboardInformationDTO;
+import com.example.BEsub.dtos.DashboardInformationDTO;
 import com.example.BEsub.dtos.OrderCreateDTO;
 import com.example.BEsub.dtos.OrderDTO;
 import com.example.BEsub.dtos.OrderStatusChangeDTO;
@@ -22,4 +24,6 @@ public interface OrderService {
     void changeStatusOfOrder(OrderStatusChangeDTO orderStatusChangeDTO);
     List<OrderDTO> getAllOrdersByStatus(OrderStatus status); // Lọc toàn bộ đơn hàng theo trạng thái
     List<OrderDTO> getAllOrdersByMonthAndYear(int month, int year); // Lọc toàn bộ đơn hàng theo tháng/năm
+    DashboardInformationDTO getDashboardInformation(int year);
+    List<Integer> getDistinctOrderYears();
 }
