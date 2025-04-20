@@ -110,23 +110,6 @@ export default function Footer() {
           </div>
         </div>
       </div>
-
-      {/* Phần bản quyền */}
-      <div className="bg-gray-200">
-        <div className="container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row">
-          <p className="text-gray-500 text-sm text-center sm:text-left">
-            © {new Date().getFullYear()} YourBrand — All Rights Reserved
-          </p>
-          <span className="inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
-            <a className="text-gray-500" href="/privacy">
-              Privacy Policy
-            </a>
-            <a className="ml-3 text-gray-500" href="/terms">
-              Terms of Service
-            </a>
-          </span>
-        </div>
-      </div>
     </footer>
   );
 }
