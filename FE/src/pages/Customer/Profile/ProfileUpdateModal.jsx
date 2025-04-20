@@ -87,7 +87,6 @@ export default function ProfileUpdateModal({ initialData, onClose, onSave }) {
             error={!!errors.phone}
             helperText={errors.phone}
             margin="normal"
-            inputProps={{ pattern: "0[0-9]{9}" }}
           />
           <FormControl fullWidth margin="normal">
             <InputLabel>Giới tính</InputLabel>
@@ -113,8 +112,6 @@ export default function ProfileUpdateModal({ initialData, onClose, onSave }) {
             error={!!errors.dateOfBirth}
             helperText={errors.dateOfBirth}
             margin="normal"
-            InputLabelProps={{ shrink: true }}
-            inputProps={{ max: new Date().toISOString().split('T')[0] }}
           />
         </form>
       </DialogContent>

@@ -42,7 +42,7 @@ export default function ProfileInfo() {
       const updatedProfile = await updateProfile(formData);
       setProfile(updatedProfile);
     } catch (error) {
-      throw error; // Ném lỗi để ProfileUpdateModal xử lý
+      throw error; 
     }
   };
 

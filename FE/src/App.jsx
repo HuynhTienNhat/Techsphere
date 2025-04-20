@@ -20,6 +20,7 @@ import Cart from './pages/Customer/Cart/Cart.jsx';
 import Checkout from './pages/Customer/Checkout/Checkout.jsx';
 import Profile from './pages/Customer/Profile/Profile.jsx';
 import OrdersManagement from './pages/Admin/Orders/Orders.jsx';
+import GeneralInformation from './pages/Customer/About/GeneralInformation.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -131,6 +132,16 @@ function AppContent() {
             </CustomerLayout>
           }
         />
+
+        <Route
+          path="/links/*"
+          element={
+            <CustomerLayout>
+              <GeneralInformation />
+            </CustomerLayout>
+          }
+        />
+
         {/* Admin Routes */}
         <Route
           path="/admin/*"
@@ -150,7 +161,7 @@ function AppContent() {
       </Routes>
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

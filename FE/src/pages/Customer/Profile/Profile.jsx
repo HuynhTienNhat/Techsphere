@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import ProfileInfo from "./ProfileInfo";
 import Orders from "./Order";
