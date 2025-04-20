@@ -362,3 +362,48 @@ export const getYears = async () => {
     throw new Error(error.response?.data?.message || 'Không thể load năm');
   }
 }
+
+export const changePassword = async (oldPassword, newPassword, showToast = true) => {
+  try {
+    console.log('Sending password change request...');
+    const response = await commonApi.put('/users/password', {
+      oldPassword,
+      newPassword
+    });
+    
+    console.log('Password change response:', response);
+    
+    if (showToast) {
+      toast.success('Đổi mật khẩu thành công!');
+    }
+    
+    return {
+      success: true,
+      message: response.data
+    };
+  } catch (error) {
+    console.error('Password change error:', error);
+    
+    let errorMessage = 'Có lỗi xảy ra khi thay đổi mật khẩu';
+    
+    if (error.response) {
+      console.log('Error response status:', error.response.status);
+      console.log('Error response data:', error.response.data);
+      
+      if (error.response.status === 400) {
+        errorMessage = 'Mật khẩu hiện tại không chính xác';
+      } else if (error.response.data) {
+        errorMessage = error.response.data;
+      }
+    }
+    
+    if (showToast) {
+      toast.error(errorMessage);
+    }
+    
+    return {
+      success: false,
+      message: errorMessage
+    };
+  }
+};
