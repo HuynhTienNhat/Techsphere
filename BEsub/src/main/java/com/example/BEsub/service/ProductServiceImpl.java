@@ -488,7 +488,7 @@ public class ProductServiceImpl implements ProductService {
         // Ánh xạ Reviews
         List<ReviewDTO> reviews = reviewRepository.findByProductId(product.getId()).stream()
                 .map(r -> new ReviewDTO(r.getId(), r.getRating(), r.getComment(),
-                        r.getUser().getId(), r.getUser().getName(), r.getCreatedAt()))
+                        r.getUser().getId(), r.getUser().getName(), r.getCreatedAt(),r.getVariantName()))
                 .collect(Collectors.toList());
         dto.setReviews(reviews);
 

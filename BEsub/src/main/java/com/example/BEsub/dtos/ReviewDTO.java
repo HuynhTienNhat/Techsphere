@@ -16,4 +16,5 @@ public class ReviewDTO {
     private Long userId;
     private String username;
     private LocalDateTime createdAt;
+    private String variantName;
 }

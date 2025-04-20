@@ -316,6 +316,7 @@ public class OrderServiceImpl implements OrderService {
         orderItemDTO.setProductName(orderItem.getVariant().getProduct().getName());
         orderItemDTO.setVariantId(orderItem.getVariant().getId());
         orderItemDTO.setUnitPrice(orderItem.getUnitPrice());
+        orderItemDTO.setProductId(orderItem.getVariant().getProduct().getId());
 
         return orderItemDTO;
     }

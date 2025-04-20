@@ -73,9 +73,10 @@ public class ReviewServiceImpl implements ReviewService{
         reviewDTO.setCreatedAt(LocalDateTime.now());
         reviewDTO.setComment(review.getComment());
         reviewDTO.setUserId(getCurrentUserId());
-        reviewDTO.setUsername(review.getUser().getUsername());
+        reviewDTO.setUsername(review.getUser().getName());
         reviewDTO.setId(review.getId());
         reviewDTO.setRating(review.getRating());
+        reviewDTO.setVariantName(review.getVariantName());
         return reviewDTO;
     }
 
@@ -90,6 +91,7 @@ public class ReviewServiceImpl implements ReviewService{
                 .orElseThrow(()->new AppException("Order not found")));
         review.setProduct(productRepository.findById(reviewCreateDTO.getProductId())
                 .orElseThrow(()->new AppException("Product not found")));
+        review.setVariantName(reviewCreateDTO.getVariantName());
         return review;
     }
 

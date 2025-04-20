@@ -13,4 +13,5 @@ public class ReviewCreateDTO {
     private String comment;
     private Long productId;
     private Long orderId;
+    private String variantName;
 }

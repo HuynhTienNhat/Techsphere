@@ -452,3 +452,21 @@ export const changePassword = async (oldPassword, newPassword, showToast = true)
     };
   }
 };
+
+export const createReview = async (rating, comment, orderId, productId, variantName) => {
+  try {
+    const reviewData = {
+      rating,
+      comment,
+      productId,
+      orderId,
+      variantName
+    };
+    console.log(reviewData);
+    const response = await commonApi.post("/reviews", reviewData);
+    return response.data;
+  } catch (error) {
+    console.error("Lỗi khi tạo đánh giá:", error);
+    throw new Error(error.response?.data?.message || "Không thể tạo đánh giá!");
+  }
+};
