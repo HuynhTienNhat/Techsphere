@@ -111,9 +111,6 @@ public class OrderServiceImpl implements OrderService {
 
             informationDTO.setProducts(BigDecimal.valueOf(productVariantRepository.count()));
 
-            BigDecimal totalRevenue = orderRepository.getTotalRevenueByYear(year);
-            informationDTO.setTotalRevenue(totalRevenue != null ? totalRevenue : BigDecimal.ZERO);
-
             List<Order> orders = orderRepository.findTop3LatestOrders();
             informationDTO.setRecentOrders(orders != null ? orders.stream().map(this::mapToDashboardOrderDTO).toList() : new ArrayList<>());
 
@@ -124,6 +121,11 @@ public class OrderServiceImpl implements OrderService {
                 defaultChartData.add(new ChartDataDTO("Tháng " + i, revenues.get(i-1)));
             }
             informationDTO.setOrdersCompletedByYear(ordersByYear != null ? defaultChartData : new ArrayList<>());
+
+            BigDecimal totalRevenue = revenues.stream()
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            informationDTO.setTotalRevenue(totalRevenue);
         }catch (Exception e) {
             System.out.println(e.getMessage());
         }
@@ -264,7 +266,7 @@ public class OrderServiceImpl implements OrderService {
         List<BigDecimal> monthlyRevenues = new ArrayList<>(Collections.nCopies(12, BigDecimal.ZERO));
 
         for (Order order : orders) {
-            if (order.getOrderDate() != null && order.getTotalAmount() != null) {
+            if (order.getOrderDate() != null && order.getTotalAmount() != null && order.getStatus().equals(OrderStatus.COMPLETED)) {
                 int month = order.getOrderDate().getMonthValue();
                 BigDecimal currentRevenue = monthlyRevenues.get(month - 1);
                 monthlyRevenues.set(month - 1, currentRevenue.add(order.getTotalAmount()));
