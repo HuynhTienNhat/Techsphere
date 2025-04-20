@@ -1,11 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import UserDetailModal from './UserDetailModal';
 import { getAllUsers, deleteUser } from '../../../services/api';
+// Import necessary MUI components
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [userToDelete, setUserToDelete] = useState(null);
   const [openModal, setOpenModal] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -24,14 +33,25 @@ export default function Users() {
     }
   };
 
-  const handleDelete = async (userId) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      try {
-        await deleteUser(userId);
-        setUsers(users.filter((user) => user.id !== userId));
-      } catch (error) {
-        console.error('Error deleting user:', error);
-      }
+  const handleOpenDeleteDialog = (user) => {
+    setUserToDelete(user);
+    setOpenDeleteDialog(true);
+  };
+
+  const handleCloseDeleteDialog = () => {
+    setOpenDeleteDialog(false);
+    setUserToDelete(null);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+    
+    try {
+      await deleteUser(userToDelete.id);
+      setUsers(users.filter((user) => user.id !== userToDelete.id));
+      handleCloseDeleteDialog();
+    } catch (error) {
+      console.error('Error deleting user:', error);
     }
   };
 
@@ -78,7 +98,7 @@ export default function Users() {
               View Details
             </button>
             <button
-              onClick={() => handleDelete(user.id)}
+              onClick={() => handleOpenDeleteDialog(user)}
               className="bg-red-500 cursor-pointer text-white px-4 py-2 rounded-md hover:bg-red-600 transition-colors"
             >
               Delete
@@ -86,6 +106,8 @@ export default function Users() {
           </div>
         ))}
       </div>
+
+      {/* User Details Modal */}
       {selectedUser && (
         <UserDetailModal
           open={openModal}
@@ -93,6 +115,31 @@ export default function Users() {
           user={selectedUser}
         />
       )}
+
+      {/* MUI Delete Confirmation Dialog */}
+      <Dialog
+        open={openDeleteDialog}
+        onClose={handleCloseDeleteDialog}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">
+          {"Confirm User Deletion"}
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete {userToDelete?.name}? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDeleteDialog} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} color="error" autoFocus>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 }

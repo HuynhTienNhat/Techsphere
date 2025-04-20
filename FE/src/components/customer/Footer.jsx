@@ -1,4 +1,5 @@
 import { FaFacebook, FaInstagram, FaComment } from "react-icons/fa";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -54,24 +55,19 @@ export default function Footer() {
             </h2>
             <nav className="list-none">
               <li>
-                <a className="text-gray-600 hover:text-gray-800" href="/policy">
+                <Link to={"/links/privacy-policy"}  className="text-gray-600 hover:text-gray-800">
                   Chính sách bảo mật
-                </a>
+                </Link>
               </li>
               <li>
-                <a className="text-gray-600 hover:text-gray-800" href="/terms">
+                <Link to={"/links/term-of-use"}  className="text-gray-600 hover:text-gray-800">
                   Điều khoản sử dụng
-                </a>
+                </Link>
               </li>
               <li>
-                <a className="text-gray-600 hover:text-gray-800" href="/support">
-                  Hỗ trợ khách hàng
-                </a>
-              </li>
-              <li>
-                <a className="text-gray-600 hover:text-gray-800" href="/about">
+                <Link to={"/links/about-us"}  className="text-gray-600 hover:text-gray-800">
                   Về chúng tôi
-                </a>
+                </Link>
               </li>
             </nav>
           </div>
