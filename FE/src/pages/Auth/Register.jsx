@@ -31,6 +31,7 @@ export default function Register() {
   };
 
   useEffect(() => {
+    console.log("isVerify: " + location.state?.isVerify);
     if (location.state?.isVerify === "yes") {
       const savedData = JSON.parse(localStorage.getItem("registerData"));
       if (savedData) {
@@ -131,6 +132,7 @@ export default function Register() {
       return;
     }
     localStorage.setItem("registerEmail", registerData.email);
+    localStorage.setItem("registerData", JSON.stringify(registerData));
     navigate("/email-verify", { state:"register"});
     await sendOTP(registerData.email);
     

@@ -69,6 +69,7 @@ function ResetPassword() {
       
         if (response.status === 200) {
           toast.success("Đặt lại mật khẩu thành công!");
+          localStorage.removeItem("resetEmail");
           window.location.href = "../login";
         } else {
           toast.error(text || "Đặt lại mật khẩu thất bại.");
