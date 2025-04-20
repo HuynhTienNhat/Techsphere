@@ -1,62 +1,76 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Tabs, Tab, TextField, Button, Box, Alert } from '@mui/material';
+import {
+  Container, Typography, Tabs, Tab, TextField,
+  Button, Box
+} from '@mui/material';
 import OrderList from './OrderList';
 import OrderDetailModal from './OrderDetailModal';
-import { getAllOrders } from './../../../services/api';
+import {
+  getAllOrders,
+  getOrdersByMonthAndYear_Admin,
+  getOrdersByStatus_Admin
+} from './../../../services/api';
 import { toast } from 'react-toastify';
 
 const Orders = () => {
   const [activeTab, setActiveTab] = useState('ALL');
   const [orders, setOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [month, setMonth] = useState('');
-  const [year, setYear] = useState('');
+  const [month, setMonth] = useState(null);
+  const [year, setYear] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [error, setError] = useState(null);
 
   const tabs = [
     { name: 'Tất cả', value: 'ALL' },
     { name: 'Chờ xác nhận', value: 'CONFIRMING' },
-    { name: 'Đã xác nhận', value: 'CONFIRMED' },
+    { name: 'Đang chuẩn bị', value: 'PREPARING' },
     { name: 'Đang giao', value: 'DELIVERING' },
     { name: 'Hoàn thành', value: 'COMPLETED' },
     { name: 'Đã hủy', value: 'CANCELLED' },
   ];
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      setIsLoading(true);
-      try {
-        const data = await getAllOrders();
-        setOrders(data.data);
-      } catch (err) {
-        setError(err.message);
-        toast.error(err.message);
-      } finally {
-        setIsLoading(false);
+  const fetchOrders = async () => {
+    setIsLoading(true);
+    try {
+      let data;
+      if (month && year) {
+        data = await getOrdersByMonthAndYear_Admin(month, year);
+      } else if (activeTab !== 'ALL') {
+        data = await getOrdersByStatus_Admin(activeTab);
+      } else {
+        data = await getAllOrders();
       }
-    };
-    fetchOrders();
-  }, []);
-
-  const handleTabChange = (event, newValue) => {
-    setActiveTab(newValue);
+      setOrders(data);
+    } catch (error) {
+      toast.error(error.message || 'Đã có lỗi xảy ra');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleFilterByDate = (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    fetchOrders();
+  }, [activeTab]);
+
+  const handleTabChange = (_, newValue) => {
+    setActiveTab(newValue);
+    setMonth(null);
+    setYear(null);
+  };
+
+  const handleFilterByDate = () => {
     if (month && year) {
-      fetchOrders(newValue, month, year);
+      fetchOrders();
     } else {
       toast.error("Vui lòng nhập cả tháng và năm!");
     }
   };
 
   const handleClearFilter = () => {
-    setMonth('');
-    setYear('');
-    fetchOrders(activeTab);
+    setMonth(null);
+    setYear(null);
+    fetchOrders();
   };
 
   const handleOpenModal = (order) => {
@@ -70,7 +84,11 @@ const Orders = () => {
   };
 
   const handleUpdateOrder = (updatedOrder) => {
-    setOrders(orders.map((order) => (order.orderId === updatedOrder.orderId ? updatedOrder : order)));
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.orderId === updatedOrder.orderId ? updatedOrder : order
+      )
+    );
     handleCloseModal();
   };
 
@@ -79,7 +97,6 @@ const Orders = () => {
       <Typography variant="h4" gutterBottom>
         Quản lý đơn hàng
       </Typography>
-      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
       {/* Tabs trạng thái */}
       <Tabs
@@ -95,26 +112,25 @@ const Orders = () => {
       </Tabs>
 
       {/* Bộ lọc tháng/năm */}
-      <Box component="form" onSubmit={handleFilterByDate} sx={{ display: 'flex', gap: 2, mb: 3 }}>
+      <Box sx={{ display: 'flex', gap: 2, mb: 3 }}>
         <TextField
           type="number"
           label="Tháng (1-12)"
-          value={month}
-          onChange={(e) => setMonth(e.target.value)}
+          value={month ?? ''}
+          onChange={(e) => setMonth(Number(e.target.value))}
           size="small"
-          inputProps={{ min: 1, max: 12 }}
           sx={{ width: 120 }}
         />
         <TextField
           type="number"
           label="Năm (e.g., 2025)"
-          value={year}
-          onChange={(e) => setYear(e.target.value)}
+          value={year ?? ''}
+          onChange={(e) => setYear(Number(e.target.value))}
           size="small"
           inputProps={{ min: 2000, max: 2099 }}
           sx={{ width: 120 }}
         />
-        <Button type="submit" variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={handleFilterByDate}>
           Lọc
         </Button>
         <Button variant="outlined" onClick={handleClearFilter}>

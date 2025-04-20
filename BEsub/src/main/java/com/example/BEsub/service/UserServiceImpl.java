@@ -24,6 +24,9 @@ public class UserServiceImpl implements UserService {
     private UserAddressRepository addressRepository;
 
     @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
@@ -182,9 +185,31 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found"));
+
         if (user.getRole() == Role.ADMIN) {
             throw new AppException("Cannot delete another Admin");
         }
+
+        List<OrderStatus> incompleteOrders = List.of(OrderStatus.CONFIRMING, OrderStatus.PREPARING, OrderStatus.DELIVERING);
+
+        // Kiểm tra các đơn hàng chưa hoàn thành liên quan đến User
+        boolean hasIncompleteOrdersByUser = orderRepository
+                .findByUserAndStatusIn(user, incompleteOrders)
+                .stream()
+                .anyMatch(order -> incompleteOrders.contains(order.getStatus()));
+
+        // Kiểm tra các đơn hàng chưa hoàn thành liên quan đến UserAddress
+        boolean hasIncompleteOrdersByAddress = user.getAddresses().stream()
+                .anyMatch(address -> orderRepository
+                        .findByAddressAndStatusIn(address, incompleteOrders)
+                        .stream()
+                        .anyMatch(order -> incompleteOrders.contains(order.getStatus())));
+
+        // Nếu có đơn hàng chưa hoàn thành, từ chối xóa
+        if (hasIncompleteOrdersByUser || hasIncompleteOrdersByAddress) {
+            throw new AppException("Cannot delete user because they have incomplete orders");
+        }
+
         userRepository.delete(user);
     }
 

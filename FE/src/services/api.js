@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
 
 const ADMIN_USER_MANAGEMENT_URL = 'http://localhost:8080/api/admin';
 const API_BASE_URL = 'http://localhost:8080/api';
@@ -37,7 +38,34 @@ commonApi.interceptors.request.use((config) => {
 });
 
 // Lấy danh sách tất cả đơn hàng (cho admin)
-export const getAllOrders = () => api.get('/orders');
+export const getAllOrders = async () => {
+  try {
+    const response = await api.get('/orders')
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải danh sách đơn hàng');
+  }
+};
+
+// Lọc đơn hàng theo trạng thái
+export const getOrdersByStatus_Admin = async (status) => {
+  try {
+    const response = await api.get(`/orders/status?status=${status}`)
+    return response.data
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải danh sách đơn hàng theo trạng thái.');
+  }
+}
+
+// Lọc đơn hàng theo tháng và năm
+export const getOrdersByMonthAndYear_Admin = async (month, year) => {
+  try {
+    const response = await api.get(`/orders/month-year?month=${month}&year=${year}`);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Không thể tải đơn hàng theo tháng/năm');
+  }
+};
 
 // Lấy danh sách user
 export const getAllUsers = () => api.get('/users');
@@ -67,8 +95,25 @@ export const getUserAddresses = (userId) => api.get(`/users/${userId}/addresses`
 // Lấy danh sách đơn hàng của user
 export const getUserOrders = (userId) => api.get(`/orders/${userId}`);
 
-// Xóa user
-export const deleteUser = (userId) => api.delete(`/users/${userId}`);
+// Xóa User
+export const deleteUser = async (userId) => {
+  try {
+    await api.delete(`/users/${userId}`);
+    toast.success("Xóa người dùng thành công");
+  } catch (error) {
+    let errMsg = "Xóa người dùng thất bại";
+    if (error.response && error.response.data) {
+      errMsg = error.response.data.message || 
+               error.response.data.error || 
+               error.response.data || 
+               "Xóa người dùng thất bại";
+    }
+
+    toast.error(errMsg);
+    throw error;
+  }
+};
+
 
 // Thay đổi trạng thái đơn hàng
 export const changeOrderStatus = (userId, orderId, status) => api.put('/orders', { userId, orderId, status });

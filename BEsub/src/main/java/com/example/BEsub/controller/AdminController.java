@@ -101,14 +101,14 @@ public class AdminController {
         return ResponseEntity.status(HttpStatus.OK).body("Change status of order successfully");
     }
 
-    @GetMapping("/status")
+    @GetMapping("/orders/status")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDTO>> getAllOrdersByStatus(@RequestParam String status) {
         OrderStatus orderStatus = OrderStatus.fromString(status);
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrdersByStatus(orderStatus));
     }
 
-    @GetMapping("/month-year")
+    @GetMapping("/orders/month-year")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderDTO>> getAllOrdersByMonthAndYear(@RequestParam int month, @RequestParam int year) {
         return ResponseEntity.status(HttpStatus.OK).body(orderService.getAllOrdersByMonthAndYear(month, year));

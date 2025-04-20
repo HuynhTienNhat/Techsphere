@@ -1,73 +1,132 @@
-import { FaFacebook, FaInstagram, FaTiktok } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaComment } from "react-icons/fa";
 
 export default function Footer() {
-    return (
-        <footer className="px-4 divide-y dark:bg-gray-100 dark:text-gray-800 px-30 mt-16">
-            <div className="container flex flex-col justify-between py-10 mx-auto space-y-8 lg:flex-row lg:space-y-0">
-                <div className="lg:w-[200px]">
-                    <a rel="noopener noreferrer" href="#" className="flex justify-center space-x-3 lg:justify-start">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-full dark:bg-violet-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="currentColor" className="flex-shrink-0 w-5 h-5 rounded-full dark:text-gray-50">
-                                <path d="M18.266 26.068l7.839-7.854 4.469 4.479c1.859 1.859 1.859 4.875 0 6.734l-1.104 1.104c-1.859 1.865-4.875 1.865-6.734 0zM30.563 2.531l-1.109-1.104c-1.859-1.859-4.875-1.859-6.734 0l-6.719 6.734-6.734-6.734c-1.859-1.859-4.875-1.859-6.734 0l-1.104 1.104c-1.859 1.859-1.859 4.875 0 6.734l6.734 6.734-6.734 6.734c-1.859 1.859-1.859 4.875 0 6.734l1.104 1.104c1.859 1.859 4.875 1.859 6.734 0l21.307-21.307c1.859-1.859 1.859-4.875 0-6.734z"></path>
-                            </svg>
-                        </div>
-                        <span className="self-center text-2xl font-semibold">TechSphere</span>
-                    </a>
-                </div>
-                <div className="grid grid-cols-2 text-sm gap-x-3 gap-y-8 lg:w-2/3 sm:grid-cols-4">
-                    <div className="space-y-3">
-                        <h3 className="tracking-wide uppercase dark:text-gray-900">Tổng đài hỗ trợ</h3>
-                        <ul className="space-y-1">
-                            <li>
-                                <span>Mua hàng - bảo hành <strong>0337939487</strong></span>
-                            </li>
-                            <li>
-                            <span>Khiếu nại <br /> <strong>0337939487</strong></span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="space-y-3">
-                        <h3 className="tracking-wide uppercase dark:text-gray-900">Company</h3>
-                        <ul className="space-y-1">
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Privacy</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Terms of Service</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="space-y-3">
-                        <h3 className="uppercase dark:text-gray-900">Developers</h3>
-                        <ul className="space-y-1">
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Public API</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Documentation</a>
-                            </li>
-                            <li>
-                                <a rel="noopener noreferrer" href="#">Guides</a>
-                            </li>
-                        </ul>
-                    </div>
-                    <div className="space-y-3">
-                        <div className="uppercase dark:text-gray-900">Social media</div>
-                        <div className="flex justify-start space-x-3">
-                            <a rel="noopener noreferrer" href="#" title="Facebook" className="flex items-center p-1">
-                                <FaFacebook size={28} className="text-blue-600 hover:text-blue-500 transition duration-200" />
-                            </a>
-                            <a rel="noopener noreferrer" href="#" title="Twitter" className="flex items-center p-1">
-                                <FaInstagram size={28} className="text-pink-500 hover:text-pink-400 transition duration-200" />
-                            </a>
-                            <a rel="noopener noreferrer" href="#" title="Instagram" className="flex items-center p-1">
-                                <FaTiktok size={28} className="text-black hover:opacity-70 transition duration-200" />   
-                            </a>
-                        </div>
-                    </div>
-                </div>
+  return (
+    <footer className="bg-gray-100 text-gray-600 body-font mt-12">
+      <div className="container px-5 py-12 mx-auto flex flex-wrap flex-col md:flex-row pl-30">
+        {/* Cột 1: Logo và tên công ty */}
+        <div className="w-full md:w-1/4 flex-shrink-0 mb-10 md:mb-0 text-center md:text-left ">
+          <a className="flex items-center justify-center md:justify-start text-gray-900">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              stroke="currentColor"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              className="w-10 h-10 text-white p-2 bg-purple-500 rounded-full"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path>
+            </svg>
+            <span className="ml-3 text-xl font-semibold">TechSphere</span>
+          </a>
+          <p className="mt-2 text-sm text-gray-500">
+            Giải pháp mua sắm trực tuyến hàng đầu
+          </p>
+        </div>
+
+        {/* Các cột khác */}
+        <div className="flex-grow flex flex-wrap md:pl-10 justify-between -mb-10 md:mt-0 mt-10 md:text-left text-center pr-20">
+          {/* Cột 2: Tổng đài hỗ trợ */}
+          <div className="lg:w-1/4 md:w-1/2 w-full px-4 mb-10 whitespace-nowrap mr-10">
+            <h2 className="title-font font-medium text-gray-900 tracking-widest text-sm mb-3">
+              TỔNG ĐÀI HỖ TRỢ MIỄN PHÍ
+            </h2>
+            <div className="list-none">
+              <p className="text-gray-600 mb-2">
+                <strong>Mua hàng - Bảo hành:</strong>
+                <br />
+                1800.2097 (7h30 - 22h00)
+              </p>
+              <p className="text-gray-600">
+                <strong>Khiếu nại:</strong>
+                <br />
+                1800.2063 (8h00 - 21h30)
+              </p>
             </div>
-            <div className="py-6 text-sm text-center dark:text-gray-600">© 1968 Company Co. All rights reserved.</div>
-        </footer>
-    )
+          </div>
+
+          {/* Cột 3: Liên kết hữu ích */}
+          <div className="lg:w-1/4 md:w-1/2 w-full px-4 mb-10">
+            <h2 className="title-font font-medium text-gray-900 tracking-widest text-sm mb-3">
+              LIÊN KẾT HỮU ÍCH
+            </h2>
+            <nav className="list-none">
+              <li>
+                <a className="text-gray-600 hover:text-gray-800" href="/policy">
+                  Chính sách bảo mật
+                </a>
+              </li>
+              <li>
+                <a className="text-gray-600 hover:text-gray-800" href="/terms">
+                  Điều khoản sử dụng
+                </a>
+              </li>
+              <li>
+                <a className="text-gray-600 hover:text-gray-800" href="/support">
+                  Hỗ trợ khách hàng
+                </a>
+              </li>
+              <li>
+                <a className="text-gray-600 hover:text-gray-800" href="/about">
+                  Về chúng tôi
+                </a>
+              </li>
+            </nav>
+          </div>
+
+          {/* Cột 4: Social Media */}
+          <div className="lg:w-1/4 md:w-1/2 w-full px-4 mb-10">
+            <h2 className="title-font font-medium text-gray-900 tracking-widest text-sm mb-3">
+              KẾT NỐI VỚI CHÚNG TÔI
+            </h2>
+            <div className="flex justify-center md:justify-start space-x-4">
+              <a
+                href="https://facebook.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-blue-600"
+              >
+                <FaFacebook size={24} />
+              </a>
+              <a
+                href="https://instagram.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-pink-600"
+              >
+                <FaInstagram size={24} />
+              </a>
+              <a
+                href="https://zalo.me"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-600 hover:text-green-600"
+              >
+                <FaComment size={24} />
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Phần bản quyền */}
+      <div className="bg-gray-200">
+        <div className="container mx-auto py-4 px-5 flex flex-wrap flex-col sm:flex-row">
+          <p className="text-gray-500 text-sm text-center sm:text-left">
+            © {new Date().getFullYear()} YourBrand — All Rights Reserved
+          </p>
+          <span className="inline-flex sm:ml-auto sm:mt-0 mt-2 justify-center sm:justify-start">
+            <a className="text-gray-500" href="/privacy">
+              Privacy Policy
+            </a>
+            <a className="ml-3 text-gray-500" href="/terms">
+              Terms of Service
+            </a>
+          </span>
+        </div>
+      </div>
+    </footer>
+  );
 }

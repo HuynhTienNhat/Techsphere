@@ -26,8 +26,8 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const allowedStatuses = ['CONFIRMING', 'CONFIRMED', 'DELIVERING'];
-  const orderStatuses = ['CONFIRMING', 'CONFIRMED', 'DELIVERING', 'COMPLETED', 'CANCELLED'];
+  const allowedStatuses = ['CONFIRMING', 'PREPARING', 'DELIVERING'];
+  const orderStatuses = ['CONFIRMING', 'PREPARING', 'DELIVERING', 'COMPLETED', 'CANCELLED'];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -92,7 +92,7 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
   const getStatusLabel = (status) => {
     const statusMap = {
       CONFIRMING: 'Chờ xác nhận',
-      CONFIRMED: 'Đã xác nhận',
+      PREPARING: 'Đang chuẩn bị',
       DELIVERING: 'Đang giao',
       COMPLETED: 'Hoàn thành',
       CANCELLED: 'Đã hủy',

@@ -1,6 +1,7 @@
 package com.example.BEsub.repositories;
 
 import com.example.BEsub.enums.OrderStatus;
+import com.example.BEsub.models.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -35,4 +36,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "SELECT SUM(total_amount) FROM orders WHERE YEAR(order_date) = :year", nativeQuery = true)
     BigDecimal getTotalRevenueByYear(@Param("year") int year);
 
+    List<Order> findByUserAndStatusIn(User user, List<OrderStatus> statuses);
+    List<Order> findByAddressAndStatusIn(UserAddress address, List<OrderStatus> statuses);
 }
