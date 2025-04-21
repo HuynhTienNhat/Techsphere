@@ -38,6 +38,9 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     UserAddressRepository addressRepository;
 
+    @Autowired
+    ProductRepository productRepository;
+
     @Override
     @Transactional
     public OrderDTO createOrder(OrderCreateDTO orderCreateDTO) {
@@ -173,6 +176,15 @@ public class OrderServiceImpl implements OrderService {
                 .filter(o -> o.getId().equals(orderStatusChangeDTO.getOrderId()))
                 .findFirst()
                 .orElseThrow(() -> new AppException("Order not found"));
+
+        OrderStatus newStatus = OrderStatus.fromString(orderStatusChangeDTO.getStatus());
+        if (newStatus == OrderStatus.COMPLETED && orderChange.getStatus() != OrderStatus.COMPLETED) {
+            for (OrderItem item : orderChange.getOrderItems()) {
+                Product product = item.getVariant().getProduct();
+                product.setSales(product.getSales() + item.getQuantity());
+                productRepository.save(product);
+            }
+        }
 
         orderChange.setStatus(OrderStatus.fromString(orderStatusChangeDTO.getStatus()));
         orderRepository.save(orderChange);

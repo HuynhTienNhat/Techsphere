@@ -43,4 +43,7 @@ public class Product extends BaseEntity {
     // Quan hệ One-to-Many với PRODUCT_SPECS
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
     private List<ProductSpec> specs;
+
+    @Column(name = "sales", nullable = false)
+    private Integer sales = 0;
 }

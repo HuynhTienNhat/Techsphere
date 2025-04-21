@@ -6,6 +6,8 @@ import com.example.BEsub.models.*;
 import com.example.BEsub.repositories.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -333,6 +335,29 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ProductDTO> getProductsSortedBySales(String sortOrder) {
+        if ("desc".equalsIgnoreCase(sortOrder)) {
+            return productRepository.findAllByOrderBySalesDesc().stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
+        } else if ("asc".equalsIgnoreCase(sortOrder)) {
+            return productRepository.findAllByOrderBySalesAsc().stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
+        } else {
+            throw new AppException("Invalid sort order. Use 'asc' or 'desc'");
+        }
+    }
+
+    @Override
+    public List<ProductDTO> getTop6BestSellingProducts() {
+        Pageable pageable = PageRequest.of(0, 6);
+        return productRepository.findTop6ByOrderBySalesDesc(pageable).stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     private void mapToEntity(ProductDTO dto, Product product) {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new AppException("Product name cannot be null or blank");
@@ -343,6 +368,7 @@ public class ProductServiceImpl implements ProductService {
         product.setSlug(dto.getSlug());
         product.setBasePrice(dto.getBasePrice());
         product.setOldPrice(dto.getOldPrice());
+        product.setSales(dto.getSales());
 
         // Ánh xạ Brand
         String brandName = dto.getBrandName();
@@ -397,6 +423,7 @@ public class ProductServiceImpl implements ProductService {
         product.setSlug(request.getSlug());
         product.setBasePrice(request.getBasePrice());
         product.setOldPrice(request.getOldPrice());
+        product.setSales(0);
 
         // Ánh xạ Brand
         String brandName = request.getBrandName();
@@ -465,6 +492,7 @@ public class ProductServiceImpl implements ProductService {
         dto.setBasePrice(product.getBasePrice());
         dto.setOldPrice(product.getOldPrice());
         dto.setBrandName(product.getBrand() != null ? product.getBrand().getName() : null);
+        dto.setSales(product.getSales());
 
         // Ánh xạ Variants
         List<ProductVariantDTO> variants = product.getVariants().stream()

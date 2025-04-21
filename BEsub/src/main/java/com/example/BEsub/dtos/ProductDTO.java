@@ -54,4 +54,6 @@ public class ProductDTO {
     private String mainImageUrl;
 
     private boolean isOutOfStock;
+
+    private Integer sales = 0;
 }

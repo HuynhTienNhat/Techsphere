@@ -17,5 +17,7 @@ public interface ProductService {
     List<ProductDTO> searchProducts(String keyword);
     List<ReviewDTO> getProductReview(Long productId);
     AverageRatingDTO getAverageRating(Long productId);
+    List<ProductDTO> getProductsSortedBySales(String sortOrder);
+    List<ProductDTO> getTop6BestSellingProducts();
 }
 
