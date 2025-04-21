@@ -159,4 +159,16 @@ public class ProductController {
     public ResponseEntity<AverageRatingDTO> getAverageRating(@PathVariable Long productId) {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getAverageRating(productId));
     }
+
+    @GetMapping("/sort-by-sales")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ProductDTO>> getProductsSortedBySales(
+            @RequestParam(defaultValue = "desc") String order) {
+        return ResponseEntity.ok(productService.getProductsSortedBySales(order));
+    }
+
+    @GetMapping("/top-6-best-selling")
+    public ResponseEntity<List<ProductDTO>> getTop6BestSellingProducts() {
+        return ResponseEntity.ok(productService.getTop6BestSellingProducts());
+    }
 }

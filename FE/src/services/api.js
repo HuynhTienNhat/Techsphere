@@ -410,13 +410,10 @@ export const getYears = async () => {
 
 export const changePassword = async (oldPassword, newPassword, showToast = true) => {
   try {
-    console.log('Sending password change request...');
     const response = await commonApi.put('/users/password', {
       oldPassword,
       newPassword
     });
-    
-    console.log('Password change response:', response);
     
     if (showToast) {
       toast.success('Đổi mật khẩu thành công!');
@@ -470,3 +467,12 @@ export const createReview = async (rating, comment, orderId, productId, variantN
     throw new Error(error.response?.data?.message || "Không thể tạo đánh giá!");
   }
 };
+
+export const getTop6BestSellingProducts = async() =>{
+  try{
+    const res = await commonApi.get("/products/top-6-best-selling")
+    return res.data
+  } catch(error){
+    throw new Error(error.message) 
+  }
+}
