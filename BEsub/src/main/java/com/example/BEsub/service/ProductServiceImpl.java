@@ -311,7 +311,7 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public AverageRatingDTO getAverageRating(Long productId) {
+    public RatingDTO getRatingInformation(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException("Product not found"));
         ProductDTO productDTO = mapToDTO(product);
@@ -322,9 +322,16 @@ public class ProductServiceImpl implements ProductService {
         for (ReviewDTO reviewDTO : reviewDTOs) {
             sum = sum.add(new BigDecimal(reviewDTO.getRating()));
         }
-        return AverageRatingDTO.builder()
-                .rating(ratingCount > 0 ? sum.divide(new BigDecimal(ratingCount), 2, RoundingMode.HALF_UP) : BigDecimal.ZERO)
-                .reviewCount(ratingCount)
+        List<RatingStarDTO> ratingData = new ArrayList<>();
+        List<Integer> ratings = getRatings(reviewDTOs);
+        for (int i = 1; i <= 5; i++) {
+            ratingData.add(new RatingStarDTO(i, ratings.get(i-1)));
+        }
+
+        return RatingDTO.builder()
+                .averageRating(ratingCount > 0 ? sum.divide(new BigDecimal(ratingCount), 1, RoundingMode.HALF_UP) : BigDecimal.ZERO)
+                .ratingCount(ratingCount)
+                .ratingStarList(ratingData)
                 .build();
     }
 
@@ -480,6 +487,20 @@ public class ProductServiceImpl implements ProductService {
             specs.add(spec);
         });
         product.setSpecs(specs);
+    }
+
+    private List<Integer> getRatings(List<ReviewDTO> reviewDTOs) {
+        List<Integer> counts = new ArrayList<>(Collections.nCopies(5, 0));
+
+        for (ReviewDTO review : reviewDTOs) {
+            int rating = review.getRating();
+            if (rating >= 1 && rating <= 5) {
+                // Trừ 1 vì index bắt đầu từ 0
+                counts.set(rating - 1, counts.get(rating - 1) + 1);
+            }
+        }
+
+        return counts;
     }
 
     // Ánh xạ từ Entity sang ProductDTO

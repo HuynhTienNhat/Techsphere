@@ -13,11 +13,9 @@ function ForgetPassword() {
   const handleClick = () => {
     sendOTP(email); 
     localStorage.setItem('resetEmail', email);
-    navigate('/email-verify',{
-      state: {
-        name: "forgetPassword",
-      }
-    }); 
+    navigate('/email-verify', {
+      state: "forgetPassword"
+    });
   };
 
   return (

@@ -6,6 +6,7 @@ import ProductVariants from './ProductVariants';
 import ProductPrice from './ProductPrice';
 import ProductBasicInfo from './BasicInformation';
 import ProductSpecs from './ProductSpecs';
+import ProductReview from './ProductReview';
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -52,7 +53,9 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         <ProductBasicInfo />
         <ProductSpecs specs={product.specs} />
+        
       </div>
+      <ProductReview productId={product.productId}></ProductReview>
     </div>
   );
 };

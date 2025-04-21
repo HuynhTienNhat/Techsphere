@@ -155,9 +155,9 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReview(productId));
     }
 
-    @GetMapping("/reviews/{productId}/averageRating")
-    public ResponseEntity<AverageRatingDTO> getAverageRating(@PathVariable Long productId) {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.getAverageRating(productId));
+    @GetMapping("/reviews/{productId}/rating")
+    public ResponseEntity<RatingDTO> getRatingInformation(@PathVariable Long productId) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getRatingInformation(productId));
     }
 
     @GetMapping("/sort-by-sales")
