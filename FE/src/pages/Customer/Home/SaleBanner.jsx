@@ -11,7 +11,7 @@ export default function SalesBanner() {
                     <span>Plus free shipping! Use code:</span>
                     <span className="font-bold text-lg">TECHSPHERE</span>
                 </div>
-                <Link to='/products' rel="noreferrer noopener" className="px-5 mt-4 lg:mt-0 py-3 rounded-md border block dark:bg-gray-900 dark:text-gray-50 dark:border-gray-600">Shop Now</Link>
+                <Link to='/products' rel="noreferrer noopener" className="px-5 mt-4 lg:mt-0 py-3 rounded-md bg-white border block text-violet-500 font-semibold">Shop Now</Link>
             </div>
         </div>
     </div>)

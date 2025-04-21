@@ -2,7 +2,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFire } from '@fortawesome/free-solid-svg-icons';
 import {products} from './../../../assets/data/Products';
 export default function HomeProducts() {
-    
     const productDisplay = products.map(product =>
         <div key={product.id} className="transition-transform transform hover:-translate-y-2 hover:shadow-lg p-2 w-50 flex flex-col justify-center rounded-md shadow-md dark:bg-white-50 dark:text-gray-900 border-[0.5px] border-gray-100">
             <a href="" className='group'>
