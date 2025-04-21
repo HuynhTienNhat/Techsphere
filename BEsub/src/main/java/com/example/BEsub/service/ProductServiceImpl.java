@@ -74,8 +74,8 @@ public class ProductServiceImpl implements ProductService {
         }
         try {
             int frontCamera = Integer.parseInt(request.getFrontCamera());
-            if (frontCamera <= 0 || frontCamera > 100) {
-                throw new AppException("Camera trước must be a number between 1 and 100");
+            if (frontCamera < 0  || frontCamera > 100) {
+                throw new AppException("Camera trước must be a number between 0 and 100");
             }
         } catch (NumberFormatException e) {
             throw new AppException("Camera trước must be a valid number (e.g., 12)");

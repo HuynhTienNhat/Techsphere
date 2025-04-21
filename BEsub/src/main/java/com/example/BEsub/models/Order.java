@@ -40,7 +40,7 @@ public class Order extends BaseEntity {
 
     // Quan hệ Many-to-One với USERS
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = true)
+    @JoinColumn(name = "user_id")
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private User user;
 

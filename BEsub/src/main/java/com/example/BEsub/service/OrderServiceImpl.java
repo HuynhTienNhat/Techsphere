@@ -67,28 +67,29 @@ public class OrderServiceImpl implements OrderService {
         Cart cart = cartRepository.findByUserId(getCurrentUserId())
                 .orElseThrow(() -> new AppException("Cart not found"));
 
-        // Kiểm tra tồn kho các sản phẩm trong giỏ hàng
+        // Kiểm tra và thu thập ProductVariant cần cập nhật
+        List<ProductVariant> variantsToUpdate = new ArrayList<>();
         for (CartItem item : cart.getCartItems()) {
-            if (item.getQuantity() > item.getVariant().getStockQuantity()) {
-                throw new AppException("Product " + item.getVariant().getProduct().getName() + " is out of stock");
+            ProductVariant variant = item.getVariant();
+            if (item.getQuantity() > variant.getStockQuantity()) {
+                throw new AppException("Product " + variant.getProduct().getName() + " is out of stock");
             }
+            variant.setStockQuantity(variant.getStockQuantity() - item.getQuantity());
+            variantsToUpdate.add(variant);
         }
 
-        // Chuyển đổi từ CartItem sang OrderItem và lưu vào đơn hàng
+        // Lưu tất cả ProductVariant
+        productVariantRepository.saveAll(variantsToUpdate);
+
+        // Chuyển đổi từ CartItem sang OrderItem
         List<OrderItem> orderItems = cart.getCartItems().stream()
                 .map(item -> mapCartItemToOrderItem(item, order))
                 .collect(Collectors.toList());
         order.setOrderItems(orderItems);
 
-        // Xóa giỏ hàng sau khi đã tạo đơn hàng
+        // Xóa giỏ hàng
         cart.getCartItems().clear();
         cartRepository.save(cart);
-
-        // Cập nhật số lượng tồn kho của các sản phẩm
-        for (CartItem item : cart.getCartItems()) {
-            item.getVariant().setStockQuantity(item.getVariant().getStockQuantity() - item.getQuantity());
-            productVariantRepository.save(item.getVariant());
-        }
 
         // Trả về DTO của đơn hàng
         return mapToOrderDTO(order);
@@ -220,6 +221,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    @Transactional
     public void cancelOrder(Long orderId) {
         Long userId = getCurrentUserId();
         Order order = orderRepository.findByIdAndUserId(orderId, userId)
@@ -228,6 +230,15 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() != OrderStatus.CONFIRMING && order.getStatus() != OrderStatus.PREPARING) {
             throw new AppException("Cannot cancel order. Only orders in CONFIRMING or PREPARING status can be cancelled.");
         }
+
+        // Hoàn lại số lượng tồn kho
+        List<ProductVariant> variantsToUpdate = new ArrayList<>();
+        for (OrderItem item : order.getOrderItems()) {
+            ProductVariant variant = item.getVariant();
+            variant.setStockQuantity(variant.getStockQuantity() + item.getQuantity());
+            variantsToUpdate.add(variant);
+        }
+        productVariantRepository.saveAll(variantsToUpdate);
 
         order.setStatus(OrderStatus.CANCELLED);
         orderRepository.save(order);
