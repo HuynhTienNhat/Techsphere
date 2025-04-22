@@ -201,21 +201,6 @@ public class ProductServiceImpl implements ProductService {
             throw new AppException("Images cannot be updated after product creation");
         }
 
-        // Validate variants
-        if (productDTO.getVariants() == null || productDTO.getVariants().isEmpty()) {
-            throw new AppException("At least one variant is required");
-        }
-
-        // Kiểm tra chỉ 1 isDefault
-        long defaultCount = productDTO.getVariants().stream().filter(ProductVariantDTO::isDefault).count();
-        if (defaultCount > 1) {
-            throw new AppException("Only one variant can be set as default");
-        }
-        if (defaultCount == 0) {
-            // Tự động chọn variant đầu tiên làm mặc định
-            productDTO.getVariants().get(0).setDefault(true);
-        }
-
         mapToEntity(productDTO, product);
         Product updatedProduct = productRepository.save(product);
         return mapToDTO(updatedProduct);
