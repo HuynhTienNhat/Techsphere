@@ -30,4 +30,6 @@ public class ProductVariantDTO {
     private Integer stockQuantity;
 
     private boolean isDefault;
+
+    private boolean isDeleted;
 }
