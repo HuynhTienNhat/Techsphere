@@ -14,8 +14,6 @@ import {
   Pagination,
   InputAdornment,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import ClearIcon from "@mui/icons-material/Clear";
 import { toast } from "react-toastify";
 
 export default function Products() {

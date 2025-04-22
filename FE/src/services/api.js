@@ -459,8 +459,12 @@ export const createReview = async (rating, comment, orderId, productId, variantN
       orderId,
       variantName
     };
-    console.log(reviewData);
     const response = await commonApi.post("/reviews", reviewData);
+
+    if (response.status == 200) {
+      toast.success("Đánh giá thành công!");
+    }
+    
     return response.data;
   } catch (error) {
     console.error("Lỗi khi tạo đánh giá:", error);
