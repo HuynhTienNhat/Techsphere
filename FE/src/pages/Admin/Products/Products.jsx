@@ -125,21 +125,6 @@ export default function Products() {
             onKeyDown={handleSearch}
             size="small"
             sx={{ maxWidth: 300 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              endAdornment: search && (
-                <InputAdornment position="end">
-                  <ClearIcon
-                    className="cursor-pointer"
-                    onClick={handleClearSearch}
-                  />
-                </InputAdornment>
-              ),
-            }}
           />
           <Select
             value={filterBrand}

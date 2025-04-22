@@ -1,4 +1,4 @@
-import {judgementImages} from './../../../assets/data/Judgement';
+import {judgementImages} from './../../../assets/data/HomePage/Judgement.js';
 
 export default function HomeJudgement() {
     const imgElements = judgementImages.map(img => 

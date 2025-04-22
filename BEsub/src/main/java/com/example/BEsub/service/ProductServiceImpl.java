@@ -201,16 +201,19 @@ public class ProductServiceImpl implements ProductService {
             throw new AppException("Images cannot be updated after product creation");
         }
 
-        // Validate variants: Chỉ 1 isDefault
-        if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
-            long defaultCount = productDTO.getVariants().stream().filter(ProductVariantDTO::isDefault).count();
-            if (defaultCount > 1) {
-                throw new AppException("Only one variant can be set as default");
-            }
-            if (defaultCount == 0) {
-                // Tự động chọn variant đầu tiên làm mặc định
-                productDTO.getVariants().get(0).setDefault(true);
-            }
+        // Validate variants
+        if (productDTO.getVariants() == null || productDTO.getVariants().isEmpty()) {
+            throw new AppException("At least one variant is required");
+        }
+
+        // Kiểm tra chỉ 1 isDefault
+        long defaultCount = productDTO.getVariants().stream().filter(ProductVariantDTO::isDefault).count();
+        if (defaultCount > 1) {
+            throw new AppException("Only one variant can be set as default");
+        }
+        if (defaultCount == 0) {
+            // Tự động chọn variant đầu tiên làm mặc định
+            productDTO.getVariants().get(0).setDefault(true);
         }
 
         mapToEntity(productDTO, product);
@@ -391,21 +394,23 @@ public class ProductServiceImpl implements ProductService {
         product.setBrand(brand);
 
         // Ánh xạ Variants
-        List<ProductVariant> currentVariants = product.getVariants() != null ? product.getVariants() : new ArrayList<>();
         List<ProductVariant> updatedVariants = new ArrayList<>();
-        Map<Long, ProductVariant> variantMap = currentVariants.stream()
-                .filter(v -> v.getId() != null)
-                .collect(Collectors.toMap(ProductVariant::getId, v -> v));
-
         if (dto.getVariants() != null) {
             for (ProductVariantDTO vDto : dto.getVariants()) {
                 ProductVariant variant;
-                if (vDto.getVariantId() != null && variantMap.containsKey(vDto.getVariantId())) {
-                    // Cập nhật variant hiện có
-                    variant = variantMap.get(vDto.getVariantId());
-                    variantMap.remove(vDto.getVariantId());
+                if (vDto.getVariantId() != null) {
+                    // Tìm biến thể hiện có
+                    variant = product.getVariants().stream()
+                            .filter(v -> v.getId().equals(vDto.getVariantId()))
+                            .findFirst()
+                            .orElseGet(() -> {
+                                // Nếu không tìm thấy, tạo mới
+                                ProductVariant newVariant = new ProductVariant();
+                                newVariant.setProduct(product);
+                                return newVariant;
+                            });
                 } else {
-                    // Thêm variant mới
+                    // Thêm biến thể mới
                     variant = new ProductVariant();
                     variant.setProduct(product);
                 }
@@ -417,6 +422,8 @@ public class ProductServiceImpl implements ProductService {
                 updatedVariants.add(variant);
             }
         }
+
+        // Thay thế danh sách biến thể
         product.setVariants(updatedVariants);
     }
 

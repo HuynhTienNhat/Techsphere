@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { FixedSizeList } from 'react-window';
 import {
   getCustomerOrders,
   getOrdersByStatus,
@@ -23,7 +24,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Rating ,
+  Rating,
   FormControl,
   InputLabel,
   Select,
@@ -47,7 +48,6 @@ export default function Orders() {
     const [selectedVariantId, setSelectedVariantId] = useState(null);
     const [variantName, setVariantName] = useState("");
 
-  
     const tabs = [
       { name: "Tất cả", value: "ALL" },
       { name: "Chờ xác nhận", value: "CONFIRMING" },
@@ -81,7 +81,6 @@ export default function Orders() {
       setSelectedOrderId(null);
     };
     
-  
     // Lấy danh sách đơn hàng
     const fetchOrders = async (status = "ALL", month = null, year = null) => {
       setIsLoading(true);
@@ -189,6 +188,59 @@ export default function Orders() {
           return "warning";
       }
     };
+
+    // Row component for virtual list
+    const OrderRow = ({ index, style }) => {
+      const order = orders[index];
+      return (
+        <div style={style}>
+          <Paper sx={{ p: 2, mb: 2, mx: 1 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+              <Typography fontWeight="medium">Đơn hàng #{order.orderId}</Typography>
+              <Chip
+                label={tabs.find((tab) => tab.value === order.status)?.name || order.status}
+                color={getStatusColor(order.status)}
+                size="small"
+              />
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              Ngày đặt: {formatDate(order.orderDate)}
+            </Typography>
+            <Typography variant="body2" fontWeight="medium" mt={1}>
+              {formatCurrency(order.totalAmount)}
+            </Typography>
+            <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleOpenModal(order.orderId)}
+              >
+                Chi tiết
+              </Button>
+              {(order.status === "CONFIRMING" || order.status === "PREPARING") && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => handleCancelOrder(order.orderId)}
+                >
+                  Hủy
+                </Button>
+              )}
+              {(order.status === "COMPLETED") && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => {handleOpenReview(order.orderId)}}
+                  sx={{ ml: "auto" }}
+                >
+                  Đánh giá
+                </Button>
+              )}
+            </Box>
+          </Paper>
+        </div>
+      );
+    };
   
     return (
       <Box sx={{ p: 4, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
@@ -217,7 +269,6 @@ export default function Orders() {
             value={month}
             onChange={(e) => setMonth(e.target.value)}
             size="small"
-            inputProps={{ min: 1, max: 12 }}
             sx={{ width: 120 }}
           />
           <TextField
@@ -226,7 +277,6 @@ export default function Orders() {
             value={year}
             onChange={(e) => setYear(e.target.value)}
             size="small"
-            inputProps={{ min: 2000, max: 2099 }}
             sx={{ width: 120 }}
           />
           <Button type="submit" variant="contained" color="primary">
@@ -240,58 +290,22 @@ export default function Orders() {
           </Button>
         </Box>
   
-        {/* Danh sách đơn hàng */}
+        {/* Danh sách đơn hàng với Virtual Scrolling */}
         {isLoading ? (
           <Typography>Đang tải...</Typography>
         ) : orders.length === 0 ? (
           <Typography>Không có đơn hàng nào.</Typography>
         ) : (
-          orders.map((order) => (
-            <Paper key={order.orderId} sx={{ p: 2, mb: 2 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                <Typography fontWeight="medium">Đơn hàng #{order.orderId}</Typography>
-                <Chip
-                  label={tabs.find((tab) => tab.value === order.status)?.name || order.status}
-                  color={getStatusColor(order.status)}
-                  size="small"
-                />
-              </Box>
-              <Typography variant="body2" color="text.secondary">
-                Ngày đặt: {formatDate(order.orderDate)}
-              </Typography>
-              <Typography variant="body2" fontWeight="medium" mt={1}>
-                {formatCurrency(order.totalAmount)}
-              </Typography>
-              <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleOpenModal(order.orderId)}
-                >
-                  Chi tiết
-                </Button>
-                {(order.status === "CONFIRMING" || order.status === "PREPARING") && (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleCancelOrder(order.orderId)}
-                  >
-                    Hủy
-                  </Button>
-                )}
-                {(order.status === "COMPLETED") && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {handleOpenReview(order.orderId)}}
-                    sx={{ ml: "auto" }}
-                  >
-                    Đánh giá
-                  </Button>
-                )}
-              </Box>
-            </Paper>
-          ))
+          <Box sx={{ height: 400, width: '100%' }}>
+            <FixedSizeList
+              height={400}
+              width="100%"
+              itemCount={orders.length}
+              itemSize={180} // Adjust based on your order item height
+            >
+              {OrderRow}
+            </FixedSizeList>
+          </Box>
         )}
   
         {/* Modal chi tiết đơn hàng (MUI Dialog) */}
@@ -409,7 +423,7 @@ export default function Orders() {
                 if(comment === "") throw new Error("Nội dung không thể trống.");
                 console.log(selectedProductId);
                 console.log(selectedOrderId);
-                createReview(rating,comment,selectedOrderId,selectedProductId,variantName);
+                createReview(rating, comment, selectedOrderId, selectedProductId, variantName);
               }
               catch(error){
                 toast.error("Lỗi: " + error.message);
@@ -420,7 +434,6 @@ export default function Orders() {
             </Button>
           </DialogActions>
         </Dialog>
-
       </Box>
     );
 }
