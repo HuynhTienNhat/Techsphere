@@ -42,7 +42,6 @@ export default function BasicTab({ formData, brands, errors, onChange }) {
         onChange={onChange}
         fullWidth
         size="small"
-        inputProps={{ min: 500000 }}
         error={!!errors.basePrice}
         helperText={errors.basePrice}
       />
@@ -54,7 +53,6 @@ export default function BasicTab({ formData, brands, errors, onChange }) {
         onChange={onChange}
         fullWidth
         size="small"
-        inputProps={{ min: 500000 }}
         error={!!errors.oldPrice}
         helperText={errors.oldPrice}
       />

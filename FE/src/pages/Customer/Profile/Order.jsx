@@ -416,13 +416,12 @@ export default function Orders() {
               sx={{ display: "flex", justifyContent: "center", mx: "auto", mt: 2 }} 
             />
           </DialogContent>
+          
           <DialogActions>
             <Button onClick={handleCloseReview}>Hủy</Button>
             <Button variant="contained" color="primary" onClick={() => {
               try{
                 if(comment === "") throw new Error("Nội dung không thể trống.");
-                console.log(selectedProductId);
-                console.log(selectedOrderId);
                 createReview(rating, comment, selectedOrderId, selectedProductId, variantName);
               }
               catch(error){
