@@ -44,7 +44,7 @@ const ProductPrice = ({ basePrice, oldPrice, selectedVariant, product }) => {
     }
   };
 
-  const isDisabled = !selectedVariant || product?.isOutOfStock;
+  const isDisabled = !selectedVariant || product?.isOutOfStock|| selectedVariant.stockQuantity === 0;
 
   return (
     <div className="mt-6 w-full">
