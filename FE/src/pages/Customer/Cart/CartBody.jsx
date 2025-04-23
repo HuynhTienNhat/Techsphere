@@ -72,7 +72,6 @@ export default function CartBody() {
           0
         )
       );
-      toast.success('Đã cập nhật số lượng');
     } catch (err) {
       if (err.message.includes('đăng nhập') || err.message.includes('403')) {
         toast.error('Vui lòng đăng nhập để cập nhật giỏ hàng');

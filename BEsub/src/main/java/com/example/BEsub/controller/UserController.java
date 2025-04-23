@@ -5,6 +5,7 @@ import com.example.BEsub.service.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -97,6 +98,17 @@ public class UserController {
         return ResponseEntity.ok("Default address set successfully");
     }
 
+    // Chỉnh sửa địa chỉ
+    @PutMapping("/addresses/{addressId}")
+    public ResponseEntity<UserAddressDTO> updateAddress(
+            @PathVariable Long addressId,
+            @RequestBody @Valid UserAddressDTO addressDTO) {
+        String userName = SecurityContextHolder.getContext().getAuthentication().getName();
+        Long userId = userService.getUserIdByUsername(userName);
+        UserAddressDTO updatedAddress = userService.updateAddress(userId, addressId, addressDTO);
+        return ResponseEntity.ok(updatedAddress);
+    }
+
     // Xóa địa chỉ
     @DeleteMapping("/addresses/{addressId}")
     public ResponseEntity<String> deleteAddress(@PathVariable Long addressId) {
@@ -105,6 +117,11 @@ public class UserController {
 
         userService.deleteAddress(userId, addressId);
         return ResponseEntity.ok("Address deleted successfully");
+    }
+
+    @GetMapping("/addresses/{addressId}")
+    public ResponseEntity<UserAddressDTO> getAddressById(@PathVariable Long addressId) {
+        return ResponseEntity.ok(userService.getAddressById(addressId));
     }
 
     // Helper đổi mật khẩu

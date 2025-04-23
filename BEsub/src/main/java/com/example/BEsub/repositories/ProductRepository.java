@@ -2,6 +2,7 @@ package com.example.BEsub.repositories;
 
 import com.example.BEsub.models.Brand;
 import com.example.BEsub.models.Product;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.*;
 import org.springframework.stereotype.Repository;
 
@@ -29,5 +30,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Lọc theo brand và sắp xếp giảm dần
     @Query("SELECT p FROM Product p WHERE p.brand = :brand ORDER BY p.basePrice DESC")
     List<Product> findByBrandOrderByBasePriceDesc(Brand brand);
+
+    @Query("SELECT p FROM Product p ORDER BY p.sales DESC")
+    List<Product> findAllByOrderBySalesDesc();
+
+    @Query("SELECT p FROM Product p ORDER BY p.sales ASC")
+    List<Product> findAllByOrderBySalesAsc();
+
+    @Query("SELECT p FROM Product p ORDER BY p.sales DESC")
+    List<Product> findTop6ByOrderBySalesDesc(Pageable pageable);
 }
 

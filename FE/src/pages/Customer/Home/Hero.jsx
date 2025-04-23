@@ -1,5 +1,5 @@
-import { banners } from '../../../assets/data/Banners';
-import {smallBanners} from '../../../assets/data/SmallBanners';
+import { banners } from './../../../assets/data/HomePage/Banners.js';
+import {smallBanners} from './../../../assets/data/HomePage/SmallBanners.js';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';
@@ -7,43 +7,36 @@ import 'swiper/css/pagination';
 import 'swiper/css/navigation';
 import React from 'react';
 import { toast } from 'react-toastify';
+import {fetchBrands} from './../../../services/api.js';
+import { Link } from 'react-router-dom';
 
 export default function HomeHero() {
     const [brands, setBrands] = React.useState([])
-    React.useEffect(() => {
-          const fetchBrands = async () => {
-            try {
-                const res = await fetch("http://localhost:8080/api/brands", {
-                    method: "GET",
-                    headers: {
-                    "Content-Type": "application/json",
-                    },
-                });
-        
-                if (!res.ok) {
-                    throw new Error("Failed to fetch brands!");
-                }
 
-                const data = await res.json();
-                setBrands(data);
-            } catch (error) {
-                toast.error(error)
-            }
+    React.useEffect(() => {
+        const loadBrands = async () => {
+          try {
+              const data = await fetchBrands();
+              setBrands(data);
+          } catch (error) {
+            toast.error("Không thể tải danh sách hãng!");
+          }
         };
-        fetchBrands();
+    
+        loadBrands();
     }, []);
 
     const liElements = brands.map(brand => (
         <li key={brand.id} className="w-full group">
-            <a 
-                href="#" 
+            <Link 
+                to={`/products?brand=${encodeURIComponent(brand.name)}`} 
                 className="flex justify-between items-center w-full h-13 p-3 rounded-md transition duration-200 hover:bg-gray-200"
             >
                 <div className="flex items-center gap-3">
                     <img src={brand.logoUrl} alt={brand.name} className="w-6 h-6 mx-2" />
                     <span className="text-gray-700 font-medium group-hover:text-violet-600">{brand.name}</span>
                 </div>
-            </a>
+            </Link>
         </li>
     ))
 

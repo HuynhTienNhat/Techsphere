@@ -12,13 +12,15 @@ import Register from './pages/Auth/Register';
 import ForgetPassword from './pages/Auth/ForgetPassword.jsx'
 import ResetPassword from './pages/Auth/ResetPassword.jsx'
 import EmailVerify from './pages/Auth/EmailVerify.jsx'
-import AdminDashBoard from './pages/Admin/Dashboard/Dashboard';
+import AdminDashBoard from './pages/Admin/DashBoard/DashBoard.jsx';
 import ProtectedAdminRoute from './routes/ProtectedAdminRoute';
 import AdminProducts from './pages/Admin/Products/Products.jsx';
 import Users from './pages/Admin/Users/Users.jsx';
 import Cart from './pages/Customer/Cart/Cart.jsx';
 import Checkout from './pages/Customer/Checkout/Checkout.jsx';
 import Profile from './pages/Customer/Profile/Profile.jsx';
+import OrdersManagement from './pages/Admin/Orders/Orders.jsx';
+import GeneralInformation from './pages/Customer/About/GeneralInformation.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -130,6 +132,16 @@ function AppContent() {
             </CustomerLayout>
           }
         />
+
+        <Route
+          path="/links/*"
+          element={
+            <CustomerLayout>
+              <GeneralInformation />
+            </CustomerLayout>
+          }
+        />
+
         {/* Admin Routes */}
         <Route
           path="/admin/*"
@@ -140,6 +152,7 @@ function AppContent() {
                   <Route path="/" element={<AdminDashBoard />} />
                   <Route path="products" element={<AdminProducts />} />
                   <Route path="users" element={<Users />} />
+                  <Route path='orders' element={<OrdersManagement/>}/>
                 </Routes>
               </AdminLayout>
             </ProtectedAdminRoute>
@@ -148,7 +161,7 @@ function AppContent() {
       </Routes>
       <ToastContainer
         position="top-right"
-        autoClose={3000}
+        autoClose={2000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick

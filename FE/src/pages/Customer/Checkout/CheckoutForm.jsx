@@ -54,7 +54,7 @@ export default function CheckoutForm({
         >
           {selectedAddress ? (
             <p className="text-gray-900">
-              {selectedAddress.houseNumber}, {selectedAddress.street}, {selectedAddress.city}
+              {selectedAddress.streetAndHouseNumber}, {selectedAddress.district}, {selectedAddress.city}
               {selectedAddress.isDefault && ' (Mặc định)'}
             </p>
           ) : (

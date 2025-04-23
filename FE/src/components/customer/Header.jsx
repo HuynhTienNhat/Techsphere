@@ -10,8 +10,9 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState("");
   const [token, setToken] = useState(localStorage.getItem("token"));
+  const [role, setRole] = useState(localStorage.getItem("role")); // Thêm trạng thái role
 
-  // Khởi tạo searchKeyword từ URL khi component được mount
+  // Khởi tạo searchKeyword từ URL
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     const keywordFromUrl = searchParams.get("keyword") || "";
@@ -20,14 +21,17 @@ export default function Header() {
     }
   }, [location.search]);
 
+  // Theo dõi thay đổi token và role
   useEffect(() => {
     const handleTokenChange = () => {
       setToken(localStorage.getItem("token"));
+      setRole(localStorage.getItem("role")); // Cập nhật role
     };
 
     window.addEventListener("token-changed", handleTokenChange);
     window.addEventListener("storage", handleTokenChange);
     setToken(localStorage.getItem("token"));
+    setRole(localStorage.getItem("role"));
 
     return () => {
       window.removeEventListener("token-changed", handleTokenChange);
@@ -35,6 +39,7 @@ export default function Header() {
     };
   }, []);
 
+  // Fetch thông tin người dùng
   useEffect(() => {
     if (token) {
       setIsLoading(true);
@@ -54,20 +59,28 @@ export default function Header() {
         .then((data) => {
           setUser(data);
           setIsLoading(false);
+          // Kiểm tra role và điều hướng
+          const userRole = localStorage.getItem("role");
+          if (userRole === "ADMIN" && location.pathname !== "/admin") {
+            navigate("/admin");
+          }
         })
         .catch((error) => {
-          console.error(error);
+          console.error("Error fetching profile:", error);
           localStorage.removeItem("token");
-          localStorage.removeItem("role"); // Xóa role nếu token không hợp lệ
+          localStorage.removeItem("role");
           setToken(null);
+          setRole(null);
           setUser(null);
           setIsLoading(false);
+          toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!");
         });
     } else {
       setUser(null);
+      setRole(null);
       setIsLoading(false);
     }
-  }, [token]);
+  }, [token, navigate, location.pathname]);
 
   const handleCartClick = () => {
     if (!user) {
@@ -81,7 +94,6 @@ export default function Header() {
     if (searchKeyword.trim()) {
       navigate(`/products?keyword=${encodeURIComponent(searchKeyword.trim())}`);
     } else {
-      // Nếu không có từ khóa, chuyển đến trang products mà không có query parameter
       navigate("/products");
     }
   };
@@ -94,39 +106,36 @@ export default function Header() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("role"); // Xóa role khi đăng xuất
+    localStorage.removeItem("role");
     setToken(null);
+    setRole(null);
     setUser(null);
     navigate("/login");
     window.dispatchEvent(new Event("token-changed"));
   };
 
-  // Xử lý khi click vào dấu X
   const handleClearSearch = () => {
     setSearchKeyword("");
-    
-    // Nếu đang ở trang products, cập nhật URL để xóa keyword
     if (location.pathname === "/products") {
       navigate("/products");
     }
   };
 
-  // Hàm tạo viết tắt từ tên người dùng
   const getInitials = (name) => {
     if (!name) return "U";
-    return name.split(' ')
-      .map(word => word[0])
-      .join('')
+    return name
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .substring(0, 2)
       .toUpperCase();
   };
 
   const getName = (fullname) => {
-    const words = fullname.trim().split(" ")
-    const lastName = words[words.length - 1]
-    
-    return lastName
-  }
+    const words = fullname.trim().split(" ");
+    const lastName = words[words.length - 1];
+    return lastName;
+  };
 
   return (
     <header className="px-30 py-4 dark:bg-gray-100 dark:text-gray-800">
@@ -136,7 +145,9 @@ export default function Header() {
             <Link
               to="/"
               className={`flex items-center px-4 -mb-1 border-b-2 ${
-                location.pathname === "/" ? "dark:border-violet-600 dark:text-violet-600" : "border-transparent hover:border-gray-300"
+                location.pathname === "/"
+                  ? "dark:border-violet-600 dark:text-violet-600"
+                  : "border-transparent hover:border-gray-300"
               }`}
             >
               Home
@@ -146,7 +157,9 @@ export default function Header() {
             <Link
               to="/products"
               className={`flex items-center px-4 -mb-1 border-b-2 ${
-                location.pathname === "/products" ? "dark:border-violet-600 dark:text-violet-600" : "border-transparent hover:border-gray-300"
+                location.pathname === "/products"
+                  ? "dark:border-violet-600 dark:text-violet-600"
+                  : "border-transparent hover:border-gray-300"
               }`}
             >
               Products
@@ -154,15 +167,24 @@ export default function Header() {
           </li>
         </ul>
 
-        <Link to={"/"} href="" aria-label="Back to homepage" className="flex items-center p-2">
+        <Link to="/" aria-label="Back to homepage" className="flex items-center p-2">
           <span className="text-2xl font-bold text-purple-600 dark:text-violet-600">TechSphere</span>
         </Link>
 
         <div className="flex items-center space-x-6">
           <div className="relative w-[280px]">
             <span className="absolute inset-y-0 left-0 flex items-center pl-2">
-              <button type="submit" title="Search" className="p-1 focus:outline-none focus:ring-0 cursor-pointer focus:ring" onClick={handleSearch}>
-                <svg fill="currentColor" viewBox="0 0 512 512" className="w-4 h-4 dark:text-gray-800">
+              <button
+                type="submit"
+                title="Search"
+                className="p-1 focus:outline-none focus:ring-0 cursor-pointer focus:ring"
+                onClick={handleSearch}
+              >
+                <svg
+                  fill="currentColor"
+                  viewBox="0 0 512 512"
+                  className="w-4 h-4 dark:text-gray-800"
+                >
                   <path d="M479.6,399.716l-81.084-81.084-62.368-25.767A175.014,175.014,0,0,0,368,192c0-97.047-78.953-176-176-176S16,94.953,16,192,94.953,368,192,368a175.034,175.034,0,0,0,101.619-32.377l25.7,62.2L400.4,478.911a56,56,0,1,0,79.2-79.195ZM48,192c0-79.4,64.6-144,144-144s144,64.6,144,144S271.4,336,192,336,48,271.4,48,192ZM456.971,456.284a24.028,24.028,0,0,1-33.942,0l-76.572-76.572-23.894-57.835L380.4,345.771l76.573,76.572A24.028,24.028,0,0,1,456.971,456.284Z"></path>
                 </svg>
               </button>
@@ -179,7 +201,8 @@ export default function Header() {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                   xmlns="http://www.w3.org/2000/svg"
-                ></svg>
+                >
+                </svg>
               </button>
             )}
             <input
@@ -199,8 +222,6 @@ export default function Header() {
             onClick={handleCartClick}
             title="Giỏ hàng"
           >
-            <Link to="/home">
-            </Link>
             <FaShoppingCart className="w-5 h-5" />
           </button>
 
@@ -208,7 +229,7 @@ export default function Header() {
             <span className="px-6 py-2 font-semibold">Đang tải...</span>
           ) : user ? (
             <div className="flex items-center space-x-4">
-              <Link to="/profile" className="flex items-center space-x-2">
+              <Link to={role === "ADMIN" ? "/admin" : "/profile"} className="flex items-center space-x-2">
                 <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold shadow-md hover:bg-violet-300 transition-colors">
                   {getInitials(user.name)}
                 </div>

@@ -94,8 +94,8 @@ public class ProductController {
     @PutMapping("/{productId}")
     public ResponseEntity<ProductDTO> updateProduct(
             @PathVariable Long productId,
-            @RequestBody @Valid ProductDTO productDTO) {
-        return ResponseEntity.ok(productService.updateProduct(productId, productDTO));
+            @RequestBody @Valid ProductUpdateDTO productUpdateDTO) {
+        return ResponseEntity.ok(productService.updateProduct(productId, productUpdateDTO));
     }
 
     @GetMapping("/id/{id}")
@@ -155,8 +155,20 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.OK).body(productService.getProductReview(productId));
     }
 
-    @GetMapping("/reviews/{productId}/averageRating")
-    public ResponseEntity<AverageRatingDTO> getAverageRating(@PathVariable Long productId) {
-        return ResponseEntity.status(HttpStatus.OK).body(productService.getAverageRating(productId));
+    @GetMapping("/reviews/{productId}/rating")
+    public ResponseEntity<RatingDTO> getRatingInformation(@PathVariable Long productId) {
+        return ResponseEntity.status(HttpStatus.OK).body(productService.getRatingInformation(productId));
+    }
+
+    @GetMapping("/sort-by-sales")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ProductDTO>> getProductsSortedBySales(
+            @RequestParam(defaultValue = "desc") String order) {
+        return ResponseEntity.ok(productService.getProductsSortedBySales(order));
+    }
+
+    @GetMapping("/top-6-best-selling")
+    public ResponseEntity<List<ProductDTO>> getTop6BestSellingProducts() {
+        return ResponseEntity.ok(productService.getTop6BestSellingProducts());
     }
 }

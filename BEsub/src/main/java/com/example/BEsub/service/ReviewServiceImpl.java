@@ -49,6 +49,13 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    public List<ReviewDTO> getReviewsByProduct(Long productId) {
+        return reviewRepository.findByProductId(productId)
+                .stream().map(this::mapReviewToReviewDTO)
+                .toList();
+    }
+
+    @Override
     public ReviewDTO updateReview(Long reviewId, ReviewUpdateDTO reviewUpdateDTO) {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(()->new AppException("Review not found"));
@@ -72,10 +79,11 @@ public class ReviewServiceImpl implements ReviewService{
         ReviewDTO reviewDTO = new ReviewDTO();
         reviewDTO.setCreatedAt(LocalDateTime.now());
         reviewDTO.setComment(review.getComment());
-        reviewDTO.setUserId(getCurrentUserId());
-        reviewDTO.setUsername(review.getUser().getUsername());
+        reviewDTO.setUserId(review.getUser().getId());
+        reviewDTO.setUsername(review.getUser().getName());
         reviewDTO.setId(review.getId());
         reviewDTO.setRating(review.getRating());
+        reviewDTO.setVariantName(review.getVariantName());
         return reviewDTO;
     }
 
@@ -90,6 +98,7 @@ public class ReviewServiceImpl implements ReviewService{
                 .orElseThrow(()->new AppException("Order not found")));
         review.setProduct(productRepository.findById(reviewCreateDTO.getProductId())
                 .orElseThrow(()->new AppException("Product not found")));
+        review.setVariantName(reviewCreateDTO.getVariantName());
         return review;
     }
 

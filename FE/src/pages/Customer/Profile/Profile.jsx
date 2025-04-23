@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import ProfileInfo from "./ProfileInfo";
 import Orders from "./Order";
@@ -9,7 +9,7 @@ import Support from "./Support";
 
 export default function Profile() {
   return (
-    <div className="mx-6 mt-2">
+    <div className="mx-30 mt-2">
       <div className="flex">
         {/* Fixed width sidebar */}
         <Sidebar />

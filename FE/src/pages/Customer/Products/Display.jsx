@@ -27,9 +27,7 @@ export default function ProductDisplay({ selectedBrand, keyword }) {
       const params = {};
       if (keyword) {
         params.keyword = keyword;
-        // Khi có keyword, không áp dụng sortOrder
       } else {
-        // Chỉ áp dụng brand và sortOrder khi không có keyword
         if (selectedBrand && selectedBrand !== "All") {
           params.brand = selectedBrand;
         }

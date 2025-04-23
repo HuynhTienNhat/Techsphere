@@ -2,8 +2,9 @@ import React from 'react';
 import {fetchBrands} from '../../../services/api';
 import { toast } from 'react-toastify';
 
-export default function ProductFilter({ onSelectBrand, keyword, disabled }) {
-  const [selectedBtn, setSelectedBtn] = React.useState("All");
+export default function ProductFilter({ onSelectBrand, keyword, disabled, initialBrand = "All" }) {
+  // Sử dụng initialBrand từ props làm giá trị khởi tạo
+  const [selectedBtn, setSelectedBtn] = React.useState(initialBrand);
   const [brands, setBrands] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -22,6 +23,13 @@ export default function ProductFilter({ onSelectBrand, keyword, disabled }) {
 
     loadBrands();
   }, []);
+  
+  // Khi initialBrand thay đổi, cập nhật selectedBtn
+  React.useEffect(() => {
+    if (initialBrand && !keyword) {
+      setSelectedBtn(initialBrand);
+    }
+  }, [initialBrand, keyword]); 
   
   // Reset về All khi có keyword
   React.useEffect(() => {
@@ -74,5 +82,5 @@ export default function ProductFilter({ onSelectBrand, keyword, disabled }) {
   
         {isLoading ? <span>Đang tải...</span> : btnElements}
       </div>
-  )
+  );
 }

@@ -14,8 +14,6 @@ import {
   Pagination,
   InputAdornment,
 } from "@mui/material";
-import SearchIcon from "@mui/icons-material/Search";
-import ClearIcon from "@mui/icons-material/Clear";
 import { toast } from "react-toastify";
 
 export default function Products() {
@@ -125,21 +123,6 @@ export default function Products() {
             onKeyDown={handleSearch}
             size="small"
             sx={{ maxWidth: 300 }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              endAdornment: search && (
-                <InputAdornment position="end">
-                  <ClearIcon
-                    className="cursor-pointer"
-                    onClick={handleClearSearch}
-                  />
-                </InputAdornment>
-              ),
-            }}
           />
           <Select
             value={filterBrand}

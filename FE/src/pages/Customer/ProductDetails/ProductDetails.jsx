@@ -6,6 +6,7 @@ import ProductVariants from './ProductVariants';
 import ProductPrice from './ProductPrice';
 import ProductBasicInfo from './BasicInformation';
 import ProductSpecs from './ProductSpecs';
+import ProductReview from './ProductReview';
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -35,9 +36,13 @@ const ProductDetail = () => {
 
   return (
     <div className="mx-26 px-4 sm:px-6 lg:px-8 max-w-7xl mt-6">
-      <h1 className="text-2xl font-bold mb-5">
-        {product.name} {product.isOutOfStock && <span className="text-sm text-red-500 ml-2">Hết hàng</span>}
-      </h1>
+      <div className='flex flex-col gap-2 justify-between mb-4'>
+        <h1 className="text-2xl font-bold">
+          {product.name} {product.isOutOfStock && <span className="text-sm text-red-500 ml-2">Hết hàng</span>}
+        </h1>
+        
+        {product.sales > 0 && <p className="text-base">Lượt bán: {product.sales}</p>}
+      </div>
 
       <div className="flex flex-col md:flex-row justify-between w-full pt-4 border-t-4 border-gray-300 gap-8"> 
         <ProductImages images={product.images} mainImageUrl={product.mainImageUrl} />
@@ -52,7 +57,9 @@ const ProductDetail = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
         <ProductBasicInfo />
         <ProductSpecs specs={product.specs} />
+        
       </div>
+      <ProductReview productId={product.productId}></ProductReview>
     </div>
   );
 };

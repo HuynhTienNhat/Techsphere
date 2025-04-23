@@ -41,7 +41,7 @@ export default function AddressSelectionModal({
                 key={addr.id}
                 value={addr.id}
                 control={<Radio sx={{ color: '#8b5cf6', '&.Mui-checked': { color: '#8b5cf6' } }} />}
-                label={`${addr.houseNumber}, ${addr.street}, ${addr.city}${addr.isDefault ? ' (Mặc định)' : ''}`}
+                label={`${addr.streetAndHouseNumber}, ${addr.district}, ${addr.city}${addr.isDefault ? ' (Mặc định)' : ''}`}
                 sx={{ color: '#1f2937', marginY: 1 }}
               />
             ))}

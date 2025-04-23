@@ -8,6 +8,7 @@ import com.example.BEsub.repositories.*;
 import com.example.BEsub.security.JwtUtil;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
@@ -23,11 +24,18 @@ public class UserServiceImpl implements UserService {
     private UserAddressRepository addressRepository;
 
     @Autowired
+    private OrderRepository orderRepository;
+
+    @Autowired
     private BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtUtil jwtUtil;
 
+    // Hàm kiểm tra typeOfAddress hợp lệ
+    private boolean isValidTypeOfAddress(String type) {
+        return type != null && (type.equals("Nhà riêng") || type.equals("Văn phòng"));
+    }
 
     @Override
     public UserResponseDTO login(UserLoginDTO loginDTO) {
@@ -113,10 +121,16 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found"));
 
+        // Kiểm tra typeOfAddress hợp lệ
+        if (!isValidTypeOfAddress(addressDTO.getTypeOfAddress())) {
+            throw new AppException("Invalid address type: " + addressDTO.getTypeOfAddress());
+        }
+
         UserAddress address = new UserAddress();
         address.setCity(addressDTO.getCity());
-        address.setStreet(addressDTO.getStreet());
-        address.setHouseNumber(addressDTO.getHouseNumber());
+        address.setDistrict(addressDTO.getDistrict());
+        address.setStreetAndHouseNumber(addressDTO.getStreetAndHouseNumber());
+        address.setTypeOfAddress(addressDTO.getTypeOfAddress());
         address.setUser(user);
 
         // Nếu đây là địa chỉ đầu tiên, đặt làm mặc định
@@ -171,9 +185,31 @@ public class UserServiceImpl implements UserService {
     public void deleteUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new AppException("User not found"));
+
         if (user.getRole() == Role.ADMIN) {
             throw new AppException("Cannot delete another Admin");
         }
+
+        List<OrderStatus> incompleteOrders = List.of(OrderStatus.CONFIRMING, OrderStatus.PREPARING, OrderStatus.DELIVERING);
+
+        // Kiểm tra các đơn hàng chưa hoàn thành liên quan đến User
+        boolean hasIncompleteOrdersByUser = orderRepository
+                .findByUserAndStatusIn(user, incompleteOrders)
+                .stream()
+                .anyMatch(order -> incompleteOrders.contains(order.getStatus()));
+
+        // Kiểm tra các đơn hàng chưa hoàn thành liên quan đến UserAddress
+        boolean hasIncompleteOrdersByAddress = user.getAddresses().stream()
+                .anyMatch(address -> orderRepository
+                        .findByAddressAndStatusIn(address, incompleteOrders)
+                        .stream()
+                        .anyMatch(order -> incompleteOrders.contains(order.getStatus())));
+
+        // Nếu có đơn hàng chưa hoàn thành, từ chối xóa
+        if (hasIncompleteOrdersByUser || hasIncompleteOrdersByAddress) {
+            throw new AppException("Cannot delete user because they have incomplete orders");
+        }
+
         userRepository.delete(user);
     }
 
@@ -181,6 +217,21 @@ public class UserServiceImpl implements UserService {
     public List<UserAddressDTO> getUserAddresses(Long userId) {
         List<UserAddress> addresses = addressRepository.findByUserId(userId);
         return mapToUserAddressDTOList(addresses);
+    }
+
+    @Override
+    public UserAddressDTO getAddressById(Long addressId) {
+        Long userId = getCurrentUserId();
+        UserAddress address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new AppException("Address not found"));
+        return mapToUserAddressDTO(address);
+    }
+
+    @Override
+    public UserAddressDTO getAddressByIdAndUserId(Long userId, Long addressId) {
+        UserAddress address = addressRepository.findByIdAndUserId(addressId, userId)
+                .orElseThrow(() -> new AppException("Address not found"));
+        return mapToUserAddressDTO(address);
     }
 
     @Override
@@ -227,6 +278,41 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserAddressDTO updateAddress(Long userId, Long addressId, UserAddressDTO addressDTO) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Kiểm tra typeOfAddress hợp lệ
+        if (!isValidTypeOfAddress(addressDTO.getTypeOfAddress())) {
+            throw new AppException("Invalid address type: " + addressDTO.getTypeOfAddress());
+        }
+
+        UserAddress address = user.getAddresses().stream()
+                .filter(addr -> addr.getId().equals(addressId))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Address not found"));
+
+        address.setCity(addressDTO.getCity());
+        address.setDistrict(addressDTO.getDistrict());
+        address.setStreetAndHouseNumber(addressDTO.getStreetAndHouseNumber());
+        address.setTypeOfAddress(addressDTO.getTypeOfAddress());
+        address.setIsDefault(addressDTO.getIsDefault() != null && addressDTO.getIsDefault());
+
+        // Nếu đặt địa chỉ này làm mặc định, bỏ mặc định các địa chỉ khác
+        if (address.getIsDefault()) {
+            user.getAddresses().forEach(addr -> {
+                if (!addr.getId().equals(addressId)) {
+                    addr.setIsDefault(false);
+                }
+            });
+        }
+
+        userRepository.save(user);
+        return mapToUserAddressDTO(address);
+    }
+
+
+    @Override
     public void resetPassword(String email, String password) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new AppException("User not found"));
@@ -239,6 +325,13 @@ public class UserServiceImpl implements UserService {
     public List<AdminProfileDTO> getAllUsers(){
         List<User> users = userRepository.findAll();
         return users.stream().map(this::mapToAdminProfileDTO).collect(Collectors.toList());
+    }
+
+    @Override
+    public AdminProfileDTO getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException("User not found"));
+        return mapToAdminProfileDTO(user);
     }
 
     // Helper methods to map Entity to DTO
@@ -261,9 +354,10 @@ public class UserServiceImpl implements UserService {
         UserAddressDTO dto = new UserAddressDTO();
         dto.setId(address.getId());
         dto.setCity(address.getCity());
-        dto.setStreet(address.getStreet());
-        dto.setHouseNumber(address.getHouseNumber());
+        dto.setDistrict(address.getDistrict());
+        dto.setStreetAndHouseNumber(address.getStreetAndHouseNumber());
         dto.setIsDefault(address.getIsDefault());
+        dto.setTypeOfAddress(address.getTypeOfAddress());
         return dto;
     }
 
@@ -285,7 +379,15 @@ public class UserServiceImpl implements UserService {
         dto.setRole(user.getRole());
         dto.setCreatedAt(user.getCreatedAt());
         dto.setLastLogin(user.getLastLogin());
-        dto.setAddresses(getUserAddresses(user.getId())); // Lấy danh sách địa chỉ
+        dto.setAddresses(getUserAddresses(user.getId()));
         return dto;
+    }
+
+    @Override
+    public Long getCurrentUserId() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        return userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException("User not found"))
+                .getId();
     }
 }

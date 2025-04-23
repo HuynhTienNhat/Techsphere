@@ -10,20 +10,25 @@ import {
   TableRow,
   TableCell,
   CircularProgress,
-  Select,
-  MenuItem,
-  Button,
 } from '@mui/material';
 import { format } from 'date-fns';
-import { getUserAddresses, getUserOrders, changeOrderStatus } from '../../../services/api';
+import { getUserAddresses, getUserOrders } from '../../../services/api';
 import { toast } from 'react-toastify';
+
+// Object ánh xạ trạng thái với màu sắc
+const statusColors = {
+  CONFIRMED: 'text-blue-600',
+  PREPARING: 'text-orange-600',
+  DELIVERING: 'text-purple-600',
+  COMPLETED: 'text-green-600',
+  CANCEL: 'text-red-600',
+};
 
 const UserDetailModal = ({ open, onClose, user }) => {
   const [tabValue, setTabValue] = useState(0);
   const [addresses, setAddresses] = useState([]);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [statusChanges, setStatusChanges] = useState({});
 
   useEffect(() => {
     if (open && user) {
@@ -62,36 +67,6 @@ const UserDetailModal = ({ open, onClose, user }) => {
     setTabValue(newValue);
   };
 
-  const handleStatusChange = (orderId, newStatus) => {
-    setStatusChanges((prev) => ({
-      ...prev,
-      [orderId]: newStatus,
-    }));
-  };
-
-  const saveStatusChange = async (orderId) => {
-    const newStatus = statusChanges[orderId];
-    if (!newStatus) return;
-
-    try {
-      await changeOrderStatus(user.id, orderId, newStatus);
-      setOrders((prevOrders) =>
-        prevOrders.map((order) =>
-          order.orderId === orderId ? { ...order, status: newStatus } : order
-        )
-      );
-      setStatusChanges((prev) => {
-        const updated = { ...prev };
-        delete updated[orderId];
-        return updated;
-      });
-      toast.success('Order status updated successfully');
-    } catch (error) {
-      console.error('Error updating order status:', error);
-      toast.error('Failed to update order status');
-    }
-  };
-
   if (loading) {
     return (
       <Modal open={open} onClose={onClose}>
@@ -101,8 +76,6 @@ const UserDetailModal = ({ open, onClose, user }) => {
       </Modal>
     );
   }
-
-  const statusOptions = ['PROCESSING', 'DELIVERED', 'CANCELLED'];
 
   return (
     <Modal open={open} onClose={onClose}>
@@ -178,11 +151,10 @@ const UserDetailModal = ({ open, onClose, user }) => {
                   className="mb-4 p-4 border rounded-lg"
                 >
                   <Typography>
-                    {address.street}, {address.city}, {address.state},{' '}
-                    {address.postalCode}, {address.country}
+                    {address.streetAndHouseNumber}, {address.district}, {address.city}{' '}
                   </Typography>
                   {address.isDefault && (
-                    <Typography className="text-blue-500">
+                    <Typography className="text-green-500">
                       Default Address
                     </Typography>
                   )}
@@ -215,36 +187,12 @@ const UserDetailModal = ({ open, onClose, user }) => {
                   <Typography>
                     <strong>Total:</strong> {order.totalAmount}
                   </Typography>
-                  <Box className="flex items-center mt-2">
-                    <Typography className="mr-2">
-                      <strong>Status:</strong>
-                    </Typography>
-                    <Select
-                      value={statusChanges[order.orderId] || order.status}
-                      onChange={(e) =>
-                        handleStatusChange(order.orderId, e.target.value)
-                      }
-                      size="small"
-                      className="border rounded-md"
-                    >
-                      {statusOptions.map((status) => (
-                        <MenuItem key={status} value={status}>
-                          {status}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                    {statusChanges[order.orderId] &&
-                      statusChanges[order.orderId] !== order.status && (
-                        <Button
-                          variant="contained"
-                          className="bg-green-500 hover:bg-green-600 ml-2"
-                          size="small"
-                          onClick={() => saveStatusChange(order.orderId)}
-                        >
-                          Save
-                        </Button>
-                      )}
-                  </Box>
+                  <Typography>
+                    <strong>Status:</strong>{' '}
+                    <span className={statusColors[order.status] || 'text-gray-600'}>
+                      {order.status}
+                    </span>
+                  </Typography>
                 </Box>
               ))
             ) : (
@@ -254,7 +202,7 @@ const UserDetailModal = ({ open, onClose, user }) => {
         )}
 
         <button onClick={onClose} className='mt-6 bg-gray-400 px-4 py-2 cursor-pointer rounded'>
-            Close
+          Close
         </button>
       </Box>
     </Modal>

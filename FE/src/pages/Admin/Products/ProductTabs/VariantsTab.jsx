@@ -12,6 +12,7 @@ import {
   Box,
 } from "@mui/material";
 import { toast } from "react-toastify";
+import VariantEditModal from './VariantsEditModal'; 
 
 export default function VariantsTab({ variants, onChange, errors }) {
   const storageOptions = ["64GB", "128GB", "256GB", "512GB", "1TB"];
@@ -22,6 +23,8 @@ export default function VariantsTab({ variants, onChange, errors }) {
     stockQuantity: 0,
     default: false,
   });
+  const [editVariantIndex, setEditVariantIndex] = useState(null); // State để mở modal chỉnh sửa
+  const [openEditModal, setOpenEditModal] = useState(false); // State để kiểm soát modal
 
   const handleAddVariant = () => {
     const exists = variants.some(
@@ -31,12 +34,10 @@ export default function VariantsTab({ variants, onChange, errors }) {
       toast.warning("Biến thể với màu và bộ nhớ này đã tồn tại!");
       return;
     }
-    if (newVariant.default) {
-      const updatedVariants = variants.map((v) => ({ ...v, default: false }));
-      onChange([...updatedVariants, newVariant]);
-    } else {
-      onChange([...variants, newVariant]);
-    }
+    const updatedVariants = newVariant.default
+      ? variants.map((v) => ({ ...v, default: false }))
+      : variants;
+    onChange([...updatedVariants, { ...newVariant, isDeleted: false }]);
     setNewVariant({
       color: "",
       storage: storageOptions[0],
@@ -47,7 +48,17 @@ export default function VariantsTab({ variants, onChange, errors }) {
   };
 
   const handleDeleteVariant = (index) => {
-    onChange(variants.filter((_, i) => i !== index));
+    const variant = variants[index];
+    if (variant.variantId) {
+      // Nếu variant đã có variantId, đánh dấu isDeleted: true
+      const updatedVariants = variants.map((v, i) =>
+        i === index ? { ...v, isDeleted: true } : v
+      );
+      onChange(updatedVariants);
+    } else {
+      // Nếu variant chưa có variantId, xóa trực tiếp khỏi danh sách
+      onChange(variants.filter((_, i) => i !== index));
+    }
   };
 
   const handleToggleDefault = (index) => {
@@ -56,6 +67,24 @@ export default function VariantsTab({ variants, onChange, errors }) {
       default: i === index,
     }));
     onChange(updatedVariants);
+  };
+
+  const handleEditVariant = (index) => {
+    setEditVariantIndex(index);
+    setOpenEditModal(true);
+  };
+
+  const handleSaveVariant = (updatedVariant) => {
+    const updatedVariants = [...variants];
+    updatedVariants[editVariantIndex] = { ...updatedVariant, isDeleted: false };
+    onChange(updatedVariants);
+    setOpenEditModal(false);
+    setEditVariantIndex(null);
+  };
+
+  const handleCloseEditModal = () => {
+    setOpenEditModal(false);
+    setEditVariantIndex(null);
   };
 
   return (
@@ -97,7 +126,7 @@ export default function VariantsTab({ variants, onChange, errors }) {
               onChange={(e) =>
                 setNewVariant({
                   ...newVariant,
-                  priceAdjustment: parseFloat(e.target.value),
+                  priceAdjustment: parseFloat(e.target.value) || 0,
                 })
               }
               fullWidth
@@ -110,7 +139,7 @@ export default function VariantsTab({ variants, onChange, errors }) {
               onChange={(e) =>
                 setNewVariant({
                   ...newVariant,
-                  stockQuantity: parseInt(e.target.value),
+                  stockQuantity: parseInt(e.target.value) || 0,
                 })
               }
               fullWidth
@@ -145,42 +174,51 @@ export default function VariantsTab({ variants, onChange, errors }) {
         </Typography>
       ) : (
         <Box className="max-h-64 overflow-y-auto space-y-2 p-2 border rounded">
-          {variants.map((variant, index) => (
-            <Card key={index} className="flex items-center justify-between p-2">
-              <CardContent>
-                <Typography variant="body2">
-                  <strong>Color:</strong> {variant.color}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Storage:</strong> {variant.storage}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Price Adjustment:</strong>{" "}
-                  {variant.priceAdjustment.toLocaleString("vi-VN")} VND
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Stock:</strong> {variant.stockQuantity}
-                </Typography>
-                <Typography variant="body2">
-                  <strong>Default:</strong> {variant.default ? "Yes" : "No"}
-                </Typography>
-              </CardContent>
-              <Box className="flex gap-2 mr-4">
-                <Button
-                  color="primary"
-                  onClick={() => handleToggleDefault(index)}
-                >
-                  Set Default
-                </Button>
-                <Button
-                  color="error"
-                  onClick={() => handleDeleteVariant(index)}
-                >
-                  Delete
-                </Button>
-              </Box>
-            </Card>
-          ))}
+          {variants
+            .map((variant, index) => ({ variant, index }))
+            .filter(({ variant }) => !variant.isDeleted) // Chỉ hiển thị variant chưa bị xóa
+            .map(({ variant, index }) => (
+              <Card key={index} className="flex items-center justify-between p-2">
+                <CardContent>
+                  <Typography variant="body2">
+                    <strong>Color:</strong> {variant.color}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Storage:</strong> {variant.storage}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Price Adjustment:</strong>{" "}
+                    {variant.priceAdjustment.toLocaleString("vi-VN")} VND
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Stock:</strong> {variant.stockQuantity}
+                  </Typography>
+                  <Typography variant="body2">
+                    <strong>Default:</strong> {variant.default ? "Yes" : "No"}
+                  </Typography>
+                </CardContent>
+                <Box className="flex gap-2 mr-4">
+                  <Button
+                    color="primary"
+                    onClick={() => handleEditVariant(index)}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    color="error"
+                    onClick={() => handleDeleteVariant(index)}
+                  >
+                    Delete
+                  </Button>
+                  <Button
+                    color="primary"
+                    onClick={() => handleToggleDefault(index)}
+                  >
+                    Set Default
+                  </Button>
+                </Box>
+              </Card>
+            ))}
         </Box>
       )}
       {errors.variants && (
@@ -188,6 +226,14 @@ export default function VariantsTab({ variants, onChange, errors }) {
           {errors.variants}
         </Typography>
       )}
+
+      <VariantEditModal
+        open={openEditModal}
+        variant={editVariantIndex !== null ? variants[editVariantIndex] : null}
+        storageOptions={storageOptions}
+        onSave={handleSaveVariant}
+        onClose={handleCloseEditModal}
+      />
     </Box>
   );
 }

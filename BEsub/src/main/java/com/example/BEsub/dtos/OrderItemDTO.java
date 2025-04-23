@@ -16,4 +16,5 @@ public class OrderItemDTO {
     private String storage;    // Dung lượng
     private Integer quantity;  // Số lượng (mặc định 1, có thể tăng/giảm)
     private BigDecimal unitPrice; // Giá đơn vị
+    private Long productId;
 }
