@@ -140,7 +140,7 @@ export default function Contact() {
         <ContactCard 
           icon={<EmailIcon />} 
           title="Email" 
-          value="cskh@cellphones.com.vn" 
+          value="cskh@techsphere.com.vn" 
           isEmail={true} 
         />
       </div>

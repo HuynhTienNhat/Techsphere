@@ -47,13 +47,13 @@ export default function ProfileInfo() {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 4, maxWidth: 800 }}>
+    <Paper elevation={3} sx={{ p: 4, maxWidth: 1000 }}>
       <Typography variant="h5" fontWeight="bold" mb={3}>
         Thông tin cá nhân
       </Typography>
 
       {/* Profile picture */}
-      <Box mb={3}>
+      <Box mb={3} sx={{ display: 'flex', justifyContent: 'center' }}>
         <svg width="100" height="100" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
           <rect width="44" height="44" rx="22" fill="#E0D4F9"></rect>
           <path
@@ -85,7 +85,7 @@ export default function ProfileInfo() {
 
       {/* Profile content */}
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={6} sx={{width: '100%'}}>
           <Box mb={2}>
             <Typography variant="body2" color="textSecondary">
               Họ tên
