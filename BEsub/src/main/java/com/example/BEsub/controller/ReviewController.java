@@ -34,6 +34,11 @@ public class ReviewController {
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.getReviewsByProduct(productId));
     }
 
+    @GetMapping("/order/{orderId}")
+    ResponseEntity<List<ReviewDTO>> getReviewsOfUserByOrderId(@PathVariable Long orderId){
+        return ResponseEntity.status(HttpStatus.OK).body(reviewService.getByUserIdAndOrderId(orderId));
+    }
+
     @PutMapping("/{reviewId}")
     ResponseEntity<ReviewDTO> updateReview(@PathVariable Long reviewId, @RequestBody ReviewUpdateDTO reviewUpdateDTO){
         return ResponseEntity.status(HttpStatus.OK).body(reviewService.updateReview(reviewId,reviewUpdateDTO));

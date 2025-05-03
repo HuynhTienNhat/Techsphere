@@ -49,6 +49,13 @@ public class ReviewServiceImpl implements ReviewService{
     }
 
     @Override
+    public List<ReviewDTO> getByUserIdAndOrderId(Long orderId) {
+        return reviewRepository.findByUserIdAndOrderId(getCurrentUserId(),orderId).stream()
+                .map(this::mapReviewToReviewDTO)
+                .toList();
+    }
+
+    @Override
     public List<ReviewDTO> getReviewsByProduct(Long productId) {
         return reviewRepository.findByProductId(productId)
                 .stream().map(this::mapReviewToReviewDTO)

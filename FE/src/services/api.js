@@ -496,3 +496,13 @@ export const getReviewsOfProduct = async (productId) => {
     throw new Error(error.message);
   }
 }
+
+export const getReviewsOfUserByOrderId = async (orderId) => {
+  try{
+    const response = await commonApi.get(`/reviews/order/${orderId}`);
+    return response.data;
+  }
+  catch(error){
+    throw new Error(error.message);
+  }
+}

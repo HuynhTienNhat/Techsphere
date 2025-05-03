@@ -7,7 +7,6 @@ import {
   cancelOrder,
   getOrderDetails,
   getAddressById,
-  createReview,
 } from './../../../services/api.js'; 
 import {
   Box,
@@ -29,6 +28,7 @@ import {
   Select,
   MenuItem 
 } from "@mui/material";
+import ReviewDialog from "./ReviewDialog.jsx";
 
 export default function Orders() {
     const [activeTab, setActiveTab] = useState("ALL");
@@ -41,11 +41,6 @@ export default function Orders() {
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [openReview, setOpenReview] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
-    const [rating, setRating] = useState(0);
-    const [comment, setComment] = useState("");
-    const [selectedProductId, setSelectedProductId] = useState(null);
-    const [selectedVariantId, setSelectedVariantId] = useState(null);
-    const [variantName, setVariantName] = useState("");
 
   
     const tabs = [
@@ -57,13 +52,6 @@ export default function Orders() {
       { name: "Đã hủy", value: "CANCELLED" },
     ];
 
-    useEffect(() => {
-      if (selectedOrder?.orderItems?.length > 0) {
-        const firstItem = selectedOrder.orderItems[0];
-        setSelectedVariantId(firstItem.variantId);
-        setSelectedProductId(firstItem.productId);
-      }
-    }, [selectedOrder]);
 
     const handleOpenReview = async (orderId) => {
       try {
@@ -354,72 +342,13 @@ export default function Orders() {
           )}
         </Dialog>
 
-        <Dialog open={openReview} onClose={handleCloseReview}>
-          <DialogTitle>Đánh giá đơn hàng #{selectedOrderId}</DialogTitle>
-          <DialogContent>
-            <FormControl fullWidth sx={{ mt: 2 ,mb: 2}}>
-              <InputLabel id="product-select-label">Sản phẩm</InputLabel>
-              <Select
-                labelId="product-select-label"
-                value={selectedVariantId}
-                onChange={(e) => {
-                  const selectedId = e.target.value;
-                  setSelectedVariantId(selectedId);
-              
-                  const selectedItem = selectedOrder?.orderItems?.find(
-                    (item) => item.variantId === selectedId
-                  );
-              
-                  if (selectedItem) {
-                    setSelectedProductId(selectedItem.productId);
-                    setVariantName(`${selectedItem.productName} (${selectedItem.color}, ${selectedItem.storage})`);
-                  }
-                }}
-                label="Sản phẩm"
-              >
-                {selectedOrder?.orderItems?.map((item) => (
-                  <MenuItem key={item.variantId} value={item.variantId}>
-                    {item.productName} ({item.color}, {item.storage})
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <TextField
-              label="Nội dung đánh giá"
-              fullWidth
-              multiline
-              onChange={(e)=>{setComment(e.target.value)}}
-              rows={4}
-              sx={{ mt: 2, width: 552 }}
-            />
-            <Rating
-              name="rating"
-              value={rating}
-              onChange={(event, newValue) => {
-                setRating(newValue);
-              }}
-              precision={1}
-              sx={{ display: "flex", justifyContent: "center", mx: "auto", mt: 2 }} 
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseReview}>Hủy</Button>
-            <Button variant="contained" color="primary" onClick={() => {
-              try{
-                if(comment === "") throw new Error("Nội dung không thể trống.");
-                console.log(selectedProductId);
-                console.log(selectedOrderId);
-                createReview(rating,comment,selectedOrderId,selectedProductId,variantName);
-              }
-              catch(error){
-                toast.error("Lỗi: " + error.message);
-              }
-              handleCloseReview();
-            }}>
-              Gửi đánh giá
-            </Button>
-          </DialogActions>
-        </Dialog>
+        <ReviewDialog
+          open={openReview}
+          onClose={handleCloseReview}
+          selectedOrder={selectedOrder}
+          selectedOrderId={selectedOrderId}
+        />
+
 
       </Box>
     );
