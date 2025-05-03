@@ -1,5 +1,5 @@
-import { banners } from '../../../assets/data/Banners';
-import {smallBanners} from '../../../assets/data/SmallBanners';
+import { banners } from './../../../assets/data/HomePage/Banners.js';
+import {smallBanners} from './../../../assets/data/HomePage/SmallBanners.js';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 import 'swiper/css';

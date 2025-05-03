@@ -118,8 +118,8 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
           borderRadius: 2,
         }}
       >
-        <Typography variant="h5" gutterBottom>
-          Chi tiết đơn hàng #{order.orderId}
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold'}}>
+          Chi tiết đơn hàng #ĐH-{order.orderId}
         </Typography>
         {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
 
@@ -133,7 +133,7 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
 
         {/* Thông tin người đặt */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="subtitle1" gutterBottom sx={{color: '	#6d28d9', fontWeight: 'bold'}}>
             Thông tin người đặt
           </Typography>
           {userInfo ? (
@@ -148,12 +148,12 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
 
         {/* Thông tin địa chỉ */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="subtitle1" gutterBottom sx={{color: '	#6d28d9', fontWeight: 'bold'}}>
             Địa chỉ giao hàng
           </Typography>
           {address ? (
             <Typography>
-              {address.streetAndHouseNumber}, {address.district}, {address.city}, {address.typeOfAddress}
+              {address.streetAndHouseNumber}, {address.district}, {address.city} - <strong>{address.typeOfAddress}</strong>
               {address.isDefault && ' (Mặc định)'}
             </Typography>
           ) : (
@@ -193,7 +193,7 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
 
         {/* Sản phẩm */}
         <Box sx={{ mb: 2 }}>
-          <Typography variant="subtitle1" gutterBottom>
+          <Typography variant="subtitle1" gutterBottom sx={{color: '	#6d28d9', fontWeight: 'bold'}}>
             Sản phẩm
           </Typography>
           <TableContainer component={Paper}>

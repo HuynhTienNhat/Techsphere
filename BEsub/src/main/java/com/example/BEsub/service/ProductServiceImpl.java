@@ -76,7 +76,7 @@ public class ProductServiceImpl implements ProductService {
         }
         try {
             int frontCamera = Integer.parseInt(request.getFrontCamera());
-            if (frontCamera < 0  || frontCamera > 100) {
+            if (frontCamera < 0 || frontCamera > 100) {
                 throw new AppException("Camera trước must be a number between 0 and 100");
             }
         } catch (NumberFormatException e) {
@@ -182,40 +182,22 @@ public class ProductServiceImpl implements ProductService {
 
     @Transactional
     @Override
-    public ProductDTO updateProduct(Long productId, ProductDTO productDTO) {
+    public ProductDTO updateProduct(Long productId, ProductUpdateDTO productUpdateDTO) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new AppException("Product not found"));
 
-        Product existingProduct = productRepository.findBySlug(productDTO.getSlug());
+        Product existingProduct = productRepository.findBySlug(productUpdateDTO.getSlug());
         if (existingProduct != null && !existingProduct.getId().equals(productId)) {
             throw new AppException("Slug already exists");
         }
 
-        // Không cho phép cập nhật specs
-        if (productDTO.getSpecs() != null && !productDTO.getSpecs().isEmpty()) {
-            throw new AppException("Specs cannot be updated after product creation");
+        try {
+            mapToEntity(productUpdateDTO, product);
+            Product updatedProduct = productRepository.save(product);
+            return mapToDTO(updatedProduct);
+        } catch (Exception e) {
+            throw new AppException("Failed to update product: " + e.getMessage());
         }
-
-        // Không cho phép cập nhật images
-        if (productDTO.getImages() != null && !productDTO.getImages().isEmpty()) {
-            throw new AppException("Images cannot be updated after product creation");
-        }
-
-        // Validate variants: Chỉ 1 isDefault
-        if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
-            long defaultCount = productDTO.getVariants().stream().filter(ProductVariantDTO::isDefault).count();
-            if (defaultCount > 1) {
-                throw new AppException("Only one variant can be set as default");
-            }
-            if (defaultCount == 0) {
-                // Tự động chọn variant đầu tiên làm mặc định
-                productDTO.getVariants().get(0).setDefault(true);
-            }
-        }
-
-        mapToEntity(productDTO, product);
-        Product updatedProduct = productRepository.save(product);
-        return mapToDTO(updatedProduct);
     }
 
     @Override
@@ -301,7 +283,6 @@ public class ProductServiceImpl implements ProductService {
         return products.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
 
-
     @Override
     public List<ReviewDTO> getProductReview(Long productId) {
         Product product = productRepository.findById(productId)
@@ -325,7 +306,7 @@ public class ProductServiceImpl implements ProductService {
         List<RatingStarDTO> ratingData = new ArrayList<>();
         List<Integer> ratings = getRatings(reviewDTOs);
         for (int i = 1; i <= 5; i++) {
-            ratingData.add(new RatingStarDTO(i, ratings.get(i-1)));
+            ratingData.add(new RatingStarDTO(i, ratings.get(i - 1)));
         }
 
         return RatingDTO.builder()
@@ -365,7 +346,7 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    private void mapToEntity(ProductDTO dto, Product product) {
+    private void mapToEntity(ProductUpdateDTO dto, Product product) {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new AppException("Product name cannot be null or blank");
         }
@@ -375,7 +356,6 @@ public class ProductServiceImpl implements ProductService {
         product.setSlug(dto.getSlug());
         product.setBasePrice(dto.getBasePrice());
         product.setOldPrice(dto.getOldPrice());
-        product.setSales(dto.getSales());
 
         // Ánh xạ Brand
         String brandName = dto.getBrandName();
@@ -391,33 +371,81 @@ public class ProductServiceImpl implements ProductService {
         product.setBrand(brand);
 
         // Ánh xạ Variants
-        List<ProductVariant> currentVariants = product.getVariants() != null ? product.getVariants() : new ArrayList<>();
-        List<ProductVariant> updatedVariants = new ArrayList<>();
-        Map<Long, ProductVariant> variantMap = currentVariants.stream()
-                .filter(v -> v.getId() != null)
-                .collect(Collectors.toMap(ProductVariant::getId, v -> v));
+        if (dto.getVariants() != null && !dto.getVariants().isEmpty()) {
+            // Validate: Chỉ 1 isDefault trong payload
+            long defaultCount = dto.getVariants().stream().filter(ProductVariantDTO::isDefault).count();
+            if (defaultCount > 1) {
+                throw new AppException("Only one variant can be set as default");
+            }
 
-        if (dto.getVariants() != null) {
+            // Lấy danh sách variants hiện có
+            List<ProductVariant> variants = product.getVariants();
+
+            // Xử lý variants từ DTO
             for (ProductVariantDTO vDto : dto.getVariants()) {
+                // Nếu variant được đánh dấu xóa
+                if (vDto.isDeleted() && vDto.getVariantId() != null) {
+                    variants.removeIf(v -> v.getId().equals(vDto.getVariantId()));
+                    continue;
+                }
+
+                // Bỏ qua nếu isDeleted = true nhưng không có variantId
+                if (vDto.isDeleted()) {
+                    continue;
+                }
+
                 ProductVariant variant;
-                if (vDto.getVariantId() != null && variantMap.containsKey(vDto.getVariantId())) {
-                    // Cập nhật variant hiện có
-                    variant = variantMap.get(vDto.getVariantId());
-                    variantMap.remove(vDto.getVariantId());
+                if (vDto.getVariantId() != null) {
+                    // Tìm variant hiện có
+                    variant = variants.stream()
+                            .filter(v -> v.getId().equals(vDto.getVariantId()))
+                            .findFirst()
+                            .orElseGet(() -> {
+                                // Nếu không tìm thấy, tạo mới và thêm vào danh sách
+                                ProductVariant newVariant = new ProductVariant();
+                                newVariant.setProduct(product);
+                                variants.add(newVariant);
+                                return newVariant;
+                            });
                 } else {
-                    // Thêm variant mới
+                    // Tạo variant mới
                     variant = new ProductVariant();
                     variant.setProduct(product);
+                    variants.add(variant);
+                }
+                // Nếu variant này là default, đặt tất cả variants khác thành false
+                if (vDto.isDefault()) {
+                    variants.forEach(v -> v.setDefault(false));
                 }
                 variant.setColor(vDto.getColor());
                 variant.setStorage(vDto.getStorage());
                 variant.setPriceAdjustment(vDto.getPriceAdjustment());
                 variant.setStockQuantity(vDto.getStockQuantity());
                 variant.setDefault(vDto.isDefault());
-                updatedVariants.add(variant);
+            }
+
+            // Đảm bảo chỉ có 1 isDefault
+            long finalDefaultCount = variants.stream().filter(ProductVariant::isDefault).count();
+            if (finalDefaultCount > 1) {
+                // Nếu vẫn có nhiều default, giữ default của variant cuối cùng trong DTO
+                variants.forEach(v -> v.setDefault(false));
+                for (int i = dto.getVariants().size() - 1; i >= 0; i--) {
+                    ProductVariantDTO vDto = dto.getVariants().get(i);
+                    if (vDto.isDefault()) {
+                        variants.stream()
+                                .filter(v -> (vDto.getVariantId() != null && v.getId().equals(vDto.getVariantId())) ||
+                                        (vDto.getVariantId() == null && v.getColor().equals(vDto.getColor()) && v.getStorage().equals(vDto.getStorage())))
+                                .findFirst()
+                                .ifPresent(v -> v.setDefault(true));
+                        break;
+                    }
+                }
+            } else if (finalDefaultCount == 0 && !variants.isEmpty()) {
+                // Nếu không có default, đặt variant đầu tiên làm default
+                variants.get(0).setDefault(true);
             }
         }
-        product.setVariants(updatedVariants);
+        // Nếu variants là null hoặc rỗng, giữ nguyên variants hiện có
     }
 
     private void mapToEntity(ProductCreateRequest request, Product product) {
@@ -518,7 +546,7 @@ public class ProductServiceImpl implements ProductService {
         // Ánh xạ Variants
         List<ProductVariantDTO> variants = product.getVariants().stream()
                 .map(v -> new ProductVariantDTO(v.getId(), v.getColor(), v.getStorage(),
-                        v.getPriceAdjustment(), v.getStockQuantity(), v.isDefault()))
+                        v.getPriceAdjustment(), v.getStockQuantity(), v.isDefault(), false))
                 .collect(Collectors.toList());
         dto.setVariants(variants);
 
@@ -537,7 +565,7 @@ public class ProductServiceImpl implements ProductService {
         // Ánh xạ Reviews
         List<ReviewDTO> reviews = reviewRepository.findByProductId(product.getId()).stream()
                 .map(r -> new ReviewDTO(r.getId(), r.getRating(), r.getComment(),
-                        r.getUser().getId(), r.getUser().getName(), r.getCreatedAt(),r.getVariantName()))
+                        r.getUser().getId(), r.getUser().getName(), r.getCreatedAt(), r.getVariantName()))
                 .collect(Collectors.toList());
         dto.setReviews(reviews);
 

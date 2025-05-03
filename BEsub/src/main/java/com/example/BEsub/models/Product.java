@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import java.math.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor
@@ -33,8 +34,8 @@ public class Product extends BaseEntity {
     private Brand brand;
 
     // Quan hệ One-to-Many với PRODUCT_VARIANTS
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<ProductVariant> variants;
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductVariant> variants = new ArrayList<>();
 
     // Quan hệ One-to-Many với PRODUCT_IMAGES
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)

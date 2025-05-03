@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { toast } from "react-toastify";
+import { FixedSizeList } from 'react-window';
 import {
   getCustomerOrders,
   getOrdersByStatus,
@@ -7,6 +8,7 @@ import {
   cancelOrder,
   getOrderDetails,
   getAddressById,
+  createReview,
 } from './../../../services/api.js'; 
 import {
   Box,
@@ -22,13 +24,12 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Rating ,
+  Rating,
   FormControl,
   InputLabel,
   Select,
   MenuItem 
 } from "@mui/material";
-import ReviewDialog from "./ReviewDialog.jsx";
 
 export default function Orders() {
     const [activeTab, setActiveTab] = useState("ALL");
@@ -41,8 +42,12 @@ export default function Orders() {
     const [selectedAddress, setSelectedAddress] = useState(null);
     const [openReview, setOpenReview] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
+    const [rating, setRating] = useState(0);
+    const [comment, setComment] = useState("");
+    const [selectedProductId, setSelectedProductId] = useState(null);
+    const [selectedVariantId, setSelectedVariantId] = useState(null);
+    const [variantName, setVariantName] = useState("");
 
-  
     const tabs = [
       { name: "Tất cả", value: "ALL" },
       { name: "Chờ xác nhận", value: "CONFIRMING" },
@@ -52,6 +57,13 @@ export default function Orders() {
       { name: "Đã hủy", value: "CANCELLED" },
     ];
 
+    useEffect(() => {
+      if (selectedOrder?.orderItems?.length > 0) {
+        const firstItem = selectedOrder.orderItems[0];
+        setSelectedVariantId(firstItem.variantId);
+        setSelectedProductId(firstItem.productId);
+      }
+    }, [selectedOrder]);
 
     const handleOpenReview = async (orderId) => {
       try {
@@ -69,7 +81,6 @@ export default function Orders() {
       setSelectedOrderId(null);
     };
     
-  
     // Lấy danh sách đơn hàng
     const fetchOrders = async (status = "ALL", month = null, year = null) => {
       setIsLoading(true);
@@ -177,6 +188,59 @@ export default function Orders() {
           return "warning";
       }
     };
+
+    // Row component for virtual list
+    const OrderRow = ({ index, style }) => {
+      const order = orders[index];
+      return (
+        <div style={style}>
+          <Paper sx={{ p: 2, mb: 2, mx: 1 }}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+              <Typography fontWeight="medium">Đơn hàng #{order.orderId}</Typography>
+              <Chip
+                label={tabs.find((tab) => tab.value === order.status)?.name || order.status}
+                color={getStatusColor(order.status)}
+                size="small"
+              />
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              Ngày đặt: {formatDate(order.orderDate)}
+            </Typography>
+            <Typography variant="body2" fontWeight="medium" mt={1}>
+              {formatCurrency(order.totalAmount)}
+            </Typography>
+            <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleOpenModal(order.orderId)}
+              >
+                Chi tiết
+              </Button>
+              {(order.status === "CONFIRMING" || order.status === "PREPARING") && (
+                <Button
+                  variant="contained"
+                  color="error"
+                  onClick={() => handleCancelOrder(order.orderId)}
+                >
+                  Hủy
+                </Button>
+              )}
+              {(order.status === "COMPLETED") && (
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  onClick={() => {handleOpenReview(order.orderId)}}
+                  sx={{ ml: "auto" }}
+                >
+                  Đánh giá
+                </Button>
+              )}
+            </Box>
+          </Paper>
+        </div>
+      );
+    };
   
     return (
       <Box sx={{ p: 4, bgcolor: "white", borderRadius: 2, boxShadow: 3 }}>
@@ -205,7 +269,6 @@ export default function Orders() {
             value={month}
             onChange={(e) => setMonth(e.target.value)}
             size="small"
-            inputProps={{ min: 1, max: 12 }}
             sx={{ width: 120 }}
           />
           <TextField
@@ -214,7 +277,6 @@ export default function Orders() {
             value={year}
             onChange={(e) => setYear(e.target.value)}
             size="small"
-            inputProps={{ min: 2000, max: 2099 }}
             sx={{ width: 120 }}
           />
           <Button type="submit" variant="contained" color="primary">
@@ -228,58 +290,22 @@ export default function Orders() {
           </Button>
         </Box>
   
-        {/* Danh sách đơn hàng */}
+        {/* Danh sách đơn hàng với Virtual Scrolling */}
         {isLoading ? (
           <Typography>Đang tải...</Typography>
         ) : orders.length === 0 ? (
           <Typography>Không có đơn hàng nào.</Typography>
         ) : (
-          orders.map((order) => (
-            <Paper key={order.orderId} sx={{ p: 2, mb: 2 }}>
-              <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
-                <Typography fontWeight="medium">Đơn hàng #{order.orderId}</Typography>
-                <Chip
-                  label={tabs.find((tab) => tab.value === order.status)?.name || order.status}
-                  color={getStatusColor(order.status)}
-                  size="small"
-                />
-              </Box>
-              <Typography variant="body2" color="text.secondary">
-                Ngày đặt: {formatDate(order.orderDate)}
-              </Typography>
-              <Typography variant="body2" fontWeight="medium" mt={1}>
-                {formatCurrency(order.totalAmount)}
-              </Typography>
-              <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={() => handleOpenModal(order.orderId)}
-                >
-                  Chi tiết
-                </Button>
-                {(order.status === "CONFIRMING" || order.status === "PREPARING") && (
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleCancelOrder(order.orderId)}
-                  >
-                    Hủy
-                  </Button>
-                )}
-                {(order.status === "COMPLETED") && (
-                  <Button
-                    variant="contained"
-                    color="secondary"
-                    onClick={() => {handleOpenReview(order.orderId)}}
-                    sx={{ ml: "auto" }}
-                  >
-                    Đánh giá
-                  </Button>
-                )}
-              </Box>
-            </Paper>
-          ))
+          <Box sx={{ height: 400, width: '100%' }}>
+            <FixedSizeList
+              height={400}
+              width="100%"
+              itemCount={orders.length}
+              itemSize={180} // Adjust based on your order item height
+            >
+              {OrderRow}
+            </FixedSizeList>
+          </Box>
         )}
   
         {/* Modal chi tiết đơn hàng (MUI Dialog) */}
@@ -342,14 +368,71 @@ export default function Orders() {
           )}
         </Dialog>
 
-        <ReviewDialog
-          open={openReview}
-          onClose={handleCloseReview}
-          selectedOrder={selectedOrder}
-          selectedOrderId={selectedOrderId}
-        />
-
-
+        <Dialog open={openReview} onClose={handleCloseReview}>
+          <DialogTitle>Đánh giá đơn hàng #{selectedOrderId}</DialogTitle>
+          <DialogContent>
+            <FormControl fullWidth sx={{ mt: 2 ,mb: 2}}>
+              <InputLabel id="product-select-label">Sản phẩm</InputLabel>
+              <Select
+                labelId="product-select-label"
+                value={selectedVariantId}
+                onChange={(e) => {
+                  const selectedId = e.target.value;
+                  setSelectedVariantId(selectedId);
+              
+                  const selectedItem = selectedOrder?.orderItems?.find(
+                    (item) => item.variantId === selectedId
+                  );
+              
+                  if (selectedItem) {
+                    setSelectedProductId(selectedItem.productId);
+                    setVariantName(`${selectedItem.productName} (${selectedItem.color}, ${selectedItem.storage})`);
+                  }
+                }}
+                label="Sản phẩm"
+              >
+                {selectedOrder?.orderItems?.map((item) => (
+                  <MenuItem key={item.variantId} value={item.variantId}>
+                    {item.productName} ({item.color}, {item.storage})
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <TextField
+              label="Nội dung đánh giá"
+              fullWidth
+              multiline
+              onChange={(e)=>{setComment(e.target.value)}}
+              rows={4}
+              sx={{ mt: 2, width: 552 }}
+            />
+            <Rating
+              name="rating"
+              value={rating}
+              onChange={(event, newValue) => {
+                setRating(newValue);
+              }}
+              precision={1}
+              sx={{ display: "flex", justifyContent: "center", mx: "auto", mt: 2 }} 
+            />
+          </DialogContent>
+          
+          <DialogActions>
+            <Button onClick={handleCloseReview}>Hủy</Button>
+            <Button variant="contained" color="primary" onClick={() => {
+              try{
+                if(comment === "") throw new Error("Nội dung không thể trống.");
+                createReview(rating, comment, selectedOrderId, selectedProductId, variantName);
+              }
+              catch(error){
+                toast.error("Lỗi: " + error.message);
+              }
+              handleCloseReview();
+            }}>
+              Gửi đánh giá
+            </Button>
+          </DialogActions>
+        </Dialog>
       </Box>
     );
 }
