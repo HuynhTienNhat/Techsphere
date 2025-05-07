@@ -129,7 +129,7 @@ export default function ProfileInfo() {
         </Grid>
       </Grid>
 
-      <Box mt={4}>
+      <Box mt={4} sx={{ display: 'flex', justifyContent: 'center' }}>
         <Button
           variant="contained"
           color="primary"
