@@ -21,6 +21,7 @@ import Checkout from './pages/Customer/Checkout/Checkout.jsx';
 import Profile from './pages/Customer/Profile/Profile.jsx';
 import OrdersManagement from './pages/Admin/Orders/Orders.jsx';
 import GeneralInformation from './pages/Customer/About/GeneralInformation.jsx';
+import PaymentSuccess from './pages/Customer/Checkout/PaymentSuccess.jsx';
 
 function AppContent() {
   const location = useLocation();
@@ -138,6 +139,15 @@ function AppContent() {
           element={
             <CustomerLayout>
               <GeneralInformation />
+            </CustomerLayout>
+          }
+        />
+
+        <Route
+          path="/payment-success"
+          element={
+            <CustomerLayout>
+              <PaymentSuccess />
             </CustomerLayout>
           }
         />
