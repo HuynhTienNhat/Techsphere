@@ -506,3 +506,22 @@ export const getReviewsOfUserByOrderId = async (orderId) => {
     throw new Error(error.message);
   }
 }
+
+export const handlePayment = async (amount, order, url) => {
+    try {
+      console.log(order);
+      const response = await commonApi.get("/payment/create", {
+        params: {
+          amount: amount,
+          orderInfor: JSON.stringify(order),
+          urlReturn: url
+        }
+      });
+
+      const paymentUrl = response.data;
+      window.location.href = paymentUrl; // Chuyển hướng đến cổng thanh toán VNPay
+    } catch (error) {
+      console.error("Lỗi khi tạo thanh toán VNPay:", error);
+      alert("Có lỗi xảy ra khi tạo yêu cầu thanh toán.");
+    }
+  };

@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { fetchCart, getAddresses, createOrder } from '../../../services/api.js';
+import { fetchCart, getAddresses, createOrder, handlePayment } from '../../../services/api.js';
 import CheckoutItems from './CheckoutItems.jsx';
 import CheckoutSummary from './CheckoutSummary';
 import CheckoutForm from './CheckoutForm';
@@ -20,6 +20,7 @@ export default function Checkout() {
     const [selectedAddressId, setSelectedAddressId] = useState(null);
     const [order, setOrder] = useState(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [banking, setBanking] = useState(null);
   
     useEffect(() => {
       const loadData = async () => {
@@ -75,14 +76,16 @@ export default function Checkout() {
         setShowConfirmModal(false);
         return;
       }
+
       if (cartItems.length === 0) {
         toast.error('Giỏ hàng trống, vui lòng thêm sản phẩm');
         setShowConfirmModal(false);
         return;
       }
-  
+
       try {
-        const orderCreateDTO = {
+        // Lưu tạm vào localStorage để dùng lại sau khi thanh toán thành công
+        const orderDraft = {
           subtotal: totalPrice,
           shippingFee,
           discountCode: shippingFee === 0 ? 'TECHSPHERE' : '',
@@ -90,7 +93,19 @@ export default function Checkout() {
           paymentMethod,
           userAddressId: selectedAddressId,
         };
-        const createdOrder = await createOrder(orderCreateDTO);
+
+        localStorage.setItem('pendingOrder', JSON.stringify(orderDraft));
+        localStorage.setItem('orderAddress',JSON.stringify(addresses));
+
+        console.log(paymentMethod);
+        console.log(banking);
+        if (paymentMethod === "BANKING" && banking === "VNPay") {
+          await handlePayment(totalPrice + shippingFee, orderDraft,"");
+          return; // Dừng lại, đợi xử lý sau khi redirect
+        }
+
+        // Với COD hoặc các phương thức không cần redirect
+        const createdOrder = await createOrder(orderDraft);
         setOrder(createdOrder);
         setShowConfirmModal(false);
         toast.success('Đơn hàng đã được tạo thành công');
@@ -107,6 +122,7 @@ export default function Checkout() {
         }
       }
     };
+
   
     if (isLoading) {
       return (
@@ -140,6 +156,8 @@ export default function Checkout() {
               selectedAddressId={selectedAddressId}
               setSelectedAddressId={setSelectedAddressId}
               onConfirm={handleConfirmCheckout}
+              setBanking={setBanking}
+              Banking={banking}
             />
           </div>
         </div>

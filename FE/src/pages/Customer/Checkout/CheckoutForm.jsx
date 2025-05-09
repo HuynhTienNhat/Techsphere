@@ -9,6 +9,8 @@ export default function CheckoutForm({
   selectedAddressId,
   setSelectedAddressId,
   onConfirm,
+  setBanking,
+  Banking
 }) {
   const [openAddressModal, setOpenAddressModal] = useState(false);
 
@@ -27,7 +29,10 @@ export default function CheckoutForm({
               type="radio"
               value="COD"
               checked={paymentMethod === 'COD'}
-              onChange={(e) => setPaymentMethod(e.target.value)}
+              onChange={(e) => {
+                setPaymentMethod(e.target.value);
+                setBanking(null);
+              }}
               className="text-violet-600 focus:ring-violet-600"
             />
             Thanh toán khi nhận hàng (COD)
@@ -37,11 +42,23 @@ export default function CheckoutForm({
               type="radio"
               value="BANKING"
               checked={paymentMethod === 'BANKING'}
-              onChange={(e) => setPaymentMethod(e.target.value)}
+              onChange={(e) => {
+                setPaymentMethod(e.target.value);
+                setBanking("VNPay");
+              }}
               className="text-violet-600 focus:ring-violet-600"
             />
             Chuyển khoản ngân hàng
           </label>
+          {(paymentMethod === 'BANKING')&&(
+            <div className="flex gap-2 ml-7">
+              <button className={`bg-gray-200 p-2 rounded-md h-9 w-28 border ${Banking === "VNPay" ? "border-red-100" : "border-transparent"}`} 
+                      style={{backgroundImage: "url('https://cdn.brandfetch.io/idV02t6WJs/theme/dark/logo.svg?c=1dxbfHSJFAPEGdCLU4o5B')"}}
+                      onClick={()=>{setBanking("VNPay");}}>
+
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
