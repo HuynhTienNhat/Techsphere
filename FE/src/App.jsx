@@ -22,6 +22,7 @@ import Profile from './pages/Customer/Profile/Profile.jsx';
 import OrdersManagement from './pages/Admin/Orders/Orders.jsx';
 import GeneralInformation from './pages/Customer/About/GeneralInformation.jsx';
 import PaymentSuccess from './pages/Customer/Checkout/PaymentSuccess.jsx';
+import PaymentFailed from './pages/Customer/Checkout/PaymentFailed.jsx/index.js';
 
 function AppContent() {
   const location = useLocation();
@@ -148,6 +149,15 @@ function AppContent() {
           element={
             <CustomerLayout>
               <PaymentSuccess />
+            </CustomerLayout>
+          }
+        />
+
+        <Route
+          path="/payment-failed"
+          element={
+            <CustomerLayout>
+              <PaymentFailed />
             </CustomerLayout>
           }
         />
