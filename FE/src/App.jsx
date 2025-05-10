@@ -22,7 +22,7 @@ import Profile from './pages/Customer/Profile/Profile.jsx';
 import OrdersManagement from './pages/Admin/Orders/Orders.jsx';
 import GeneralInformation from './pages/Customer/About/GeneralInformation.jsx';
 import PaymentSuccess from './pages/Customer/Checkout/PaymentSuccess.jsx';
-import PaymentFailed from './pages/Customer/Checkout/PaymentFailed.jsx/index.js';
+import PaymentFailed from './pages/Customer/Checkout/PaymentFailed.jsx';
 
 function AppContent() {
   const location = useLocation();
