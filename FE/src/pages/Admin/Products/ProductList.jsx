@@ -32,7 +32,7 @@ export default function ProductList({ products, onEdit, onDelete }) {
       ) : (
         <Grid container spacing={2} sx={{ justifyContent: "space-between" }}>
           {products.map((product) => (
-            <Grid item key={product.productId} sx={{ width: "calc(50% - 16px)" }}>
+            <Grid item key={product.productId} sx={{ width: "100%" }}>
               <Card
                 elevation={1}
                 sx={{

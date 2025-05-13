@@ -41,41 +41,41 @@ const OrderList = ({ orders, onViewDetails }) => {
   };
 
   return (
-    <Grid container spacing={2}>
-      {orders.length === 0 ? (
-        <Grid item xs={12}>
-          <Typography>Không có đơn hàng nào.</Typography>
-        </Grid>
-      ) : (
-        orders.map((order) => (
-          <Grid item xs={12} md={6} key={order.orderId}>
-            <Card>
-              <CardContent>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                  <Typography variant="h6">Đơn hàng #{order.orderId}</Typography>
-                  <Chip
-                    label={getStatusLabel(order.status)}
-                    color={getStatusColor(order.status)}
-                    size="small"
-                  />
+    <Grid container spacing={2}> 
+    {orders.length === 0 ? ( 
+      <Grid item xs={12}> 
+        <Typography>Không có đơn hàng nào.</Typography> 
+      </Grid> 
+    ) : ( 
+      orders.map((order) => ( 
+        <Grid item xs={12} md={6} key={order.orderId} sx={{ width: '100%' }}> 
+          <Card>
+            <CardContent> 
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 1 }}> 
+                <Typography variant="h6">Đơn hàng #{order.orderId}</Typography>
+                <Chip label={getStatusLabel(order.status)} color={getStatusColor(order.status)} size="small" /> 
+              </Box> 
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 1 }}>
+                <Box>
+                  <Typography>Ngày đặt: {formatDate(order.orderDate)}</Typography> 
+                  <Typography>Tổng tiền: {formatCurrency(order.totalAmount)}</Typography> 
+                  <Typography>Phương thức thanh toán: {order.paymentMethod}</Typography>
                 </Box>
-                <Typography>Ngày đặt: {formatDate(order.orderDate)}</Typography>
-                <Typography>Tổng tiền: {formatCurrency(order.totalAmount)}</Typography>
-                <Typography>Phương thức thanh toán: {order.paymentMethod}</Typography>
-                <Button
-                  variant="contained"
-                  color="primary"
+                <Button 
+                  variant="contained" 
+                  color="primary" 
                   onClick={() => onViewDetails(order)}
-                  sx={{ mt: 2 }}
-                >
-                  Chi tiết
+                  sx={{ alignSelf: 'center', height: 'fit-content' }}
+                > 
+                  Chi tiết 
                 </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))
-      )}
-    </Grid>
+              </Box>
+            </CardContent> 
+          </Card> 
+        </Grid> 
+      ))
+    )} 
+  </Grid>
   );
 };
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container, Typography, Tabs, Tab, TextField,
+  Container, Typography, Tabs, Tab, TextField, Pagination,
   Button, Box
 } from '@mui/material';
 import OrderList from './OrderList';
@@ -20,6 +20,9 @@ const Orders = () => {
   const [year, setYear] = useState(null);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const ordersPerPage = 5;
 
   const tabs = [
     { name: 'Tất cả', value: 'ALL' },
@@ -41,6 +44,11 @@ const Orders = () => {
       } else {
         data = await getAllOrders();
       }
+      setTotalPages(Math.ceil(data.length / ordersPerPage));
+      if (page > totalPages) {
+        setPage(1);
+      }
+
       setOrders(data);
     } catch (error) {
       toast.error(error.message || 'Đã có lỗi xảy ra');
@@ -53,6 +61,10 @@ const Orders = () => {
     fetchOrders();
   }, [activeTab]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [activeTab]);
+
   const handleTabChange = (_, newValue) => {
     setActiveTab(newValue);
     setMonth(null);
@@ -61,6 +73,7 @@ const Orders = () => {
 
   const handleFilterByDate = () => {
     if (month && year) {
+      setPage(1);
       fetchOrders();
     } else {
       toast.error("Vui lòng nhập cả tháng và năm!");
@@ -70,6 +83,7 @@ const Orders = () => {
   const handleClearFilter = () => {
     setMonth(null);
     setYear(null);
+    setPage(1);
     fetchOrders();
   };
 
@@ -91,6 +105,16 @@ const Orders = () => {
     );
     handleCloseModal();
   };
+
+  const handlePageChange = (event, newPage) => {
+    setPage(newPage);
+  }
+
+  const getCurrentOrders = () => {
+    const startIndex = (page - 1) * ordersPerPage;
+    const endIndex = startIndex + ordersPerPage;
+    return orders.slice(startIndex, endIndex);
+  }
 
   return (
     <Container sx={{ py: 4 }}>
@@ -142,7 +166,26 @@ const Orders = () => {
       {isLoading ? (
         <Typography>Đang tải...</Typography>
       ) : (
-        <OrderList orders={orders} onViewDetails={handleOpenModal} />
+        <>
+        <OrderList orders={getCurrentOrders()} onViewDetails={handleOpenModal} />
+        {/* Phân trang */}
+        {orders.length > 0 && (
+          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 3 }}>
+            <Pagination
+              count={totalPages}
+              page={page}
+              onChange={handlePageChange}
+              color="primary"
+            />
+          </Box>
+        )}
+
+        {orders.length === 0 && (
+          <Typography variant="body1" color="text.secondary" sx={{ textAlign: "center", p: 6 }}>
+            Không có đơn hàng nào.
+          </Typography>
+        )}
+        </>
       )}
 
       {/* Modal chi tiết */}
