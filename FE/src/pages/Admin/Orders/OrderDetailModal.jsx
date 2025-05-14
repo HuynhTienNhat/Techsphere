@@ -100,6 +100,18 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
     return statusMap[status] || status;
   };
 
+  // Xác định trạng thái hợp lệ tiếp theo
+  const getNextValidStatuses = (currentStatus) => {
+    const statusOrder = ['CONFIRMING', 'PREPARING', 'DELIVERING', 'COMPLETED', 'CANCELLED'];
+    const currentIndex = statusOrder.indexOf(currentStatus);
+    if (currentIndex === -1) return [];
+
+    // Chỉ hiển thị các trạng thái tiếp theo
+    return statusOrder.slice(currentIndex + 1);
+  };
+
+  const nextStatuses = getNextValidStatuses(order.status);
+
   return (
     <Modal open={true} onClose={onClose}>
       <Box
@@ -128,7 +140,7 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
           <Typography><strong>Ngày đặt:</strong> {formatDate(order.orderDate)}</Typography>
           <Typography><strong>Tổng tiền:</strong> {formatCurrency(order.totalAmount)}</Typography>
           <Typography><strong>Phương thức thanh toán:</strong> {order.paymentMethod}</Typography>
-          <Typography><strong>Trạng thái:</strong> {getStatusLabel(order.status)}</Typography>
+          <Typography><strong>Trạng thái:</strong> <p style={{color:"Green", fontWeight:600 ,display:"inline-block"}}>{getStatusLabel(order.status)}</p></Typography>
         </Box>
 
         {/* Thông tin người đặt */}
@@ -173,7 +185,7 @@ const OrderDetailModal = ({ order, onClose, onUpdate }) => {
               fullWidth
               sx={{ mb: 2 }}
             >
-              {orderStatuses.map((s) => (
+              {nextStatuses.map((s) => (
                 <MenuItem key={s} value={s}>
                   {getStatusLabel(s)}
                 </MenuItem>

@@ -30,75 +30,112 @@ export default function ProductList({ products, onEdit, onDelete }) {
           Không có sản phẩm nào.
         </Typography>
       ) : (
-        <Grid container spacing={2} sx={{ justifyContent: "space-between" }}>
+        <div>
+          {/* Header - Table title row */}
+          <Box 
+            sx={{ 
+              display: 'flex',
+              borderBottom: '1px solid #e0e0e0',
+              py: 1.5,
+              alignItems: 'center',
+            }}
+          >
+            <Box sx={{ width: '90px', pl: 2 }}>
+              <Typography variant="subtitle2">Hình ảnh</Typography>
+            </Box>
+            <Box sx={{ flex: 1 }}>
+              <Typography variant="subtitle2">Tên sản phẩm</Typography>
+            </Box>
+            <Box sx={{ width: '200px', textAlign: 'right', pr: 6 }}>
+              <Typography variant="subtitle2">Giá</Typography>
+            </Box>
+            <Box sx={{ width: '100px', textAlign: 'center' }}>
+              <Typography variant="subtitle2">Số lượng</Typography>
+            </Box>
+            <Box sx={{ width: '220px', textAlign: 'center' }}>
+              <Typography variant="subtitle2">Tác vụ</Typography>
+            </Box>
+          </Box>
+
+          {/* Product rows */}
           {products.map((product) => (
-            <Grid item key={product.productId} sx={{ width: "100%" }}>
-              <Card
-                elevation={1}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  p: 2,
-                  "&:hover": { bgcolor: "rgba(0, 0, 0, 0.04)" },
-                  minHeight: "120px", // Đặt chiều cao tối thiểu để đảm bảo đồng đều
-                }}
-              >
-                <CardMedia
-                  component="img"
-                  image={getMainImageUrl(product)}
+            <Box 
+              key={product.productId} 
+              sx={{ 
+                display: 'flex',
+                alignItems: 'center',
+                borderBottom: '1px solid #e0e0e0',
+                py: 1.5,
+                '&:hover': { bgcolor: 'rgba(0, 0, 0, 0.04)' },
+              }}
+            >
+              <Box sx={{ width: '90px', pl: 2 }}>
+                <img 
+                  src={getMainImageUrl(product)} 
                   alt={product.name}
-                  sx={{ width: 80, height: 80, objectFit: "contain", flexShrink: 0 }}
+                  style={{ 
+                    width: 60, 
+                    height: 60, 
+                    objectFit: 'contain'
+                  }} 
                 />
-                <CardContent
-                  sx={{
-                    flex: 1,
-                    ml: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    overflow: "hidden", // Ngăn nội dung tràn
+              </Box>
+              <Box sx={{ flex: 1 }}>
+                <Typography 
+                  variant="body2" 
+                  sx={{ 
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontWeight: 500,
                   }}
                 >
-                  <Typography
-                    variant="h6"
-                    fontWeight="semibold"
-                    sx={{
-                      whiteSpace: "nowrap",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis", // Cắt ngắn tên nếu quá dài
-                    }}
-                  >
-                    {product.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.primary">
-                    {product.basePrice.toLocaleString("vi-VN")} VND
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Tổng số lượng: {getTotalStock(product)}
-                  </Typography>
-                </CardContent>
-                <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mr: 1, flexShrink: 0 }}>
-                  <Button
-                    variant="contained"
-                    color="info"
-                    onClick={() => onEdit(product)}
-                    sx={{ minWidth: "80px", background:"#8b5cf6", "&:hover":{backgroundColor:"#7c3aed"} }} // Đặt chiều rộng cố định cho button
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => onDelete(product.productId)}
-                    sx={{ minWidth: "80px", background:"#ef4444","&:hover": { bgcolor: "#dc2626" } }} // Đặt chiều rộng cố định cho button
-                  >
-                    Delete
-                  </Button>
-                </Box>
-              </Card>
-            </Grid>
+                  {product.name}
+                </Typography>
+              </Box>
+              <Box sx={{ width: '200px', textAlign: 'right' }}>
+                <Typography variant="body2">
+                  {product.basePrice.toLocaleString("vi-VN")} VND
+                </Typography>
+              </Box>
+              <Box sx={{ width: '100px', textAlign: 'center' }}>
+                <Typography variant="body2">
+                  {getTotalStock(product)}
+                </Typography>
+              </Box>
+              <Box sx={{ width: '220px', textAlign: 'right', pr: 2, display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="info"
+                  onClick={() => onEdit(product)}
+                  sx={{ 
+                    background: "#8b5cf6", 
+                    "&:hover": { backgroundColor: "#7c3aed" },
+                    minWidth: '80px',
+                    borderRadius: 1
+                  }}
+                >
+                  EDIT
+                </Button>
+                <Button
+                  size="small"
+                  variant="contained"
+                  color="error"
+                  onClick={() => onDelete(product.productId)}
+                  sx={{ 
+                    background: "#ef4444", 
+                    "&:hover": { bgcolor: "#dc2626" },
+                    minWidth: '80px',
+                    borderRadius: 1
+                  }}
+                >
+                  DELETE
+                </Button>
+              </Box>
+            </Box>
           ))}
-        </Grid>
+        </div>
       )}
     </Box>
   );

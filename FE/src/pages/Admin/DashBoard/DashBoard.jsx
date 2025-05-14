@@ -37,7 +37,6 @@ export default function AdminDashboard() {
   const loadYears = async () => {
     try {
       const data = await getYears();
-      console.log('Years data:', data);
       if (data) {
         setYears(data);
         setYear(data.at(0));
@@ -87,10 +86,10 @@ export default function AdminDashboard() {
     }).format(number);
   // Số liệu mẫu để hiển thị
   const stats = [
-    { title: "Tổng doanh thu theo năm", value: formatCurrency(dashboardData?.totalRevenue), icon: <AttachMoney color="primary" fontSize="large" />, color: "#e3f2fd" },
-    { title: "Đơn hàng mới", value: dashboardData?.newOrders, icon: <TrendingUp color="success" fontSize="large" />, color: "#e8f5e9" },
-    { title: "Khách hàng", value: dashboardData?.customers, icon: <People color="info" fontSize="large" />, color: "#e0f7fa" },
-    { title: "Sản phẩm", value: dashboardData?.products, icon: <Inventory color="warning" fontSize="large" />, color: "#fff8e1" },
+    { title: "Tổng doanh thu theo năm", value: formatCurrency(dashboardData?.totalRevenue), icon: <AttachMoney sx={{marginLeft:1}} color="primary" fontSize="large" />, color: "#e3f2fd" },
+    { title: "Đơn hàng mới", value: dashboardData?.newOrders, icon: <TrendingUp color="success" fontSize="large" sx={{marginLeft:1}}/>, color: "#e8f5e9" },
+    { title: "Khách hàng", value: dashboardData?.customers, icon: <People color="info" fontSize="large" sx={{marginLeft:1}}/>, color: "#e0f7fa" },
+    { title: "Sản phẩm bán ra", value: dashboardData?.products, icon: <Inventory color="warning" fontSize="large" sx={{marginLeft:1}}/>, color: "#fff8e1" },
   ];
 
   return (
