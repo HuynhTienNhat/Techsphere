@@ -19,8 +19,9 @@ const OrderList = ({ orders, onViewDetails }) => {
   const getStatusLabel = (status) => {
     const statusMap = {
       CONFIRMING: 'Chờ xác nhận',
+      PREPARING: 'Đang chuẩn bị',
       CONFIRMED: 'Đã xác nhận',
-      DELIVERING: 'Đang giao',
+      DELIVERING: 'Đang giao hàng',
       COMPLETED: 'Hoàn thành',
       CANCELLED: 'Đã hủy',
     };
