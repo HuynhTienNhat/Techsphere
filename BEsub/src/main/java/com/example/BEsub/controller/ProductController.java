@@ -171,4 +171,9 @@ public class ProductController {
     public ResponseEntity<List<ProductDTO>> getTop6BestSellingProducts() {
         return ResponseEntity.ok(productService.getTop6BestSellingProducts());
     }
+
+    @GetMapping("/top-6-new-products")
+    public ResponseEntity<List<ProductDTO>> getTop6NewProducts() {
+        return ResponseEntity.ok(productService.getTop6NewProducts());
+    }
 }

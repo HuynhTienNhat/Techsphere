@@ -104,6 +104,10 @@ export default function Header() {
     }
   };
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, [location.pathname]);
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("role");
@@ -138,7 +142,7 @@ export default function Header() {
   };
 
   return (
-    <header className="px-30 py-4 dark:bg-gray-100 dark:text-gray-800">
+    <header className="px-30 sticky top-0 z-2 py-4 dark:bg-gray-100 dark:text-gray-800">
       <div className="container flex justify-between h-16 items-center">
         <ul className="items-stretch hidden space-x-3 lg:flex">
           <li className="flex">

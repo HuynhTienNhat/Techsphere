@@ -29,6 +29,12 @@ function AppContent() {
   const [role, setRole] = useState(localStorage.getItem('role'));
 
   useEffect(() => {
+    if ("scrollRestoration" in window.history) {
+      window.history.scrollRestoration = "manual"; // Tắt tự động khôi phục vị trí cuộn
+    }
+  }, []);
+
+  useEffect(() => {
     const handleTokenChange = () => {
       setRole(localStorage.getItem('role'));
     };

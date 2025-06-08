@@ -346,6 +346,13 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<ProductDTO> getTop6NewProducts() {
+        return productRepository.findTop6ByOrderByCreatedAtDesc().stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     private void mapToEntity(ProductUpdateDTO dto, Product product) {
         if (dto.getName() == null || dto.getName().isBlank()) {
             throw new AppException("Product name cannot be null or blank");

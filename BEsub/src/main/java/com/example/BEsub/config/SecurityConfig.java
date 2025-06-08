@@ -46,6 +46,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/products/sort").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/by-brand").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/products/top-6-best-selling").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/products/top-6-new-products").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/brand/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/users/reset-password").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/users/password").hasRole("CUSTOMER")

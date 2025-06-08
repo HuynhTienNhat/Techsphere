@@ -12,8 +12,9 @@ import {
   Box,
   Typography,
   Pagination,
-  InputAdornment,
+  IconButton,
 } from "@mui/material";
+import ClearIcon from '@mui/icons-material/Clear';
 import { toast } from "react-toastify";
 
 export default function Products() {
@@ -123,6 +124,20 @@ export default function Products() {
             onKeyDown={handleSearch}
             size="small"
             sx={{ maxWidth: 300 }}
+            slotProps={{
+              input: {
+                endAdornment: search && (
+                  <IconButton
+                    size="small"
+                    onClick={handleClearSearch}
+                    aria-label="clear search"
+                    edge="end"
+                  >
+                    <ClearIcon fontSize="small" />
+                  </IconButton>
+                ),
+              },
+            }}
           />
           <Select
             value={filterBrand}

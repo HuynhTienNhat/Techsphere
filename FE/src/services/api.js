@@ -481,6 +481,15 @@ export const getTop6BestSellingProducts = async() =>{
   }
 }
 
+export const getTop6NewProducts = async() =>{
+  try{
+    const res = await commonApi.get("/products/top-6-new-products")
+    return res.data
+  } catch(error){
+    throw new Error(error.message) 
+  }
+}
+
 export const getRatingInformation = async (productId) => {
   try{
     const response = await commonApi.get(`/products/reviews/${productId}/rating`);

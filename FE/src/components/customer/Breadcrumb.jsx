@@ -6,7 +6,7 @@ export default function BreadCrumb() {
 
     if (paths.length===0) return null;
     return (
-        <div className="px-34 py-3 text-gray-600 text-sm shadow-md">
+        <div className="px-34 py-3 top-24 sticky z-2 text-gray-600 bg-white text-sm shadow-md">
             <ul className="flex space-x-2">
                 <li>
                     <Link to="/" className="hover:underline">Home</Link>
