@@ -21,7 +21,6 @@ const ProductDetail = () => {
         
         if (!response.ok) throw new Error('Product not found');
         const data = await response.json();
-        console.log(data)
         setProduct(data);
         setLoading(false);
       } catch (error) {

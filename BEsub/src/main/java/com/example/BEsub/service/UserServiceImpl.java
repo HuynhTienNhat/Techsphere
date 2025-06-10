@@ -247,9 +247,7 @@ public class UserServiceImpl implements UserService {
         // Đặt địa chỉ được chọn thành mặc định
         UserAddress defaultAddress = addressRepository.findById(addressId)
                 .orElseThrow(() -> new AppException("Address not found"));
-        if (!defaultAddress.getUser().getId().equals(userId)) {
-            throw new AppException("Address does not belong to this user");
-        }
+
         defaultAddress.setIsDefault(true);
         addressRepository.save(defaultAddress);
     }
@@ -262,9 +260,6 @@ public class UserServiceImpl implements UserService {
         UserAddress address = addressRepository.findById(addressId)
                 .orElseThrow(() -> new AppException("Address not found"));
 
-        if (!address.getUser().getId().equals(userId)) {
-            throw new AppException("Address does not belong to this user");
-        }
         if (address.getIsDefault()) {
             throw new AppException("Cannot delete default address!");
         }

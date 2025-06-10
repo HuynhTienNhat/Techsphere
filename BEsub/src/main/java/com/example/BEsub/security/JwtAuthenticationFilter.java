@@ -1,6 +1,7 @@
 package com.example.BEsub.security;
 
 import io.jsonwebtoken.Claims;
+import io.micrometer.common.lang.NonNullApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -29,9 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
-        System.out.println("Request URI: " + request.getRequestURI());
         String header = request.getHeader("Authorization");
-        System.out.println("Authorization header: " + header);
         String token = null;
         String username = null;
 
@@ -42,7 +41,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtUtil.validateToken(token)) {
-
                 // Lấy role từ token
                 Claims claims = jwtUtil.getClaimsFromToken(token);
                 String role = claims.get("role", String.class);

@@ -103,7 +103,7 @@ export default function Orders() {
   
     // Gọi khi component mount hoặc khi tab thay đổi
     useEffect(() => {
-      fetchOrders(activeTab); // Chỉ gọi khi activeTab thay đổi
+      fetchOrders(activeTab); 
     }, [activeTab]);
   
     // Xử lý hủy đơn hàng
@@ -126,7 +126,6 @@ export default function Orders() {
         setSelectedOrder(order);
         if (order.userAddressId) {
           const address = await getAddressById(order.userAddressId);
-          console.log(address);
           
           setSelectedAddress(address);
         } else {

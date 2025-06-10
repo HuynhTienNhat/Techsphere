@@ -35,7 +35,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleAppException(AppException ex) {
         Map<String, String> error = new HashMap<>();
         error.put("error", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error); // Hoặc HttpStatus.UNAUTHORIZED nếu phù hợp
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 
     // (Tùy chọn) Xử lý ngoại lệ chung

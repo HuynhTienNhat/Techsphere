@@ -1,5 +1,5 @@
 // src/components/ProductDetail/ProductVariants.jsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 const ProductVariants = ({ variants, onVariantChange }) => {
   // Check if variants don't exist or are empty

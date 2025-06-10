@@ -20,11 +20,6 @@ const ProductPrice = ({ basePrice, oldPrice, selectedVariant, product }) => {
       return;
     }
 
-    if (product?.isOutOfStock) {
-      toast.error('Sản phẩm hiện đã hết hàng');
-      return;
-    }
-
     try {
       await addToCart(selectedVariant.variantId, 1);
       toast.success('Đã thêm thành công');
